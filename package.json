@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "axios": "0.16.2",
+    "balanced-match": "^3.0.1",
     "history": "^4.10.1",
     "moment": "^2.19.1",
     "react": "^16.0.0",
