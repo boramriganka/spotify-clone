@@ -30,7 +30,7 @@
     "build-css": "sass src:src --no-source-map",
     "watch-css": "sass src:src --watch --no-source-map",
     "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider PORT=3008 react-scripts start",
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+    "build": "react-scripts build",
     "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
