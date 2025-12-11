@@ -44,7 +44,7 @@ class Favourite extends Component {
         this.setState({items: updatedList});
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.setState({items: store.getState().search.favourite})
     }
 
