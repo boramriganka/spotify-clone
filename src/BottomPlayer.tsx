@@ -21,18 +21,21 @@ const BottomPlayer: React.FC = () => {
   } = usePlayer();
 
   // Handle audio playback and track changes
+  const currentTrackId = playerState.currentTrack?.id;
+  const currentTrackPreviewUrl = playerState.currentTrack?.previewUrl;
+
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (playerState.currentTrack?.previewUrl) {
-      audio.src = playerState.currentTrack.previewUrl;
+    if (currentTrackPreviewUrl) {
+      audio.src = currentTrackPreviewUrl;
       audio.currentTime = 0;
       if (playerState.isPlaying) {
         audio.play().catch(err => console.error('Error playing audio:', err));
       }
     }
-  }, [playerState.currentTrack?.id, playerState.currentTrack?.previewUrl]);
+  }, [currentTrackId, currentTrackPreviewUrl, playerState.isPlaying]);
 
   useEffect(() => {
     const audio = audioRef.current;

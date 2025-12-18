@@ -18,7 +18,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
   const [loading, setLoading] = useState(true);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(propSelectedPlaylist || null);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-  const { playTrack } = usePlayer();
+  usePlayer();
 
   // Update selectedPlaylist when prop changes
   React.useEffect(() => {
@@ -748,7 +748,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
                   fontWeight: '600',
                   marginBottom: '12px',
                 }}>
-                  🎵 Full-Featured Player
+                  <span role="img" aria-label="musical note">🎵</span> Full-Featured Player
                 </h4>
                 <p style={{
                   color: '#B3B3B3',
@@ -772,7 +772,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
                     fontWeight: '600',
                     marginBottom: '6px',
                   }}>
-                    ⚠️ Track Duration Note
+                    <span role="img" aria-label="warning">⚠️</span> Track Duration Note
                   </p>
                   <p style={{
                     color: '#B3B3B3',

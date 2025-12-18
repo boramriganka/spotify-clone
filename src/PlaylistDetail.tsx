@@ -1,6 +1,6 @@
 import React from 'react';
 import { HiChevronLeft } from 'react-icons/hi2';
-import { FaPlay, FaPause, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaPlay, FaHeart, FaRegHeart } from 'react-icons/fa';
 import { Playlist, Track } from './api';
 import { usePlayer } from './PlayerContext';
 import { connect } from 'react-redux';
@@ -22,7 +22,7 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
   addToFavourite,
   removeFavourite,
 }) => {
-  const { playerState, playTrack, togglePlayPause } = usePlayer();
+  const { playerState, playTrack } = usePlayer();
 
   if (!playlist) return null;
 
