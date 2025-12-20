@@ -1,5 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { HiOutlineHeart } from 'react-icons/hi2';
+import React, { useRef, useEffect } from 'react';
 import { FiShuffle } from 'react-icons/fi';
 import { MdSkipPrevious, MdSkipNext, MdRepeat, MdRepeatOne } from 'react-icons/md';
 import { FaPlay, FaPause, FaHeart, FaRegHeart } from 'react-icons/fa';
