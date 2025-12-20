@@ -6,6 +6,7 @@ import { getQuickLinks, getMadeForYou, Playlist } from './api';
 import { usePlayer } from './PlayerContext';
 import SkeletonLoader from './SkeletonLoader';
 import PlaylistDetail from './PlaylistDetail';
+import './Home.css';
 
 interface HomeProps {
   selectedPlaylist?: Playlist | null;
@@ -84,7 +85,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
   }
 
   return (
-    <div style={{
+    <div className="home-container" style={{
       flex: 1,
       height: '100vh',
       backgroundColor: '#121212',
@@ -106,7 +107,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
       }} />
 
       {/* Top Bar - Sticky */}
-      <div style={{
+      <div className="home-top-bar" style={{
         position: 'sticky',
         top: 0,
         zIndex: 10,
@@ -117,7 +118,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
         backgroundColor: 'rgba(18, 18, 18, 0.8)',
         backdropFilter: 'blur(10px)',
       }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="home-nav-buttons" style={{ display: 'flex', gap: '8px' }}>
           <button
             style={{
               width: '32px',
@@ -197,7 +198,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
         zIndex: 1,
       }}>
         {/* Greeting */}
-        <h1 style={{
+        <h1 className="home-greeting" style={{
           fontSize: '32px',
           fontWeight: '700',
           color: '#FFFFFF',
@@ -248,7 +249,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
         ) : (
           <>
             {/* Quick Links Grid */}
-            <div style={{
+            <div className="home-quick-links" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(2, 1fr)',
               gap: '12px',
@@ -339,7 +340,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
         </div>
 
         {/* Made For You Section */}
-        <div style={{ marginBottom: '32px' }}>
+        <div className="home-made-for-you" style={{ marginBottom: '32px' }}>
           <h2 style={{
             fontSize: '24px',
             fontWeight: '700',
@@ -358,6 +359,7 @@ const Home: React.FC<HomeProps> = ({ selectedPlaylist: propSelectedPlaylist, onP
             {madeForYou.map((playlist) => (
               <div
                 key={playlist.id}
+                className="home-card"
                 style={{
                   minWidth: '180px',
                   padding: '16px',

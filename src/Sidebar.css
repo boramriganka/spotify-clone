@@ -1,0 +1,23 @@
+/* Sidebar Container */
+.sidebar-container {
+  width: 240px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background-color: #000000;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .sidebar-container {
+    width: 280px;
+    max-width: 85vw;
+    padding: 16px 12px;
+    padding-top: 16px; /* Normal padding, close button is positioned separately */
+  }
+}
+

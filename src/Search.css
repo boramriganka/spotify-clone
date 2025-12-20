@@ -1,0 +1,65 @@
+/* Search Component Mobile Styles */
+@media (max-width: 768px) {
+  .search-container {
+    padding: 16px !important;
+  }
+
+  .search-header {
+    padding: 16px !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #121212;
+  }
+
+  .search-input {
+    font-size: 14px !important;
+    padding: 10px 14px 10px 44px !important;
+  }
+
+  .search-categories {
+    gap: 6px !important;
+    flex-wrap: wrap;
+  }
+
+  .search-category-button {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .search-results {
+    padding: 0 16px 16px !important;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .search-card {
+    padding: 12px !important;
+  }
+
+  .search-card img {
+    margin-bottom: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    padding: 12px !important;
+  }
+
+  .search-header {
+    padding: 12px !important;
+  }
+
+  .search-results {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 12px !important;
+    padding: 0 12px 12px !important;
+  }
+
+  .search-category-button {
+    padding: 4px 10px !important;
+    font-size: 11px !important;
+  }
+}
+

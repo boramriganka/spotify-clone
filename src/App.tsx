@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import { HiBars3 } from 'react-icons/hi2';
+import { HiX } from 'react-icons/hi';
 import Sidebar from './Sidebar';
 import Home from './Home';
 import Search from './Search';
@@ -7,6 +9,7 @@ import Favourites from './Favourites';
 import BottomPlayer from './BottomPlayer';
 import { PlayerProvider } from './PlayerContext';
 import { getQuickLinks, Playlist } from './api';
+import './App.css';
 
 interface AppProps {
   userPlaylists: any[];
@@ -17,12 +20,17 @@ const App: React.FC<AppProps> = ({ userPlaylists }) => {
   const [libraryFilter, setLibraryFilter] = useState<'playlists' | 'artists' | 'albums'>('playlists');
   const [sidebarPlaylists, setSidebarPlaylists] = useState<Playlist[]>([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleViewChange = (view: string) => {
     setActiveView(view);
     // Clear selected playlist when switching views (except when going to home with a playlist selected)
     if (view !== 'home') {
       setSelectedPlaylist(null);
+    }
+    // Close sidebar on mobile after navigation
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
     }
   };
 
@@ -67,30 +75,46 @@ const App: React.FC<AppProps> = ({ userPlaylists }) => {
 
   return (
     <PlayerProvider>
-      <div style={{
-        display: 'flex',
-        height: '100vh',
-        backgroundColor: '#000000',
-        gap: '8px',
-        padding: '8px',
-        paddingBottom: '98px', // Space for bottom player
-      }}>
-        <Sidebar
-          activeView={activeView}
-          onViewChange={handleViewChange}
-          libraryFilter={libraryFilter}
-          onLibraryFilterChange={setLibraryFilter}
-          playlists={sidebarPlaylists}
-          userPlaylists={userPlaylists}
-          onPlaylistSelect={(playlist) => {
-            setSelectedPlaylist(playlist);
-            setActiveView('home');
-          }}
-        />
+      <div className="app-container">
+        {/* Mobile Hamburger Menu */}
+        <button
+          className={`mobile-menu-button ${sidebarOpen ? 'sidebar-open' : ''}`}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label="Toggle menu"
+        >
+          {sidebarOpen ? <HiX size={24} /> : <HiBars3 size={24} />}
+        </button>
+
+        {/* Mobile Overlay */}
+        {sidebarOpen && (
+          <div
+            className="mobile-overlay"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <div className={`sidebar-wrapper ${sidebarOpen ? 'sidebar-open' : ''}`}>
+          <Sidebar
+            activeView={activeView}
+            onViewChange={handleViewChange}
+            libraryFilter={libraryFilter}
+            onLibraryFilterChange={setLibraryFilter}
+            playlists={sidebarPlaylists}
+            userPlaylists={userPlaylists}
+            onPlaylistSelect={(playlist) => {
+              setSelectedPlaylist(playlist);
+              setActiveView('home');
+            }}
+          />
+        </div>
         
-        {activeView === 'home' && <Home selectedPlaylist={selectedPlaylist} onPlaylistBack={() => setSelectedPlaylist(null)} />}
-        {activeView === 'search' && <Search />}
-        {activeView === 'library' && <Favourites />}
+        {/* Main Content */}
+        <div className="main-content">
+          {activeView === 'home' && <Home selectedPlaylist={selectedPlaylist} onPlaylistBack={() => setSelectedPlaylist(null)} />}
+          {activeView === 'search' && <Search />}
+          {activeView === 'library' && <Favourites />}
+        </div>
       </div>
       
       <BottomPlayer />

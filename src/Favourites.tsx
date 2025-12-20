@@ -6,6 +6,7 @@ import { FaPlay, FaHeart, FaList, FaTrash } from 'react-icons/fa';
 import { removeFavourite, deletePlaylist, removeFromPlaylist } from './modules/reducer';
 import { usePlayer } from './PlayerContext';
 import PlaylistModal from './PlaylistModal';
+import './Favourites.css';
 
 interface FavouritesProps {
   playlists: any[];
@@ -71,7 +72,7 @@ const Favourites: React.FC<FavouritesProps> = ({ playlists, removeFavourite, del
   };
 
   return (
-    <div style={{
+    <div className="favourites-container" style={{
       flex: 1,
       height: '100vh',
       backgroundColor: '#121212',
@@ -81,7 +82,7 @@ const Favourites: React.FC<FavouritesProps> = ({ playlists, removeFavourite, del
       flexDirection: 'column',
     }}>
       {/* Header */}
-      <div style={{
+      <div className="favourites-header" style={{
         padding: '24px 32px',
         position: 'sticky',
         top: 0,
@@ -158,6 +159,7 @@ const Favourites: React.FC<FavouritesProps> = ({ playlists, removeFavourite, del
           />
           <input
             type="text"
+            className="favourites-search-input"
             placeholder="Search your favourites"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -203,7 +205,7 @@ const Favourites: React.FC<FavouritesProps> = ({ playlists, removeFavourite, del
             </p>
           </div>
         ) : (
-          <div style={{
+          <div className="favourites-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
             gap: '24px',
@@ -211,6 +213,7 @@ const Favourites: React.FC<FavouritesProps> = ({ playlists, removeFavourite, del
             {filteredFavourites.map((item, index) => (
               <div
                 key={index}
+                className="favourites-card"
                 style={{
                   padding: '16px',
                   backgroundColor: '#1A1A1A',
@@ -343,7 +346,7 @@ const Favourites: React.FC<FavouritesProps> = ({ playlists, removeFavourite, del
               </p>
             </div>
           ) : (
-            <div style={{
+            <div className="favourites-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
               gap: '24px',
@@ -351,6 +354,7 @@ const Favourites: React.FC<FavouritesProps> = ({ playlists, removeFavourite, del
               {playlists.map((playlist) => (
                 <div
                   key={playlist.id}
+                  className="favourites-card"
                   style={{
                     padding: '16px',
                     backgroundColor: '#1A1A1A',
