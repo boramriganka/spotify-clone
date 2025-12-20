@@ -6,6 +6,7 @@ import { HiPlus } from 'react-icons/hi';
 import { HiChevronRight } from 'react-icons/hi2';
 import { Playlist } from './api';
 import CreatePlaylistModal from './CreatePlaylistModal';
+import './Sidebar.css';
 
 interface SidebarProps {
   activeView: string;
@@ -59,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, [playlists, userPlaylists]);
 
   return (
-    <div style={{
+    <div className="sidebar-container" style={{
       width: '240px',
       height: '100vh',
       display: 'flex',

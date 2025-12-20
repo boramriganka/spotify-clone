@@ -1,0 +1,36 @@
+/* Favourites Component Mobile Styles */
+@media (max-width: 768px) {
+  .favourites-container {
+    padding: 16px !important;
+  }
+
+  .favourites-header {
+    padding: 16px !important;
+  }
+
+  .favourites-search-input {
+    font-size: 14px !important;
+    padding: 10px 14px 10px 44px !important;
+  }
+
+  .favourites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 16px !important;
+  }
+
+  .favourites-card {
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .favourites-container {
+    padding: 12px !important;
+  }
+
+  .favourites-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)) !important;
+    gap: 12px !important;
+  }
+}
+

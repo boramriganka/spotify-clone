@@ -6,8 +6,8 @@ import { FaPlay, FaHeart, FaRegHeart, FaList } from 'react-icons/fa';
 import { search, addToFavourite, removeFavourite } from './modules/reducer';
 import { usePlayer } from './PlayerContext';
 import PlaylistModal from './PlaylistModal';
-
 import SkeletonLoader from './SkeletonLoader';
+import './Search.css';
 
 interface SearchProps {
   data: any[];
@@ -100,7 +100,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
   };
 
   return (
-    <div style={{
+    <div className="search-container" style={{
       flex: 1,
       height: '100vh',
       backgroundColor: '#121212',
@@ -110,7 +110,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
       flexDirection: 'column',
     }}>
       {/* Search Header */}
-      <div style={{
+      <div className="search-header" style={{
         padding: '24px 32px',
         position: 'sticky',
         top: 0,
@@ -133,6 +133,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
           />
           <input
             type="text"
+            className="search-input"
             placeholder="What do you want to listen to?"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -151,7 +152,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
         </div>
 
         {/* Category Filters */}
-        <div style={{
+        <div className="search-categories" style={{
           display: 'flex',
           gap: '8px',
           flexWrap: 'wrap',
@@ -159,6 +160,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
           {categories.map((category, index) => (
             <button
               key={index}
+              className="search-category-button"
               onClick={() => handleCategoryClick(index)}
               style={{
                 padding: '8px 16px',
@@ -190,7 +192,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
       </div>
 
       {/* Results */}
-      <div style={{
+      <div className="search-results" style={{
         flex: 1,
         overflowY: 'auto',
         padding: '0 32px 32px',
@@ -222,7 +224,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
             </p>
           </div>
         ) : (
-          <div style={{
+          <div className="search-results" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
             gap: '24px',
@@ -230,6 +232,7 @@ const Search: React.FC<SearchProps> = ({ data, playlists, loading, search, addTo
             {data.map((item, index) => (
               <div
                 key={index}
+                className="search-card"
                 style={{
                   padding: '16px',
                   backgroundColor: '#1A1A1A',

@@ -1,13 +1,23 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { HiOutlineHeart } from 'react-icons/hi2';
 import { FiShuffle } from 'react-icons/fi';
 import { MdSkipPrevious, MdSkipNext, MdRepeat, MdRepeatOne } from 'react-icons/md';
-import { FaPlay, FaPause } from 'react-icons/fa';
+import { FaPlay, FaPause, FaHeart, FaRegHeart } from 'react-icons/fa';
 import { HiMicrophone, HiDesktopComputer, HiVolumeUp } from 'react-icons/hi';
 import { MdQueueMusic } from 'react-icons/md';
 import { usePlayer } from './PlayerContext';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { addToFavourite, removeFavourite } from './modules/reducer';
+import './BottomPlayer.css';
 
-const BottomPlayer: React.FC = () => {
+interface BottomPlayerProps {
+  favourites: any[];
+  addToFavourite: (item: any) => void;
+  removeFavourite: (item: any) => void;
+}
+
+const BottomPlayer: React.FC<BottomPlayerProps> = ({ favourites, addToFavourite, removeFavourite }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const {
     playerState,
@@ -19,6 +29,34 @@ const BottomPlayer: React.FC = () => {
     nextTrack,
     previousTrack,
   } = usePlayer();
+
+  const isFavourite = (track: any) => {
+    if (!track) return false;
+    return favourites.some(fav => 
+      fav.trackId === track.id || 
+      fav.id === track.id ||
+      (fav.trackName === track.name && fav.artistName === track.artist)
+    );
+  };
+
+  const toggleFavourite = () => {
+    if (!playerState.currentTrack) return;
+    
+    const trackData = {
+      trackId: playerState.currentTrack.id,
+      trackName: playerState.currentTrack.name,
+      artistName: playerState.currentTrack.artist,
+      collectionName: playerState.currentTrack.album,
+      artworkUrl100: playerState.currentTrack.image,
+      previewUrl: playerState.currentTrack.previewUrl,
+    };
+
+    if (isFavourite(playerState.currentTrack)) {
+      removeFavourite(trackData);
+    } else {
+      addToFavourite(trackData);
+    }
+  };
 
   // Handle audio playback and track changes
   const currentTrackId = playerState.currentTrack?.id;
@@ -113,7 +151,7 @@ const BottomPlayer: React.FC = () => {
     : 0;
 
   return (
-    <div style={{
+    <div className="bottom-player" style={{
       position: 'fixed',
       bottom: 0,
       left: 0,
@@ -127,12 +165,13 @@ const BottomPlayer: React.FC = () => {
       zIndex: 1000,
     }}>
       {/* Left: Now Playing */}
-      <div style={{
+      <div className="player-left" style={{
         flex: '0 0 30%',
         display: 'flex',
         alignItems: 'center',
-        gap: '14px',
+        gap: '12px',
         minWidth: 0,
+        maxWidth: '30%',
       }}>
         {playerState.currentTrack ? (
           <>
@@ -146,7 +185,7 @@ const BottomPlayer: React.FC = () => {
                 objectFit: 'cover',
               }}
             />
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="player-track-info" style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
               <div style={{
                 color: '#FFFFFF',
                 fontSize: '14px',
@@ -155,6 +194,7 @@ const BottomPlayer: React.FC = () => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 marginBottom: '4px',
+                width: '100%',
               }}>
                 {playerState.currentTrack.name}
               </div>
@@ -164,25 +204,38 @@ const BottomPlayer: React.FC = () => {
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
+                width: '100%',
               }}>
                 {playerState.currentTrack.artist}
               </div>
             </div>
             <button
+              onClick={toggleFavourite}
               style={{
                 backgroundColor: 'transparent',
                 border: 'none',
-                color: '#B3B3B3',
+                color: isFavourite(playerState.currentTrack) ? '#1ED760' : '#B3B3B3',
                 cursor: 'pointer',
                 padding: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 transition: 'color 0.2s',
+                flexShrink: 0,
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#FFFFFF'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#B3B3B3'}
+              onMouseEnter={(e) => {
+                if (!isFavourite(playerState.currentTrack)) {
+                  e.currentTarget.style.color = '#FFFFFF';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = isFavourite(playerState.currentTrack) ? '#1ED760' : '#B3B3B3';
+              }}
             >
-              <HiOutlineHeart size={16} />
+              {isFavourite(playerState.currentTrack) ? (
+                <FaHeart size={16} />
+              ) : (
+                <FaRegHeart size={16} />
+              )}
             </button>
           </>
         ) : (
@@ -193,7 +246,7 @@ const BottomPlayer: React.FC = () => {
       </div>
 
       {/* Center: Controls */}
-      <div style={{
+      <div className="player-center" style={{
         flex: '1 1 40%',
         display: 'flex',
         flexDirection: 'column',
@@ -360,7 +413,7 @@ const BottomPlayer: React.FC = () => {
       </div>
 
       {/* Right: Volume & Other Controls */}
-      <div style={{
+      <div className="player-right" style={{
         flex: '0 0 30%',
         display: 'flex',
         alignItems: 'center',
@@ -455,4 +508,13 @@ const BottomPlayer: React.FC = () => {
   );
 };
 
-export default BottomPlayer;
+const mapStateToProps = (state: any) => ({
+  favourites: state.search?.favourite || [],
+});
+
+const mapDispatchToProps = (dispatch: any) => bindActionCreators({
+  addToFavourite,
+  removeFavourite,
+}, dispatch);
+
+export default connect(mapStateToProps, mapDispatchToProps)(BottomPlayer);

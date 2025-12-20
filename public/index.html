@@ -40,6 +40,18 @@
         overflow: hidden;
       }
 
+      /* Mobile Responsive Fixes */
+      @media (max-width: 768px) {
+        body {
+          overflow-x: hidden;
+          -webkit-overflow-scrolling: touch;
+        }
+        
+        html {
+          -webkit-text-size-adjust: 100%;
+        }
+      }
+
       /* Custom Webkit Scrollbar */
       ::-webkit-scrollbar {
         width: 12px;

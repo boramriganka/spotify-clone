@@ -6,6 +6,7 @@ import { usePlayer } from './PlayerContext';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { addToFavourite, removeFavourite } from './modules/reducer';
+import './PlaylistDetail.css';
 
 interface PlaylistDetailProps {
   playlist: Playlist | null;
@@ -61,13 +62,12 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
   };
 
   const formatDuration = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    // All tracks are 30-second previews from iTunes API
+    return '0:30';
   };
 
   return (
-    <div style={{
+    <div className="playlist-detail-container" style={{
       flex: 1,
       height: '100vh',
       backgroundColor: '#121212',
@@ -77,13 +77,14 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
       flexDirection: 'column',
     }}>
       {/* Header with back button */}
-      <div style={{
+      <div className="playlist-detail-header" style={{
         padding: '16px 32px',
         display: 'flex',
         alignItems: 'center',
         gap: '16px',
       }}>
         <button
+          className="playlist-back-button"
           onClick={onBack}
           style={{
             width: '32px',
@@ -106,7 +107,7 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
       </div>
 
       {/* Playlist Header */}
-      <div style={{
+      <div className="playlist-header-content" style={{
         padding: '0 32px 24px',
         display: 'flex',
         gap: '24px',
@@ -202,12 +203,12 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
       </div>
 
       {/* Songs List */}
-      <div style={{
+      <div className="playlist-songs-list" style={{
         flex: 1,
         overflowY: 'auto',
         padding: '0 32px 32px',
       }}>
-        <div style={{
+        <div className="playlist-songs-header" style={{
           borderBottom: '1px solid #333',
           paddingBottom: '8px',
           marginBottom: '8px',
@@ -223,14 +224,15 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
         }}>
           <div>#</div>
           <div>TITLE</div>
-          <div>ALBUM</div>
-          <div>DATE ADDED</div>
+          <div className="mobile-hide">ALBUM</div>
+          <div className="mobile-hide">DATE ADDED</div>
           <div style={{ textAlign: 'right' }}>DURATION</div>
           <div></div>
         </div>
         {playlist.tracks.map((track, index) => (
           <div
             key={track.id}
+            className="playlist-song-row"
             style={{
               display: 'grid',
               gridTemplateColumns: '16px 1fr 1fr 1fr 60px 40px',
@@ -290,7 +292,7 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
                 </div>
               </div>
             </div>
-            <div style={{
+            <div className="mobile-hide" style={{
               color: '#B3B3B3',
               fontSize: '14px',
               whiteSpace: 'nowrap',
@@ -299,7 +301,7 @@ const PlaylistDetail: React.FC<PlaylistDetailProps> = ({
             }}>
               {track.album}
             </div>
-            <div style={{
+            <div className="mobile-hide" style={{
               color: '#B3B3B3',
               fontSize: '14px',
             }}>

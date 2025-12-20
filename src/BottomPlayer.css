@@ -1,0 +1,167 @@
+/* Bottom Player */
+.bottom-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 90px;
+  background-color: #000000;
+  border-top: 1px solid #282828;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 1000;
+}
+
+/* Player text overflow fixes for desktop */
+.player-left {
+  min-width: 0;
+  overflow: hidden;
+  max-width: 30%;
+  padding-right: 8px;
+}
+
+.player-track-info {
+  min-width: 0;
+  max-width: calc(100% - 80px); /* Account for image (56px) and heart button (24px) */
+  overflow: hidden;
+  flex: 1;
+}
+
+.player-track-info > div {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Ensure proper spacing and alignment */
+.player-left img {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+}
+
+.player-left button {
+  flex-shrink: 0;
+  padding: 8px;
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .bottom-player {
+    height: auto !important;
+    min-height: 80px;
+    padding: 8px !important;
+    flex-wrap: wrap;
+    align-items: flex-start !important;
+  }
+
+  .player-left {
+    flex: 1 1 100% !important;
+    order: 2;
+    min-width: 0;
+    padding: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    gap: 10px !important;
+    margin-top: 4px;
+  }
+
+  .player-left img {
+    flex-shrink: 0 !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+
+  .player-track-info {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: hidden;
+    max-width: calc(100% - 90px) !important; /* Account for image (48px) + gap (10px) + heart button (32px) */
+  }
+
+  .player-track-info > div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    display: block !important;
+  }
+
+  .player-left button {
+    flex-shrink: 0 !important;
+    padding: 6px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .player-center {
+    flex: 1 1 100% !important;
+    order: 1;
+    padding: 0 !important;
+    margin-bottom: 4px;
+  }
+
+  .player-right {
+    display: none !important;
+  }
+
+  /* Hide volume and other controls on mobile */
+  .player-right button,
+  .player-right .player-controls-group {
+    display: none;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .bottom-player {
+    height: auto !important;
+    min-height: 70px;
+    padding: 6px !important;
+  }
+
+  .player-left {
+    gap: 8px !important;
+  }
+
+  .player-left img {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  .player-track-info {
+    max-width: calc(100% - 84px) !important; /* Account for image (44px) + gap (8px) + heart button (32px) */
+  }
+
+  .player-track-info > div:first-child {
+    font-size: 13px !important;
+  }
+
+  .player-track-info > div:last-child {
+    font-size: 11px !important;
+  }
+
+  .player-left button {
+    padding: 4px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+  }
+
+  .player-controls-group button {
+    padding: 2px !important;
+  }
+
+  .player-controls-group button svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+

@@ -1,0 +1,132 @@
+/* PlaylistDetail Component Mobile Styles */
+@media (max-width: 768px) {
+  .playlist-detail-container {
+    border-radius: 0 !important;
+  }
+
+  .playlist-detail-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 10 !important;
+    padding: 12px 16px !important;
+    padding-left: 64px !important; /* Space for hamburger menu */
+    background-color: rgba(18, 18, 18, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    border-bottom: none !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 64px !important; /* Match hamburger button position */
+  }
+
+  .playlist-back-button {
+    margin-left: 0 !important; /* Keep on left side */
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Adjust playlist header for mobile - Spotify style */
+  .playlist-header-content {
+    padding: 16px !important;
+    flex-direction: row !important;
+    gap: 16px !important;
+    align-items: flex-end !important;
+  }
+
+  .playlist-header-content > div:first-child {
+    width: 128px !important;
+    height: 128px !important;
+    border-radius: 0 !important;
+    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .playlist-header-content > div:first-child img {
+    border-radius: 0 !important;
+  }
+
+  .playlist-header-content > div:last-child {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .playlist-header-content > div:last-child > div:first-child {
+    font-size: 11px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .playlist-header-content h1 {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  .playlist-header-content > div:last-child > div:nth-child(3) {
+    font-size: 13px !important;
+    margin-bottom: 16px !important;
+    color: #B3B3B3 !important;
+  }
+
+  .playlist-header-content > div:last-child > div:nth-child(4) {
+    font-size: 13px !important;
+    margin-bottom: 20px !important;
+    color: #B3B3B3 !important;
+  }
+
+  .playlist-header-content button {
+    padding: 12px 32px !important;
+    font-size: 14px !important;
+  }
+  
+  /* Adjust songs list padding for mobile */
+  .playlist-songs-list {
+    padding: 0 16px 16px !important;
+  }
+  
+  /* Simplify grid layout for mobile - Spotify style */
+  .playlist-songs-header,
+  .playlist-song-row {
+    grid-template-columns: 16px 1fr 60px 40px !important;
+    gap: 16px !important;
+    padding: 8px 0 !important;
+  }
+
+  .playlist-songs-header {
+    padding: 8px 0 !important;
+    border-bottom: 1px solid #333 !important;
+    margin-bottom: 8px !important;
+  }
+  
+  /* Hide ALBUM and DATE ADDED columns on mobile */
+  .mobile-hide {
+    display: none !important;
+  }
+
+  /* Adjust song row styling for mobile */
+  .playlist-song-row > div:first-child {
+    font-size: 14px !important;
+    color: #B3B3B3 !important;
+  }
+
+  .playlist-song-row > div:nth-child(2) {
+    min-width: 0 !important;
+  }
+
+  .playlist-song-row > div:nth-child(2) img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .playlist-song-row > div:nth-child(3) {
+    font-size: 14px !important;
+    color: #B3B3B3 !important;
+  }
+}
+
