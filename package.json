@@ -4,6 +4,7 @@
   "description": "Spotify song search react-redux",
   "main": "index.js",
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "axios": "0.16.2",
     "balanced-match": "^3.0.1",
     "history": "^4.10.1",
@@ -14,7 +15,7 @@
     "react-redux": "5.0.6",
     "react-router-dom": "4.2.2",
     "react-router-redux": "5.0.0-alpha.8",
-    "react-scripts": "3.4.1",
+    "react-scripts": "^3.4.1",
     "redux": "3.7.2",
     "redux-thunk": "2.2.0",
     "sass": "^1.77.0"

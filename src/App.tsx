@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { HiBars3 } from 'react-icons/hi2';
 import { HiX } from 'react-icons/hi';
+import { Analytics } from './vercelAnalytics';
 import Sidebar from './Sidebar';
 import Home from './Home';
 import Search from './Search';
@@ -75,6 +76,7 @@ const App: React.FC<AppProps> = ({ userPlaylists }) => {
 
   return (
     <PlayerProvider>
+      <Analytics />
       <div className="app-container">
         {/* Mobile Hamburger Menu */}
         <button
