@@ -1,0 +1,113 @@
+@import '../../styles/mixins.scss';
+
+.track-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  gap: var(--spacing-md);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+
+    .track-index {
+      display: none;
+    }
+    .track-more {
+      opacity: 1;
+    }
+  }
+
+  &.active {
+    .track-name {
+      color: var(--spotify-green);
+    }
+  }
+
+  .track-start {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-width: 0;
+
+    .track-index {
+      width: 16px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+
+    .track-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+
+    .track-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .track-name {
+        font-size: 14px;
+        font-weight: 500;
+        @include text-truncate;
+      }
+
+      .track-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .preview-label {
+          font-size: 10px;
+          background: #444;
+          padding: 1px 4px;
+          border-radius: 2px;
+          color: #fff;
+          text-transform: uppercase;
+        }
+
+        .track-artist {
+          font-size: 12px;
+          color: var(--text-secondary);
+          @include text-truncate;
+        }
+      }
+    }
+  }
+
+  .track-album {
+    flex: 1;
+    font-size: 14px;
+    color: var(--text-secondary);
+    @include text-truncate;
+
+    @include mobile {
+      display: none;
+    }
+  }
+
+  .track-end {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    .track-duration {
+      font-size: 14px;
+      color: var(--text-secondary);
+      width: 40px;
+      text-align: right;
+    }
+
+    .track-more {
+      color: var(--text-secondary);
+      opacity: 0;
+      padding: 4px;
+    }
+  }
+}

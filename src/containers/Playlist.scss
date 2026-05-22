@@ -1,0 +1,139 @@
+@import '../styles/mixins.scss';
+
+.playlist-screen {
+  margin-top: calc(-1 * var(--spacing-xl));
+  margin-left: calc(-1 * var(--spacing-xl));
+  margin-right: calc(-1 * var(--spacing-xl));
+
+  @include mobile {
+    margin-top: calc(-1 * (var(--spacing-md) + var(--header-height)));
+    margin-left: calc(-1 * var(--spacing-md));
+    margin-right: calc(-1 * var(--spacing-md));
+  }
+
+  .playlist-header {
+    height: 340px;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--spacing-xl);
+    background: linear-gradient(to bottom, rgba(80, 56, 160, 0.8) 0%, #121212 100%);
+
+    @include mobile {
+      height: 400px;
+      padding: var(--spacing-md);
+      background: linear-gradient(to bottom, #5038a0 0%, #121212 100%);
+      align-items: flex-start;
+      padding-top: 60px;
+    }
+
+    .header-content {
+      display: flex;
+      gap: var(--spacing-lg);
+      align-items: flex-end;
+
+      @include mobile {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+      }
+
+      .album-art {
+        width: 232px;
+        height: 232px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+
+        @include mobile {
+          width: 200px;
+          height: 200px;
+          margin: 0 auto;
+        }
+
+        .liked-heart-bg {
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(135deg, #450af5 0%, #c4efd9 100%);
+          @include flex-center;
+        }
+      }
+
+      .playlist-info {
+        .type {
+          font-size: 12px;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+        h1 {
+          font-size: 48px;
+          font-weight: 800;
+          margin: 4px 0;
+          letter-spacing: -1px;
+
+          @include mobile {
+            font-size: 24px;
+          }
+        }
+        .meta {
+          font-size: 14px;
+          font-weight: 500;
+          .owner { font-weight: 700; }
+        }
+      }
+    }
+  }
+
+  .playlist-actions {
+    @include flex-between;
+    padding: var(--spacing-md) var(--spacing-xl);
+
+    @include mobile {
+      padding: var(--spacing-md);
+    }
+
+    .left-actions, .right-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+    }
+
+    .action-icon {
+      color: var(--text-secondary);
+    }
+
+    .shuffle-icon {
+      color: var(--text-secondary);
+    }
+
+    .play-button {
+      width: 56px;
+      height: 56px;
+      background-color: var(--spotify-green);
+      border-radius: var(--radius-full);
+      @include flex-center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+
+      @include mobile {
+        width: 48px;
+        height: 48px;
+      }
+    }
+  }
+
+  .track-list {
+    padding: 0 var(--spacing-md);
+  }
+
+  .empty-playlist {
+    padding: var(--spacing-xxl) var(--spacing-md);
+    text-align: center;
+    p { color: var(--text-secondary); margin-bottom: var(--spacing-lg); }
+    button {
+      background-color: var(--text-primary);
+      color: var(--black);
+      padding: 10px 24px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+      margin: 0 auto;
+    }
+  }
+}

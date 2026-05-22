@@ -1,14 +1,35 @@
-import React from 'react'
-import { render } from 'react-dom'
-import { Provider } from 'react-redux'
-import store from './store/Store'
-import App from './App'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { store } from './store';
+import AppShell from './layouts/AppShell';
+import Home from './containers/Home';
+import Search from './containers/Search';
+import Playlist from './containers/Playlist';
+import Artist from './containers/Artist';
+import Settings from './containers/Settings';
+import './styles/global.scss';
 
-const target = document.querySelector('#root')
+const container = document.getElementById('root');
+const root = createRoot(container!);
 
-render(
+root.render(
+  <React.StrictMode>
     <Provider store={store}>
-        <App />
-    </Provider>,
-    target
-)
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AppShell />}>
+            <Route index element={<Home />} />
+            <Route path="search" element={<Search />} />
+            <Route path="library" element={<Playlist />} />
+            <Route path="liked" element={<Playlist />} />
+            <Route path="playlist/:id" element={<Playlist />} />
+            <Route path="artist" element={<Artist />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>
+);

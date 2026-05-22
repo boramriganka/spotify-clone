@@ -1,0 +1,46 @@
+
+> react-spotify-search@1.0.0 start
+> cross-env NODE_OPTIONS=--openssl-legacy-provider PORT=3008 react-scripts start
+
+(node:1173239) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:1173239) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Compiled successfully!
+
+You can now view react-spotify-search in the browser.
+
+  Local:            http://localhost:3008
+  On Your Network:  http://192.168.0.2:3008
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+ERROR in src/containers/Home.tsx:40:20
+TS2552: Cannot find name 'useDispatch'. Did you mean 'dispatch'?
+    38 |   }, []);
+    39 |
+  > 40 |   const dispatch = useDispatch();
+       |                    ^^^^^^^^^^^
+    41 |
+    42 |   const handlePlay = (item: MediaItem) => {
+    43 |     if (item.type === 'track') {
+
+ERROR in src/containers/Home.tsx:44:16
+TS2552: Cannot find name 'setTrack'. Did you mean 'TextTrack'?
+    42 |   const handlePlay = (item: MediaItem) => {
+    43 |     if (item.type === 'track') {
+  > 44 |       dispatch(setTrack({ track: item }));
+       |                ^^^^^^^^
+    45 |     }
+    46 |     // Handle other types as needed
+    47 |   };
+
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+No issues found.

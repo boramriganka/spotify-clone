@@ -1,0 +1,74 @@
+@import './tokens.scss';
+@import './mixins.scss';
+
+// Import component styles
+@import '../components/Sidebar/Sidebar.scss';
+@import '../components/BottomNav/BottomNav.scss';
+@import '../components/AccountDrawer/AccountDrawer.scss';
+@import '../components/MediaCard/MediaCard.scss';
+@import '../components/TrackRow/TrackRow.scss';
+@import '../components/HorizontalShelf/HorizontalShelf.scss';
+@import '../components/MiniPlayer/MiniPlayer.scss';
+@import '../components/FullPlayer/FullPlayer.scss';
+@import '../components/BottomSheet/BottomSheet.scss';
+@import '../components/FullPlayer/BottomSheetContent.scss';
+
+// Import layout and screen styles
+@import '../layouts/AppShell.scss';
+@import '../containers/Home.scss';
+@import '../containers/Search.scss';
+@import '../containers/Playlist.scss';
+@import '../containers/Artist.scss';
+@import '../containers/Settings.scss';
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--black);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  display: flex;
+  align-items: center;
+  transition: transform 0.1s ease;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+.spotify-green { color: var(--spotify-green) !important; }
+.text-secondary { color: var(--text-secondary); }
+
+.scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  @include scrollbar;
+}

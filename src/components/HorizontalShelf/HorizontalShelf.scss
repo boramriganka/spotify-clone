@@ -1,0 +1,46 @@
+@import '../../styles/mixins.scss';
+
+.horizontal-shelf {
+  margin-bottom: var(--spacing-xl);
+
+  .shelf-header {
+    @include flex-between;
+    margin-bottom: var(--spacing-md);
+    padding: 0 var(--spacing-sm);
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+
+      @include mobile {
+        font-size: 18px;
+      }
+    }
+
+    .see-all {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .shelf-content {
+    display: flex;
+    gap: var(--spacing-md);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-sm);
+
+    &::-webkit-scrollbar {
+      display: none; // Hide scrollbar for shelves
+    }
+
+    @include desktop {
+      gap: var(--spacing-lg);
+    }
+  }
+}

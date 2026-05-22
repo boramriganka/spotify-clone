@@ -1,0 +1,125 @@
+@import '../../styles/mixins.scss';
+
+.media-tile {
+  background-color: var(--surface-grey);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--surface-grey-hover);
+  }
+
+  img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+  }
+
+  .tile-title {
+    font-size: 12px;
+    font-weight: 700;
+    padding: var(--spacing-sm);
+    @include text-truncate;
+  }
+}
+
+.media-card {
+  width: 160px;
+  background-color: var(--surface-grey);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: var(--surface-grey-hover);
+
+    .play-button {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  &.circle {
+    background-color: transparent;
+    padding: 0;
+    width: 140px;
+
+    .image-container {
+      border-radius: var(--radius-full);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    .card-info {
+      text-align: center;
+      margin-top: var(--spacing-sm);
+    }
+  }
+
+  .image-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    margin-bottom: var(--spacing-md);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .play-button {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 40px;
+      height: 40px;
+      background-color: var(--spotify-green);
+      border-radius: var(--radius-full);
+      @include flex-center;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+
+      &:hover {
+        transform: scale(1.05) !important;
+      }
+    }
+  }
+
+  .card-info {
+    .item-name {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      @include text-truncate;
+    }
+
+    .item-desc {
+      display: block;
+      font-size: 12px;
+      color: var(--text-secondary);
+      @include line-clamp(2);
+    }
+  }
+
+  @include mobile {
+    width: 140px;
+    background-color: transparent;
+    padding: 0;
+
+    .item-name {
+      font-size: 12px;
+    }
+  }
+}

@@ -1,0 +1,73 @@
+import React from 'react';
+import { Play, Pause, SkipBack, SkipForward, Heart, Speaker, Shuffle, Repeat, ListMusic, Maximize2 } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../../store';
+import { togglePlay, toggleLike, nextTrack, previousTrack, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
+import ProgressBar from '../ProgressBar/ProgressBar';
+import './DesktopPlayer.scss';
+
+interface DesktopPlayerProps {
+  onTogglePanel: () => void;
+  isPanelOpen: boolean;
+}
+
+const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpen }) => {
+  const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
+  const dispatch = useDispatch();
+
+  if (!currentTrack) return null;
+
+  const isLiked = likedTrackIds.includes(currentTrack.id);
+  const formatTime = (time: number) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <footer className="desktop-player">
+      <div className="track-section" onClick={onTogglePanel}>
+        <img src={currentTrack.image} alt={currentTrack.name} />
+        <div className="text">
+          <span className="name">{currentTrack.name}</span>
+          <span className="artist">{currentTrack.artist}</span>
+        </div>
+        <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack.id)); }}>
+          <Heart size={16} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
+        </button>
+      </div>
+
+      <div className="controls-section">
+        <div className="buttons">
+          <button className={`shuffle ${isShuffled ? 'active' : ''}`} onClick={() => dispatch(toggleShuffle())}>
+            <Shuffle size={16} />
+          </button>
+          <button onClick={() => dispatch(previousTrack())}><SkipBack size={20} fill="white" /></button>
+          <button className="play-pause" onClick={() => dispatch(togglePlay())}>
+            {isPlaying ? <Pause size={24} fill="black" /> : <Play size={24} fill="black" />}
+          </button>
+          <button onClick={() => dispatch(nextTrack())}><SkipForward size={20} fill="white" /></button>
+          <button className={`repeat ${repeatMode !== 'off' ? 'active' : ''}`} onClick={() => dispatch(toggleRepeat())}>
+            <Repeat size={16} />
+          </button>
+        </div>
+        <div className="progress-area">
+          <span>{formatTime(progress)}</span>
+          <ProgressBar progress={progress} duration={duration} onSeek={(t) => dispatch(seekTo(t))} />
+          <span>{formatTime(duration)}</span>
+        </div>
+      </div>
+
+      <div className="extra-section">
+        <button onClick={onTogglePanel} className={isPanelOpen ? 'active' : ''}><Maximize2 size={16} /></button>
+        <button><ListMusic size={16} /></button>
+        <div className="volume-control">
+          <Speaker size={16} />
+          <div className="volume-bar" />
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default DesktopPlayer;

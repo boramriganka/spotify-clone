@@ -1,0 +1,107 @@
+@import '../../styles/mixins.scss';
+
+.mini-player-wrapper {
+  position: fixed;
+  bottom: var(--bottom-nav-height);
+  left: var(--spacing-sm);
+  right: var(--spacing-sm);
+  z-index: var(--z-sticky);
+  margin-bottom: var(--spacing-xs);
+
+  @include desktop {
+    display: none;
+  }
+}
+
+.mini-player {
+  height: var(--mini-player-height);
+  background-color: #282828;
+  border-radius: var(--radius-md);
+  @include flex-between;
+  padding: 0 var(--spacing-md);
+  position: relative;
+  overflow: hidden;
+
+  .track-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-width: 0;
+
+    img {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .name {
+        font-size: 13px;
+        font-weight: 700;
+        @include text-truncate;
+      }
+
+      .artist {
+        font-size: 12px;
+        color: var(--text-secondary);
+        @include text-truncate;
+      }
+    }
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+
+    button {
+      color: var(--text-primary);
+
+      .liked {
+        color: var(--spotify-green);
+      }
+    }
+
+    .device-icon {
+      color: var(--text-secondary);
+      &.spotify-green {
+        color: var(--spotify-green);
+      }
+    }
+  }
+
+  .progress-bar-mini {
+    position: absolute;
+    bottom: 0px;
+    left: var(--spacing-md);
+    right: var(--spacing-md);
+    pointer-events: none;
+
+    .progress-bar-container {
+      height: 2px;
+      padding: 0;
+
+      .progress-bar-bg {
+        height: 2px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 1px;
+      }
+
+      .progress-bar-fill {
+        background-color: #fff;
+      }
+    }
+  }
+}
+
+// Support for safe areas
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mini-player-wrapper {
+    margin-bottom: calc(var(--spacing-xs) + env(safe-area-inset-bottom));
+  }
+}
