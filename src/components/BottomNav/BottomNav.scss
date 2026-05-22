@@ -1,0 +1,43 @@
+@import '../../styles/mixins.scss';
+
+.bottom-nav {
+  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 100%);
+  backdrop-filter: blur(20px);
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky);
+  padding-top: 8px;
+  padding-bottom: env(safe-area-inset-bottom);
+
+  @include desktop {
+    display: none;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary);
+    font-size: 10px;
+    flex: 1;
+
+    &.active {
+      color: var(--text-primary);
+    }
+
+    svg {
+      transition: transform 0.2s ease;
+    }
+
+    &:active svg {
+      transform: scale(1.1);
+    }
+  }
+}

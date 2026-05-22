@@ -1,0 +1,76 @@
+@import '../../styles/mixins.scss';
+
+.credits-sheet-content {
+  .credits-section {
+    margin-bottom: var(--spacing-xl);
+
+    h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .credit-row {
+      @include flex-between;
+
+      .credit-info {
+        display: flex;
+        flex-direction: column;
+
+        .name {
+          font-size: 15px;
+          font-weight: 700;
+        }
+        .role {
+          font-size: 13px;
+          color: var(--text-secondary);
+        }
+      }
+
+      .follow-btn-small {
+        border: 1px solid var(--text-secondary);
+        border-radius: var(--radius-full);
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+    }
+
+    .source-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+  }
+
+  .report-btn {
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    padding: var(--spacing-md) 0;
+  }
+}
+
+.device-picker-content {
+  .device-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md) 0;
+    font-weight: 700;
+
+    &.active {
+      color: var(--spotify-green);
+    }
+
+    span {
+      font-size: 16px;
+    }
+  }
+}
+
+// Add these to existing FullPlayer.scss or ensure they are imported
+.full-player {
+  // ... existing styles ...
+}

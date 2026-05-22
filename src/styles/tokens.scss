@@ -1,0 +1,45 @@
+// Spotify Visual Identity Tokens
+:root {
+  // Colors
+  --spotify-green: #1DB954;
+  --spotify-green-hover: #1ED760;
+  --black: #000000;
+  --dark-grey: #121212;
+  --surface-grey: #181818;
+  --surface-grey-hover: #282828;
+  --elevated-grey: #242424;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B3B3B3;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.2);
+
+  // Spacing
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  // Radius
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  // Layout
+  --sidebar-width: 280px;
+  --bottom-player-height: 90px;
+  --mini-player-height: 64px;
+  --bottom-nav-height: 64px;
+  --header-height: 64px;
+
+  // Z-index
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-overlay: 200;
+  --z-drawer: 300;
+  --z-modal: 400;
+  --z-tooltip: 500;
+}

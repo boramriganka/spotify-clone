@@ -1,0 +1,107 @@
+@import '../../styles/mixins.scss';
+
+.desktop-player {
+  height: var(--bottom-player-height);
+  background-color: var(--black);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--spacing-md);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky);
+
+  @include mobile {
+    display: none;
+  }
+
+  .track-section {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    width: 30%;
+    cursor: pointer;
+
+    img {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-sm);
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      .name { font-size: 14px; font-weight: 500; @include text-truncate; }
+      .artist { font-size: 12px; color: var(--text-secondary); @include text-truncate; }
+    }
+
+    .liked { color: var(--spotify-green); }
+  }
+
+  .controls-section {
+    flex: 1;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    .buttons {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xl);
+      color: var(--text-secondary);
+
+      button:hover { color: var(--text-primary); }
+      .active { color: var(--spotify-green); }
+
+      .play-pause {
+        width: 32px;
+        height: 32px;
+        background-color: var(--text-primary);
+        border-radius: 50%;
+        @include flex-center;
+        color: var(--black);
+        &:hover { transform: scale(1.05); }
+      }
+    }
+
+    .progress-area {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+  }
+
+  .extra-section {
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+    color: var(--text-secondary);
+
+    button:hover { color: var(--text-primary); }
+    .active { color: var(--spotify-green); }
+
+    .volume-control {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      width: 100px;
+      .volume-bar {
+        flex: 1;
+        height: 4px;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 2px;
+      }
+    }
+  }
+}

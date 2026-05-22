@@ -1,0 +1,15 @@
+@import '../styles/mixins.scss';
+
+.home-screen {
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+
+    @include desktop {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-md);
+    }
+  }
+}

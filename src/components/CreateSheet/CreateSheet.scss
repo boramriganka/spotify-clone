@@ -1,0 +1,80 @@
+@import '../../styles/mixins.scss';
+
+.create-sheet-content {
+  .options {
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-lg);
+      padding: var(--spacing-md) 0;
+      cursor: pointer;
+
+      &:active { background-color: rgba(255,255,255,0.05); }
+
+      &.disabled {
+        opacity: 0.5;
+        cursor: default;
+      }
+
+      .icon-wrapper {
+        width: 48px;
+        height: 48px;
+        @include flex-center;
+        background-color: var(--surface-grey);
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+      }
+
+      .text {
+        display: flex;
+        flex-direction: column;
+        .title { font-size: 16px; font-weight: 700; }
+        .desc { font-size: 12px; color: var(--text-secondary); }
+      }
+    }
+  }
+
+  .naming-flow {
+    padding: var(--spacing-md) 0;
+
+    h3 {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: var(--spacing-xl);
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      background: none;
+      border: none;
+      border-bottom: 2px solid var(--text-secondary);
+      color: var(--text-primary);
+      font-size: 20px;
+      font-weight: 700;
+      padding: var(--spacing-md) 0;
+      outline: none;
+      text-align: center;
+      margin-bottom: var(--spacing-xxl);
+
+      &:focus { border-color: var(--spotify-green); }
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: var(--spacing-xl);
+
+      button {
+        padding: 12px 32px;
+        border-radius: var(--radius-full);
+        font-weight: 700;
+
+        &.create-btn {
+          background-color: var(--spotify-green);
+          color: var(--black);
+        }
+      }
+    }
+  }
+}

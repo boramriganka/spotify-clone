@@ -1,0 +1,104 @@
+@import '../styles/mixins.scss';
+
+.search-screen {
+  .search-header {
+    position: sticky;
+    top: -var(--spacing-md); // offset AppShell padding
+    background-color: var(--black);
+    padding: var(--spacing-md) 0;
+    margin-bottom: var(--spacing-lg);
+    z-index: 10;
+
+    .search-input-wrapper {
+      background-color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--spacing-md);
+      height: 48px;
+
+      .search-icon {
+        color: var(--black);
+      }
+
+      input {
+        flex: 1;
+        border: none;
+        background: none;
+        outline: none;
+        padding: 0 var(--spacing-md);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--black);
+
+        &::placeholder {
+          color: #757575;
+        }
+      }
+
+      .clear-btn {
+        color: var(--black);
+      }
+    }
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--spacing-md);
+
+    @include mobile {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .browse-all {
+    h2 {
+      font-size: 16px;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-md);
+
+      @include desktop {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+
+      .category-card {
+        height: 100px;
+        border-radius: var(--radius-md);
+        padding: var(--spacing-md);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+
+        span {
+          font-weight: 700;
+          font-size: 16px;
+        }
+
+        img {
+          position: absolute;
+          width: 60px;
+          height: 60px;
+          bottom: -10px;
+          right: -10px;
+          transform: rotate(25deg);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        &.color-0 { background-color: #E8115B; }
+        &.color-1 { background-color: #148A08; }
+        &.color-2 { background-color: #477D95; }
+        &.color-3 { background-color: #8D67AB; }
+        &.color-4 { background-color: #DC148C; }
+        &.color-5 { background-color: #F8D677; }
+        &.color-6 { background-color: #A22C46; }
+        &.color-7 { background-color: #0D73EC; }
+      }
+    }
+  }
+}
