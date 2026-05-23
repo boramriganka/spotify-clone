@@ -9,12 +9,12 @@
     padding: 0 var(--spacing-sm);
 
     h2 {
-      font-size: 20px;
+      font-size: 24px; // Specified 22-26px
       font-weight: 700;
       letter-spacing: -0.5px;
 
       @include mobile {
-        font-size: 18px;
+        font-size: 22px;
       }
     }
 
@@ -34,6 +34,7 @@
     gap: var(--spacing-md);
     overflow-x: auto;
     padding-bottom: var(--spacing-sm);
+    padding-left: var(--spacing-sm); // Align with header
 
     &::-webkit-scrollbar {
       display: none; // Hide scrollbar for shelves

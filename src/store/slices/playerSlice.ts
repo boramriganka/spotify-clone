@@ -10,6 +10,7 @@ interface PlayerState {
   duration: number;
   volume: number;
   isShuffled: boolean;
+  shuffledQueue: Track[];
   repeatMode: 'off' | 'one' | 'all';
   likedTrackIds: string[];
   currentDevice: string;
@@ -33,6 +34,7 @@ const initialState: PlayerState = {
   duration: 0,
   volume: loadState('spotify_volume', 0.7),
   isShuffled: loadState('spotify_isShuffled', false),
+  shuffledQueue: loadState('spotify_shuffledQueue', []),
   repeatMode: loadState('spotify_repeatMode', 'off'),
   likedTrackIds: loadState('spotify_likedTrackIds', []),
   currentDevice: "Mriganka’s OnePlus Buds 4",
@@ -44,6 +46,7 @@ const playerSlice = createSlice({
   reducers: {
     setTrack: (state, action: PayloadAction<{ track: Track; queue?: Track[]; index?: number }>) => {
       state.currentTrack = action.payload.track;
+
       if (action.payload.queue) {
         state.queue = action.payload.queue;
         state.currentIndex = action.payload.index !== undefined
@@ -59,6 +62,15 @@ const playerSlice = createSlice({
           state.currentIndex = existingIdx;
         }
       }
+
+      if (state.isShuffled) {
+        // If we just set a new queue and shuffle is on, reshuffle
+        const otherTracks = state.queue.filter(t => t.id !== state.currentTrack?.id);
+        state.shuffledQueue = [state.currentTrack!, ...otherTracks.sort(() => Math.random() - 0.5)];
+        state.currentIndex = 0;
+        localStorage.setItem('spotify_shuffledQueue', JSON.stringify(state.shuffledQueue));
+      }
+
       state.isPlaying = true;
       state.progress = 0;
       state.duration = action.payload.track.duration;
@@ -90,10 +102,11 @@ const playerSlice = createSlice({
       localStorage.setItem('spotify_volume', JSON.stringify(state.volume));
     },
     nextTrack: (state) => {
-      if (state.queue.length === 0) return;
+      const activeQueue = state.isShuffled ? state.shuffledQueue : state.queue;
+      if (activeQueue.length === 0) return;
 
       let nextIndex = state.currentIndex + 1;
-      if (nextIndex >= state.queue.length) {
+      if (nextIndex >= activeQueue.length) {
         if (state.repeatMode === 'all') {
           nextIndex = 0;
         } else {
@@ -103,13 +116,16 @@ const playerSlice = createSlice({
       }
 
       state.currentIndex = nextIndex;
-      state.currentTrack = state.queue[nextIndex];
+      state.currentTrack = activeQueue[nextIndex];
       state.progress = 0;
       state.duration = state.currentTrack.duration;
       state.isPlaying = true;
+      localStorage.setItem('spotify_currentTrack', JSON.stringify(state.currentTrack));
+      localStorage.setItem('spotify_currentIndex', JSON.stringify(state.currentIndex));
     },
     previousTrack: (state) => {
-      if (state.queue.length === 0) return;
+      const activeQueue = state.isShuffled ? state.shuffledQueue : state.queue;
+      if (activeQueue.length === 0) return;
 
       // If more than 3 seconds in, restart track
       if (state.progress > 3) {
@@ -120,7 +136,7 @@ const playerSlice = createSlice({
       let prevIndex = state.currentIndex - 1;
       if (prevIndex < 0) {
         if (state.repeatMode === 'all') {
-          prevIndex = state.queue.length - 1;
+          prevIndex = activeQueue.length - 1;
         } else {
           state.progress = 0;
           return;
@@ -128,13 +144,22 @@ const playerSlice = createSlice({
       }
 
       state.currentIndex = prevIndex;
-      state.currentTrack = state.queue[prevIndex];
+      state.currentTrack = activeQueue[prevIndex];
       state.progress = 0;
       state.duration = state.currentTrack.duration;
       state.isPlaying = true;
+      localStorage.setItem('spotify_currentTrack', JSON.stringify(state.currentTrack));
+      localStorage.setItem('spotify_currentIndex', JSON.stringify(state.currentIndex));
     },
     toggleShuffle: (state) => {
       state.isShuffled = !state.isShuffled;
+      if (state.isShuffled && state.currentTrack) {
+        const otherTracks = state.queue.filter(t => t.id !== state.currentTrack?.id);
+        state.shuffledQueue = [state.currentTrack, ...otherTracks.sort(() => Math.random() - 0.5)];
+        state.currentIndex = 0;
+        localStorage.setItem('spotify_shuffledQueue', JSON.stringify(state.shuffledQueue));
+        localStorage.setItem('spotify_currentIndex', JSON.stringify(state.currentIndex));
+      }
       localStorage.setItem('spotify_isShuffled', JSON.stringify(state.isShuffled));
     },
     toggleRepeat: (state) => {

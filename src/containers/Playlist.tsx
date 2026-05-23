@@ -48,6 +48,15 @@ const Playlist: React.FC = () => {
     }
   };
 
+  const handleShufflePlay = () => {
+    if (tracks.length > 0) {
+       // Toggle shuffle on and play
+       dispatch({ type: 'player/toggleShuffle' });
+       const randomIndex = Math.floor(Math.random() * tracks.length);
+       dispatch(setTrack({ track: tracks[randomIndex], queue: tracks }));
+    }
+  };
+
   const handlePlayTrack = (track: Track, index: number) => {
     dispatch(setTrack({ track, queue: tracks, index }));
   };
@@ -85,7 +94,7 @@ const Playlist: React.FC = () => {
           <MoreVertical size={24} className="action-icon" />
         </div>
         <div className="right-actions">
-          <Shuffle size={24} className="shuffle-icon" />
+          <Shuffle size={24} className="shuffle-icon" onClick={handleShufflePlay} />
           <button className="play-button" onClick={handlePlayAll}>
             <Play fill="black" size={24} />
           </button>

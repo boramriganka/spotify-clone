@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, SkipBack, SkipForward, Heart, Speaker } from 'lucide-react';
+import { Play, Pause, Heart, Speaker } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { togglePlay, toggleLike, seekTo } from '../../store/slices/playerSlice';
@@ -25,7 +25,10 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
           <img src={currentTrack.image} alt={currentTrack.name} />
           <div className="text">
             <span className="name">{currentTrack.name}</span>
-            <span className="artist">{currentTrack.artist}</span>
+            <div className="meta">
+                {currentTrack.provider === 'itunes' && <span className="preview-tag">Preview only</span>}
+                <span className="artist">{currentTrack.artist}</span>
+            </div>
           </div>
         </div>
         <div className="controls">
@@ -34,7 +37,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
             <Heart size={20} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
           </button>
           <button onClick={(e) => { e.stopPropagation(); dispatch(togglePlay()); }}>
-            {isPlaying ? <Pause size={24} fill="white" /> : <Play size={24} fill="white" />}
+            {isPlaying ? <Pause size={28} fill="white" /> : <Play size={28} fill="white" />}
           </button>
         </div>
         <div className="progress-bar-mini" onClick={(e) => e.stopPropagation()}>

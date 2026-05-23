@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Search as SearchIcon, X } from 'lucide-react';
+import { useDispatch } from 'react-redux';
 import { musicService } from '../providers';
-import { MediaItem } from '../providers/types';
+import { MediaItem, Track } from '../providers/types';
+import { setTrack } from '../store/slices/playerSlice';
 import MediaCard from '../components/MediaCard/MediaCard';
 import './Search.scss';
 
 const Search: React.FC = () => {
+  const dispatch = useDispatch();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -18,6 +21,18 @@ const Search: React.FC = () => {
     const data = await musicService.search(query);
     setResults(data);
     setIsSearching(false);
+  };
+
+  const handlePlay = (item: MediaItem) => {
+    if (item.type === 'track') {
+      const trackResults = results.filter(i => i.type === 'track') as Track[];
+      const index = trackResults.findIndex(t => t.id === item.id);
+      dispatch(setTrack({
+        track: item as Track,
+        queue: trackResults,
+        index: index !== -1 ? index : 0
+      }));
+    }
   };
 
   const clearSearch = () => {
@@ -49,7 +64,11 @@ const Search: React.FC = () => {
         {results.length > 0 ? (
           <div className="results-grid">
             {results.map((item) => (
-              <MediaCard key={item.id} item={item} />
+              <MediaCard
+                key={item.id}
+                item={item}
+                onClick={() => handlePlay(item)}
+              />
             ))}
           </div>
         ) : !isSearching && (

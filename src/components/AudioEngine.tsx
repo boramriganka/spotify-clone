@@ -27,7 +27,13 @@ const AudioEngine: React.FC = () => {
   useEffect(() => {
     if (audioRef.current) {
       if (isPlaying && streamUrl) {
-        audioRef.current.play().catch(e => console.error("Playback failed", e));
+        const playPromise = audioRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(e => {
+             console.error("Playback failed", e);
+             dispatch(setIsPlaying(false));
+          });
+        }
       } else {
         audioRef.current.pause();
       }

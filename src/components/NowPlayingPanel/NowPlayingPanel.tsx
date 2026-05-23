@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Heart, Speaker, Share2, ListMusic } from 'lucide-react';
+import { X, Heart } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { toggleLike } from '../../store/slices/playerSlice';
@@ -12,7 +12,7 @@ interface NowPlayingPanelProps {
 }
 
 const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) => {
-  const { currentTrack, likedTrackIds, currentDevice } = useSelector((state: RootState) => state.player);
+  const { currentTrack, likedTrackIds } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
 
   if (!currentTrack) return null;
@@ -24,10 +24,10 @@ const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) =>
       {isOpen && (
         <motion.aside
           className="now-playing-panel"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+          initial={{ width: 0, opacity: 0 }}
+          animate={{ width: 320, opacity: 1 }}
+          exit={{ width: 0, opacity: 0 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
         >
           <div className="panel-header">
             <h3>Now Playing</h3>
@@ -45,7 +45,7 @@ const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) =>
                 <p>{currentTrack.artist}</p>
               </div>
               <button onClick={() => dispatch(toggleLike(currentTrack.id))}>
-                <Heart size={24} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
+                <Heart size={24} className={isLiked ? 'liked' : ''} fill={isLiked ? '#1DB954' : 'none'} />
               </button>
             </div>
 
@@ -65,9 +65,20 @@ const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) =>
                 <h4>Credits</h4>
                 <button className="show-all">Show all</button>
               </div>
-              <div className="credit-item">
-                <span className="name">{currentTrack.artist}</span>
-                <span className="role">Main Artist</span>
+              <div className="credit-list">
+                <div className="credit-item">
+                    <div className="name-role">
+                        <span className="name">{currentTrack.artist}</span>
+                        <span className="role">Main Artist</span>
+                    </div>
+                    <button className="follow-link">Follow</button>
+                </div>
+                <div className="credit-item">
+                    <div className="name-role">
+                        <span className="name">{currentTrack.artist}</span>
+                        <span className="role">Producer</span>
+                    </div>
+                </div>
               </div>
             </div>
           </div>
