@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search as SearchIcon, X } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { musicService } from '../providers';
@@ -12,16 +12,33 @@ const Search: React.FC = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [activeChip, setActiveChip] = useState('Full songs');
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async () => {
     if (!query.trim()) return;
 
     setIsSearching(true);
-    const data = await musicService.search(query);
+    const filterFull = activeChip === 'Full songs';
+    const data = await musicService.search(query, { filterFull });
     setResults(data);
     setIsSearching(false);
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    if (q) {
+       setQuery(q);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (query.trim()) {
+      handleSearch();
+    } else {
+      setResults([]);
+    }
+  }, [activeChip, query]);
 
   const handlePlay = (item: MediaItem) => {
     if (item.type === 'track') {
@@ -43,7 +60,13 @@ const Search: React.FC = () => {
   return (
     <div className="search-screen">
       <div className="search-header">
-        <form className="search-input-wrapper" onSubmit={handleSearch}>
+        <div className="search-top-mobile">
+           <button className="avatar-btn" onClick={() => (window as any).toggleDrawer?.()}>
+             <div className="avatar">M</div>
+           </button>
+           <h2>Search</h2>
+        </div>
+        <form className="search-input-wrapper" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
           <SearchIcon className="search-icon" size={20} />
           <input
             type="text"
@@ -58,20 +81,61 @@ const Search: React.FC = () => {
             </button>
           )}
         </form>
+        <div className="search-chips scroll-container">
+          {['All', 'Full songs', 'Artists', 'Albums', 'Playlists', 'Preview only'].map(chip => (
+            <button
+              key={chip}
+              className={`chip ${activeChip === chip ? 'active' : ''}`}
+              onClick={() => setActiveChip(chip)}
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="search-content">
-        {results.length > 0 ? (
-          <div className="results-grid">
-            {results.map((item) => (
-              <MediaCard
-                key={item.id}
-                item={item}
-                onClick={() => handlePlay(item)}
-              />
-            ))}
+        {isSearching ? (
+          <div className="loading">Searching...</div>
+        ) : results.length > 0 ? (
+          <>
+            {results.some(i => i.type === 'artist') && (
+              <div className="search-section">
+                <h2>Artists</h2>
+                <div className="results-grid">
+                  {results.filter(i => i.type === 'artist').map((item) => (
+                    <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="search-section">
+              <h2>{activeChip === 'Full songs' ? 'Full songs' : 'Results'}</h2>
+              <div className="results-grid">
+                {results.filter(i => i.type === 'track' && (i as Track).availability !== 'preview').map((item) => (
+                  <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
+                ))}
+              </div>
+            </div>
+
+            {(activeChip === 'All' || activeChip === 'Preview only') && results.some(i => (i as Track).availability === 'preview') && (
+              <div className="search-section">
+                <h2>Preview-only matches</h2>
+                <div className="results-grid">
+                  {results.filter(i => i.type === 'track' && (i as Track).availability === 'preview').map((item) => (
+                    <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        ) : query ? (
+          <div className="no-results">
+            <p>No {activeChip.toLowerCase()} found for "{query}"</p>
+            <p className="subtitle">Try another artist, remix, live version, or related genre.</p>
           </div>
-        ) : !isSearching && (
+        ) : (
           <div className="browse-all">
             <h2>Browse all</h2>
             <div className="category-grid">
@@ -84,8 +148,6 @@ const Search: React.FC = () => {
             </div>
           </div>
         )}
-
-        {isSearching && <div className="loading">Searching...</div>}
       </div>
     </div>
   );

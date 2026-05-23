@@ -20,7 +20,9 @@ const TrackRow: React.FC<TrackRowProps> = ({ track, index, isActive, onPlay, sho
         <div className="track-info">
           <span className="track-name">{track.name}</span>
           <div className="track-meta">
-            {track.provider === 'itunes' && <span className="preview-label">Preview</span>}
+            {track.availability === 'preview' && <span className="preview-label">Preview</span>}
+            {track.availability === 'full' && <span className="full-label">Full Song</span>}
+            {track.availability === 'unavailable' && <span className="unavailable-label">Unavailable</span>}
             <span className="track-artist">{track.artist}</span>
           </div>
         </div>

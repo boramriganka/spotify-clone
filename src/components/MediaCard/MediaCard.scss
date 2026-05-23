@@ -112,6 +112,22 @@
       font-size: 13px;
       color: var(--text-secondary); // #b3b3b3
       @include line-clamp(2); // Specified 2 lines
+
+      .track-meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        .preview-tag {
+          font-size: 10px;
+          background: #444;
+          padding: 1px 4px;
+          border-radius: 2px;
+          color: #fff;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+      }
     }
   }
 
@@ -126,6 +142,14 @@
 
     .item-desc {
       font-size: 12px;
+    }
+
+    &.circle {
+      width: 100%;
+      .card-info {
+        text-align: center;
+        padding: 0 4px;
+      }
     }
   }
 }

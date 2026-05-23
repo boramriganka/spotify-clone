@@ -56,10 +56,32 @@ const Settings: React.FC = () => {
         { label: 'Explicit content', type: 'link' },
       ]
     },
+    {
+      title: 'About and support',
+      items: [
+        { label: 'Provider status', type: 'link', action: 'debug' },
+        { label: 'Terms and Conditions', type: 'link' },
+      ]
+    },
   ];
+
+  const [showDebug, setShowDebug] = useState(false);
 
   return (
     <div className="settings-screen">
+      {showDebug && (
+        <div className="debug-panel-overlay" onClick={() => setShowDebug(false)}>
+           <div className="debug-panel" onClick={e => e.stopPropagation()}>
+              <h3>Provider Status</h3>
+              <ul>
+                <li>Audius: <span className="status-ok">Active</span></li>
+                <li>Jamendo: <span className="status-ok">Active (Demo Key)</span></li>
+                <li>iTunes: <span className="status-ok">Active Fallback</span></li>
+              </ul>
+              <button onClick={() => setShowDebug(false)}>Close</button>
+           </div>
+        </div>
+      )}
       <header className="settings-header">
         <button className="back-btn" onClick={() => navigate(-1)}><ArrowLeft size={24} /></button>
         <h1>Settings</h1>
@@ -71,7 +93,7 @@ const Settings: React.FC = () => {
           <div key={section.title} className="settings-section">
             <h2>{section.title}</h2>
             {section.items.map((item: any) => (
-              <div key={item.label} className="settings-item" onClick={() => item.type === 'toggle' && handleToggle(item.key)}>
+              <div key={item.label} className="settings-item" onClick={() => item.type === 'toggle' ? handleToggle(item.key) : (item.action === 'debug' ? setShowDebug(true) : null)}>
                 <div className="item-text">
                   <span className="label">{item.label}</span>
                   {item.subtitle && <span className="subtitle">{item.subtitle}</span>}

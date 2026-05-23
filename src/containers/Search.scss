@@ -3,11 +3,40 @@
 .search-screen {
   .search-header {
     position: sticky;
-    top: -var(--spacing-md); // offset AppShell padding
+    top: 0;
     background-color: var(--black);
     padding: var(--spacing-md) 0;
     margin-bottom: var(--spacing-lg);
     z-index: 10;
+
+    .search-top-mobile {
+      display: none;
+      align-items: center;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+
+      h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+      }
+
+      .avatar-btn {
+        .avatar {
+          width: 32px;
+          height: 32px;
+          background-color: #f57c00;
+          border-radius: 50%;
+          @include flex-center;
+          font-size: 14px;
+          font-weight: 700;
+        }
+      }
+
+      @include mobile {
+        display: flex;
+      }
+    }
 
     .search-input-wrapper {
       background-color: var(--text-primary);
@@ -40,6 +69,39 @@
         color: var(--black);
       }
     }
+
+    .search-chips {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+
+      .chip {
+        white-space: nowrap;
+        background-color: #2a2a2a;
+        color: #fff;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 13px;
+        font-weight: 500;
+
+        &.active {
+          background-color: var(--spotify-green);
+          color: #000;
+        }
+      }
+    }
+  }
+
+  .search-section {
+    margin-bottom: 24px;
+    h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
   }
 
   .results-grid {
@@ -49,6 +111,21 @@
 
     @include mobile {
       grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 40px 20px;
+    p {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #b3b3b3;
+      font-weight: 400;
     }
   }
 

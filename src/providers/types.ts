@@ -12,6 +12,8 @@ export interface Track {
   provider: 'audius' | 'jamendo' | 'itunes';
   type: 'track';
   liked?: boolean;
+  isFull: boolean;
+  availability: 'full' | 'preview' | 'unavailable' | 'loading';
 }
 
 export interface Artist {

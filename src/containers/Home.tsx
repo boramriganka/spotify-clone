@@ -21,19 +21,17 @@ const Home: React.FC = () => {
         if (saved) setRecentlyPlayed(JSON.parse(saved));
       } catch (e) {}
 
-      // Personalized demo data
-      const [recent, releases, artists] = await Promise.all([
-        musicService.search('Assamese EDM'),
-        musicService.search('New Music Friday'),
-        musicService.search('Cora Zea')
+      // Personalized discovery focused on full songs
+      const [recent, releases, artists, assamese] = await Promise.all([
+        musicService.search('discovery', { filterFull: true }),
+        musicService.search('New Music', { filterFull: true }),
+        musicService.search('popular artists', { filterFull: true }),
+        musicService.search('Assamese EDM', { filterFull: true })
       ]);
 
-      setRecentItems(recent.slice(0, 8));
+      setRecentItems(assamese.slice(0, 8));
       setNewReleases(releases.slice(0, 16));
-
-      // Merge with some specified artists
-      const featured = await musicService.search('Pink Floyd AP Dhillon Drake');
-      setFeaturedArtists([...artists, ...featured].filter(a => a.type === 'artist').slice(0, 10));
+      setFeaturedArtists(artists.filter(a => a.type === 'artist').slice(0, 10));
     };
 
     loadData();
@@ -64,13 +62,13 @@ const Home: React.FC = () => {
         </HorizontalShelf>
       )}
 
-      <HorizontalShelf title="It's New Music Friday" onSeeAll={() => {}}>
+      <HorizontalShelf title="Full songs you can play now" onSeeAll={() => {}}>
         {newReleases.map((item) => (
           <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
         ))}
       </HorizontalShelf>
 
-      <HorizontalShelf title="Assamese EDM" onSeeAll={() => {}}>
+      <HorizontalShelf title="Assamese / Indian discovery" onSeeAll={() => {}}>
         {recentItems.map((item) => (
           <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
         ))}

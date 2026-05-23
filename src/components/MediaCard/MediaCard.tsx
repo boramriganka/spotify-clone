@@ -1,6 +1,6 @@
 import React from 'react';
 import { Play } from 'lucide-react';
-import { MediaItem } from '../../providers/types';
+import { MediaItem, Track } from '../../providers/types';
 import './MediaCard.scss';
 
 interface MediaCardProps {
@@ -35,7 +35,12 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onClick, variant = 'square'
       <div className="card-info">
         <span className="item-name">{item.name}</span>
         <span className="item-desc">
-          {item.type === 'track' && item.artist}
+          {item.type === 'track' && (
+            <div className="track-meta">
+              {(item as Track).availability === 'preview' && <span className="preview-tag">Preview</span>}
+              <span>{item.artist}</span>
+            </div>
+          )}
           {item.type === 'album' && item.artist}
           {item.type === 'artist' && 'Artist'}
           {item.type === 'playlist' && (item as any).description}

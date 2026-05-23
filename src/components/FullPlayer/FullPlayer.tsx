@@ -6,6 +6,7 @@ import {
   Share2, ListMusic, Speaker
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../store';
 import { togglePlay, nextTrack, previousTrack, toggleLike, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
 import { FastAverageColor } from 'fast-average-color';
@@ -21,6 +22,7 @@ interface FullPlayerProps {
 const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
   const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [bgColor, setBgColor] = useState('#121212');
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
   const [isDevicePickerOpen, setIsDevicePickerOpen] = useState(false);
@@ -77,13 +79,24 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                 <div className="track-text">
                   <h1>{currentTrack.name}</h1>
                   <div className="meta">
-                    {currentTrack.provider === 'itunes' && <span className="preview-tag">Preview only</span>}
+                    {currentTrack.availability === 'preview' && <span className="preview-tag">Preview only</span>}
+                    {currentTrack.availability === 'full' && <span className="full-tag">Full Song</span>}
                     <p>{currentTrack.artist}</p>
                   </div>
                 </div>
-                <button onClick={() => dispatch(toggleLike(currentTrack.id))}>
-                  <Heart size={28} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
-                </button>
+                <div className="info-actions">
+                  {currentTrack.availability === 'preview' && (
+                    <button className="find-alt-btn" onClick={() => {
+                      onClose();
+                      navigate('/search?q=' + encodeURIComponent(currentTrack.name + ' ' + currentTrack.artist));
+                    }}>
+                      Find full version
+                    </button>
+                  )}
+                  <button onClick={() => dispatch(toggleLike(currentTrack.id))}>
+                    <Heart size={28} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
+                  </button>
+                </div>
               </div>
 
               <div className="progress-container">

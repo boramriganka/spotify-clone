@@ -35,7 +35,9 @@ export class JamendoProvider implements MusicProvider {
       image: t.album_image || t.image || 'https://via.placeholder.com/150',
       streamUrl: t.audio,
       provider: 'jamendo',
-      type: 'track'
+      type: 'track',
+      isFull: true,
+      availability: 'full'
     };
   }
 

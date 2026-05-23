@@ -43,8 +43,8 @@
     .album-art-container {
       width: 100%;
       aspect-ratio: 1/1;
-      margin-bottom: var(--spacing-xl);
-      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      padding: 12px;
 
       .album-art {
         width: 100%;
@@ -74,13 +74,18 @@
           align-items: center;
           gap: 8px;
 
-          .preview-tag {
+          .preview-tag, .full-tag {
             background-color: rgba(255, 255, 255, 0.1);
             color: #b3b3b3;
             font-size: 11px;
             padding: 2px 6px;
             border-radius: 4px;
             white-space: nowrap;
+          }
+
+          .full-tag {
+             background-color: rgba(30, 215, 96, 0.2);
+             color: var(--spotify-green);
           }
 
           p {
@@ -95,6 +100,21 @@
 
       .liked {
         color: var(--spotify-green);
+      }
+
+      .info-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .find-alt-btn {
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--spotify-green);
+          border: 1px solid var(--spotify-green);
+          padding: 4px 8px;
+          border-radius: 4px;
+        }
       }
     }
 

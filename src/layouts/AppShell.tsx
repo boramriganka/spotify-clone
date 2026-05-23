@@ -20,8 +20,13 @@ const AppShell: React.FC = () => {
   });
   const location = useLocation();
 
-  // Hide drawer trigger on deep pages
-  const showDrawerTrigger = !['/player', '/settings'].some(path => location.pathname.startsWith(path));
+  // Show drawer trigger only on Home
+  const isHome = location.pathname === '/';
+
+  React.useEffect(() => {
+    (window as any).toggleDrawer = () => setIsDrawerOpen(true);
+    return () => { delete (window as any).toggleDrawer; };
+  }, []);
 
   const togglePanel = () => {
     setIsPanelOpen(prev => {
@@ -39,7 +44,7 @@ const AppShell: React.FC = () => {
         <Sidebar />
 
         <main className="main-content scroll-container">
-          {showDrawerTrigger && (
+          {isHome && (
             <header className="mobile-header">
               <button className="avatar-btn" onClick={() => setIsDrawerOpen(true)}>
                 <div className="avatar">M</div>

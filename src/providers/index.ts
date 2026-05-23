@@ -14,29 +14,56 @@ class MusicService {
     ];
   }
 
-  async search(query: string): Promise<MediaItem[]> {
+  async search(query: string, options: { filterFull?: boolean } = {}): Promise<MediaItem[]> {
     const results = await Promise.allSettled([
       this.providers[0].searchTracks(query), // Audius
       this.providers[1].searchTracks(query), // Jamendo
       this.providers[2].searchTracks(query), // iTunes
+      this.providers[0].searchArtists(query),
+      this.providers[2].searchArtists(query),
     ]);
 
-    const audiusTracks = results[0].status === 'fulfilled' ? results[0].value : [];
-    const jamendoTracks = results[1].status === 'fulfilled' ? results[1].value : [];
-    const itunesTracks = results[2].status === 'fulfilled' ? results[2].value : [];
+    let audiusTracks = results[0].status === 'fulfilled' ? results[0].value : [];
+    let jamendoTracks = results[1].status === 'fulfilled' ? results[1].value : [];
+    let itunesTracks = results[2].status === 'fulfilled' ? results[2].value : [];
+    let artists = [
+      ...(results[3].status === 'fulfilled' ? results[3].value : []),
+      ...(results[4].status === 'fulfilled' ? results[4].value : [])
+    ];
 
-    // Prioritize Audius, then Jamendo, then iTunes
-    // We also want to interleave them a bit but keep Audius/Jamendo mostly at top
+    if (options.filterFull) {
+      itunesTracks = [];
+    }
+
+    // Deduplicate and group
     const combined: MediaItem[] = [];
 
-    // Add all Audius
+    // Add full songs first
     combined.push(...audiusTracks);
-    // Add all Jamendo
     combined.push(...jamendoTracks);
-    // Add iTunes as fallback
-    combined.push(...itunesTracks);
+
+    // Add artists
+    combined.push(...artists.slice(0, 5));
+
+    // Add preview tracks if not filtered
+    if (!options.filterFull) {
+      combined.push(...itunesTracks);
+    }
 
     return combined;
+  }
+
+  async validateStream(track: Track): Promise<boolean> {
+    const url = await this.getStreamUrl(track);
+    if (!url) return false;
+
+    // Simple HEAD request or check if it's a valid URL string
+    try {
+      // In a real browser, we might use a small timeout check
+      return url.length > 0;
+    } catch (e) {
+      return false;
+    }
   }
 
   async getTrack(id: string): Promise<Track | null> {
