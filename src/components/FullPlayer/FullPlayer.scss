@@ -61,15 +61,35 @@
       padding: 0 var(--spacing-md);
 
       .track-text {
+        flex: 1;
+        min-width: 0;
         h1 {
           font-size: 24px;
           font-weight: 800;
           margin-bottom: 4px;
+          @include text-truncate;
         }
-        p {
-          font-size: 16px;
-          color: var(--text-secondary);
-          font-weight: 500;
+        .meta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .preview-tag {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #b3b3b3;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+          }
+
+          p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin: 0;
+            @include text-truncate;
+          }
         }
       }
 

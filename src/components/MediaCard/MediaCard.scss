@@ -1,11 +1,11 @@
 @import '../../styles/mixins.scss';
 
 .media-tile {
-  background-color: var(--surface-grey);
-  border-radius: var(--radius-sm);
+  background-color: var(--elevated-grey); // Spotify uses #242424 or #282828
+  border-radius: var(--radius-sm); // 4-8px
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  height: 64px; // Specified height
   overflow: hidden;
   cursor: pointer;
   transition: background-color 0.2s ease;
@@ -15,26 +15,28 @@
   }
 
   img {
-    width: 48px;
-    height: 48px;
+    width: 64px; // Specified thumbnail size
+    height: 64px;
     object-fit: cover;
   }
 
   .tile-title {
-    font-size: 12px;
+    font-size: 14px; // Specified 13-15px
     font-weight: 700;
-    padding: var(--spacing-sm);
-    @include text-truncate;
+    padding: 0 var(--spacing-sm);
+    @include line-clamp(2); // Specified max 2 lines
+    flex: 1;
   }
 }
 
 .media-card {
-  width: 160px;
+  width: 170px; // Desktop default
   background-color: var(--surface-grey);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.3s ease;
+  flex-shrink: 0;
 
   &:hover {
     background-color: var(--surface-grey-hover);
@@ -99,7 +101,7 @@
   .card-info {
     .item-name {
       display: block;
-      font-size: 14px;
+      font-size: 15px; // Specified 13-15px
       font-weight: 700;
       margin-bottom: 4px;
       @include text-truncate;
@@ -107,18 +109,22 @@
 
     .item-desc {
       display: block;
-      font-size: 12px;
-      color: var(--text-secondary);
-      @include line-clamp(2);
+      font-size: 13px;
+      color: var(--text-secondary); // #b3b3b3
+      @include line-clamp(2); // Specified 2 lines
     }
   }
 
   @include mobile {
-    width: 140px;
+    width: 150px; // Specified 140-160px
     background-color: transparent;
     padding: 0;
 
     .item-name {
+      font-size: 13px;
+    }
+
+    .item-desc {
       font-size: 12px;
     }
   }

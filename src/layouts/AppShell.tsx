@@ -68,10 +68,8 @@ const AppShell: React.FC = () => {
       <MiniPlayer onExpand={() => setIsPlayerOpen(true)} />
       <FullPlayer isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
 
-      <CreateSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
-
       <DesktopPlayer onTogglePanel={togglePanel} isPanelOpen={isPanelOpen} />
-      <BottomNav onCreateOpen={() => setIsCreateOpen(true)} />
+      <BottomNav />
     </div>
   );
 };

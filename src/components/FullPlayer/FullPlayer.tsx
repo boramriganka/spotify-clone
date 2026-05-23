@@ -76,7 +76,10 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
               <div className="track-info-container">
                 <div className="track-text">
                   <h1>{currentTrack.name}</h1>
-                  <p>{currentTrack.artist}</p>
+                  <div className="meta">
+                    {currentTrack.provider === 'itunes' && <span className="preview-tag">Preview only</span>}
+                    <p>{currentTrack.artist}</p>
+                  </div>
                 </div>
                 <button onClick={() => dispatch(toggleLike(currentTrack.id))}>
                   <Heart size={28} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />

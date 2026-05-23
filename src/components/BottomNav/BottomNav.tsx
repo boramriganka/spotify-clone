@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Search, Library, PlusSquare } from 'lucide-react';
+import CreateSheet from '../CreateSheet/CreateSheet';
 import './BottomNav.scss';
 
-interface BottomNavProps {
-  onCreateOpen: () => void;
-}
+const BottomNav: React.FC = () => {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-const BottomNav: React.FC<BottomNavProps> = ({ onCreateOpen }) => {
   return (
     <nav className="bottom-nav">
+      <CreateSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
       <NavLink to="/" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
         <Home size={24} />
         <span>Home</span>
@@ -22,7 +22,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ onCreateOpen }) => {
         <Library size={24} />
         <span>Your Library</span>
       </NavLink>
-      <button className="nav-item" onClick={onCreateOpen}>
+      <button className="nav-item" onClick={() => setIsCreateOpen(true)}>
         <PlusSquare size={24} />
         <span>Create</span>
       </button>

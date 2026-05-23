@@ -12,7 +12,7 @@ interface DesktopPlayerProps {
 }
 
 const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpen }) => {
-  const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
+  const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
 
   if (!currentTrack) return null;
@@ -30,10 +30,13 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
         <img src={currentTrack.image} alt={currentTrack.name} />
         <div className="text">
           <span className="name">{currentTrack.name}</span>
-          <span className="artist">{currentTrack.artist}</span>
+          <div className="meta">
+              {currentTrack.provider === 'itunes' && <span className="preview-tag">Preview only</span>}
+              <span className="artist">{currentTrack.artist}</span>
+          </div>
         </div>
         <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack.id)); }}>
-          <Heart size={16} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
+          <Heart size={16} className={isLiked ? 'liked' : ''} fill={isLiked ? '#1DB954' : 'none'} />
         </button>
       </div>
 
@@ -44,7 +47,7 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
           </button>
           <button onClick={() => dispatch(previousTrack())}><SkipBack size={20} fill="white" /></button>
           <button className="play-pause" onClick={() => dispatch(togglePlay())}>
-            {isPlaying ? <Pause size={24} fill="black" /> : <Play size={24} fill="black" />}
+            {isPlaying ? <Pause size={20} fill="black" /> : <Play size={20} fill="black" />}
           </button>
           <button onClick={() => dispatch(nextTrack())}><SkipForward size={20} fill="white" /></button>
           <button className={`repeat ${repeatMode !== 'off' ? 'active' : ''}`} onClick={() => dispatch(toggleRepeat())}>

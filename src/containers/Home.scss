@@ -1,10 +1,12 @@
 @import '../styles/mixins.scss';
 
 .home-screen {
+  padding: var(--spacing-md);
+
   .recent-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm);
+    grid-template-columns: repeat(2, 1fr); // Specified 2 columns
+    gap: 8px; // Specified 8px
     margin-bottom: var(--spacing-xl);
 
     @include desktop {
