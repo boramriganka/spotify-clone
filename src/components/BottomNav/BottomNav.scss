@@ -1,21 +1,21 @@
-@import '../../styles/mixins.scss';
+@import '../../styles/global.scss';
 
 .bottom-nav {
-  height: calc(64px + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 100%);
-  backdrop-filter: blur(20px);
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: var(--z-sticky);
-  padding-top: 8px;
-  padding-bottom: env(safe-area-inset-bottom);
+  height: calc(var(--nav-height) + var(--safe-bottom));
+  background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 100%);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: var(--safe-bottom);
+  z-index: 100;
+  border-top: 1px solid rgba(255,255,255,0.05);
 
-  @include desktop {
+  @media (min-width: 769px) {
     display: none;
   }
 
@@ -24,27 +24,19 @@
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    color: #b3b3b3;
+    color: var(--text-secondary);
     font-size: 10px;
     flex: 1;
-    text-decoration: none;
+    height: 100%;
+    justify-content: center;
 
     &.active {
-      color: #fff;
+      color: var(--text-primary);
     }
 
     svg {
-      transition: transform 0.2s ease;
       width: 24px;
       height: 24px;
-    }
-
-    &:active svg {
-      transform: scale(0.9);
-    }
-
-    span {
-      font-weight: 400;
     }
   }
 }

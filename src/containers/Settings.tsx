@@ -1,116 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, ArrowLeft, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
+import { RootState } from '../store';
+import { updateSetting } from '../store/slices/musicSlice';
 import './Settings.scss';
 
 const Settings: React.FC = () => {
-  const navigate = useNavigate();
-  const [toggles, setToggles] = useState(() => {
-    const saved = localStorage.getItem('spotify_settings_toggles');
-    return saved ? JSON.parse(saved) : {
-      privateSession: false,
-      autoplay: true,
-      gapless: true,
-      dataSaver: false,
-      downloadWifiOnly: true,
-      normalizeVolume: true,
-      showCanvas: true,
-    };
-  });
+  const dispatch = useDispatch();
+  const settings = useSelector((state: RootState) => state.music);
 
-  useEffect(() => {
-    localStorage.setItem('spotify_settings_toggles', JSON.stringify(toggles));
-  }, [toggles]);
-
-  const handleToggle = (key: string) => {
-    setToggles((prev: any) => ({ ...prev, [key]: !prev[key] }));
+  const handleToggle = (key: any, value: boolean) => {
+    dispatch(updateSetting({ key, value: !value }));
   };
 
-  const sections = [
-    {
-      title: 'Account',
-      items: [
-        { label: 'Private session', type: 'toggle', key: 'privateSession', subtitle: 'Hide your listening activity' },
-        { label: 'Profile', type: 'link' },
-      ]
-    },
-    {
-      title: 'Playback',
-      items: [
-        { label: 'Autoplay', type: 'toggle', key: 'autoplay', subtitle: 'Keep the music playing when yours ends' },
-        { label: 'Gapless playback', type: 'toggle', key: 'gapless' },
-        { label: 'Normalize volume', type: 'toggle', key: 'normalizeVolume' },
-      ]
-    },
-    {
-      title: 'Data Saver',
-      items: [
-        { label: 'Data Saver', type: 'toggle', key: 'dataSaver', subtitle: 'Reduces data usage' },
-        { label: 'Download over Wi-Fi only', type: 'toggle', key: 'downloadWifiOnly' },
-      ]
-    },
-    {
-      title: 'Content and display',
-      items: [
-        { label: 'Show Canvas', type: 'toggle', key: 'showCanvas' },
-        { label: 'Explicit content', type: 'link' },
-      ]
-    },
-    {
-      title: 'About and support',
-      items: [
-        { label: 'Provider status', type: 'link', action: 'debug' },
-        { label: 'Terms and Conditions', type: 'link' },
-      ]
-    },
-  ];
-
-  const [showDebug, setShowDebug] = useState(false);
+  const SettingRow = ({ title, desc, value, onToggle }: any) => (
+    <div className="setting-row" onClick={onToggle}>
+      <div className="text">
+        <span className="title">{title}</span>
+        {desc && <span className="desc">{desc}</span>}
+      </div>
+      <div className={`toggle ${value ? 'on' : ''}`}>
+        <div className="knob" />
+      </div>
+    </div>
+  );
 
   return (
-    <div className="settings-screen">
-      {showDebug && (
-        <div className="debug-panel-overlay" onClick={() => setShowDebug(false)}>
-           <div className="debug-panel" onClick={e => e.stopPropagation()}>
-              <h3>Provider Status</h3>
-              <ul>
-                <li>Audius: <span className="status-ok">Active</span></li>
-                <li>Jamendo: <span className="status-ok">Active (Demo Key)</span></li>
-                <li>iTunes: <span className="status-ok">Active Fallback</span></li>
-              </ul>
-              <button onClick={() => setShowDebug(false)}>Close</button>
-           </div>
-        </div>
-      )}
+    <div className="settings-screen scroll-container">
       <header className="settings-header">
-        <button className="back-btn" onClick={() => navigate(-1)}><ArrowLeft size={24} /></button>
-        <h1>Settings</h1>
-        <button className="search-btn"><Search size={24} /></button>
+        <button className="back-btn" onClick={() => window.history.back()}>
+          <ArrowLeft size={24} />
+        </button>
+        <h2>Settings</h2>
       </header>
 
-      <div className="settings-content scroll-container">
-        {sections.map((section) => (
-          <div key={section.title} className="settings-section">
-            <h2>{section.title}</h2>
-            {section.items.map((item: any) => (
-              <div key={item.label} className="settings-item" onClick={() => item.type === 'toggle' ? handleToggle(item.key) : (item.action === 'debug' ? setShowDebug(true) : null)}>
-                <div className="item-text">
-                  <span className="label">{item.label}</span>
-                  {item.subtitle && <span className="subtitle">{item.subtitle}</span>}
-                </div>
-                {item.type === 'toggle' ? (
-                  <div className={`toggle-switch ${toggles[item.key] ? 'active' : ''}`}>
-                    <div className="toggle-thumb" />
-                  </div>
-                ) : (
-                  <ChevronRight size={20} color="var(--text-secondary)" />
-                )}
-              </div>
-            ))}
+      <div className="settings-content">
+        <section>
+          <h3>Account</h3>
+          <div className="account-item">
+            <div className="avatar">M</div>
+            <div className="info">
+              <span className="name">Mriganka</span>
+              <span className="view-profile">View Profile</span>
+            </div>
+            <ChevronRight size={20} color="var(--text-secondary)" />
           </div>
-        ))}
+        </section>
 
-        <button className="logout-btn">Log out</button>
+        <section>
+          <h3>Playback</h3>
+          <SettingRow
+            title="Full songs only"
+            desc="Prefer full playable tracks over 30s previews"
+            value={settings.fullSongOnly}
+            onToggle={() => handleToggle('fullSongOnly', settings.fullSongOnly)}
+          />
+          <SettingRow
+            title="Autoplay"
+            desc="Keep on listening to similar tracks"
+            value={settings.autoplay}
+            onToggle={() => handleToggle('autoplay', settings.autoplay)}
+          />
+          <SettingRow
+            title="Private session"
+            desc="Listen anonymously"
+            value={settings.privateSession}
+            onToggle={() => handleToggle('privateSession', settings.privateSession)}
+          />
+        </section>
+
+        <section>
+          <h3>Data Saver</h3>
+          <SettingRow
+            title="Data Saver"
+            desc="Sets audio quality to low"
+            value={settings.dataSaver}
+            onToggle={() => handleToggle('dataSaver', settings.dataSaver)}
+          />
+        </section>
+
+        <div className="logout-section">
+           <button className="logout-btn">Log out</button>
+           <span className="version">Version 1.0.0-spotify-clone</span>
+        </div>
       </div>
     </div>
   );

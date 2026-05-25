@@ -20,12 +20,16 @@ const AppShell: React.FC = () => {
   });
   const location = useLocation();
 
-  // Show drawer trigger only on Home
   const isHome = location.pathname === '/';
+  const isLibrary = location.pathname === '/library';
 
   React.useEffect(() => {
     (window as any).toggleDrawer = () => setIsDrawerOpen(true);
-    return () => { delete (window as any).toggleDrawer; };
+    (window as any).toggleCreate = () => setIsCreateOpen(true);
+    return () => {
+      delete (window as any).toggleDrawer;
+      delete (window as any).toggleCreate;
+    };
   }, []);
 
   const togglePanel = () => {
@@ -61,7 +65,6 @@ const AppShell: React.FC = () => {
             <Outlet />
           </div>
 
-          {/* Bottom spacing for mini player and bottom nav */}
           <div className="content-bottom-spacing" />
         </main>
 
@@ -69,6 +72,7 @@ const AppShell: React.FC = () => {
       </div>
 
       <AccountDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+      <CreateSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
 
       <MiniPlayer onExpand={() => setIsPlayerOpen(true)} />
       <FullPlayer isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />

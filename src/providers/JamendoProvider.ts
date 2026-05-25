@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { MusicProvider, Track, Artist, Album, Playlist } from './types';
+import { MusicProvider, Track, Artist, Album, Playlist, MediaItem } from './types';
 
-const JAMENDO_API_BASE = process.env.REACT_APP_JAMENDO_API_BASE || 'https://api.jamendo.com/v3.0';
-const JAMENDO_CLIENT_ID = process.env.REACT_APP_JAMENDO_CLIENT_ID || '56d3047d'; // Default demo key
+const JAMENDO_API_BASE = 'https://api.jamendo.com/v3.0';
+const JAMENDO_CLIENT_ID = '56d3047d'; // Default demo key
 
 export class JamendoProvider implements MusicProvider {
   name = 'jamendo';
@@ -28,46 +28,42 @@ export class JamendoProvider implements MusicProvider {
       id: `jamendo-${t.id}`,
       name: t.name,
       artist: t.artist_name,
-      artistId: `jamendo-artist-${t.artist_id}`,
       album: t.album_name,
-      albumId: `jamendo-album-${t.album_id}`,
       duration: t.duration,
-      image: t.album_image || t.image || 'https://via.placeholder.com/150',
+      artworkUrl: t.album_image || t.image || 'https://via.placeholder.com/150',
       streamUrl: t.audio,
-      provider: 'jamendo',
-      type: 'track',
-      isFull: true,
-      availability: 'full'
+      playability: 'full',
+      source: 'jamendo',
+      type: 'track'
     };
   }
 
-  async searchTracks(query: string): Promise<Track[]> {
+  async searchTracks(query: string): Promise<MediaItem[]> {
     const results = await this.fetch('/tracks', { search: query, limit: 20, audioformat: 'mp32' });
     return results ? results.map((t: any) => this.mapTrack(t)) : [];
   }
 
-  async searchArtists(query: string): Promise<Artist[]> {
+  async searchArtists(query: string): Promise<MediaItem[]> {
     const results = await this.fetch('/artists', { name: query, limit: 10 });
     return results ? results.map((a: any) => ({
       id: `jamendo-artist-${a.id}`,
       name: a.name,
-      image: a.image || 'https://via.placeholder.com/150',
-      provider: 'jamendo',
+      artworkUrl: a.image || 'https://via.placeholder.com/150',
+      genres: [],
       type: 'artist'
-    })) : [];
+    } as MediaItem)) : [];
   }
 
-  async searchAlbums(query: string): Promise<Album[]> {
+  async searchAlbums(query: string): Promise<MediaItem[]> {
     const results = await this.fetch('/albums', { namesearch: query, limit: 10 });
     return results ? results.map((a: any) => ({
       id: `jamendo-album-${a.id}`,
-      name: a.name,
-      artist: a.artist_name,
-      image: a.image || 'https://via.placeholder.com/150',
-      tracks: [],
-      provider: 'jamendo',
+      title: a.name,
+      artistId: `jamendo-artist-${a.artist_id}`,
+      artworkUrl: a.image || 'https://via.placeholder.com/150',
+      trackIds: [],
       type: 'album'
-    })) : [];
+    } as MediaItem)) : [];
   }
 
   async getTrack(id: string): Promise<Track | null> {
@@ -84,8 +80,8 @@ export class JamendoProvider implements MusicProvider {
     return {
       id: `jamendo-artist-${a.id}`,
       name: a.name,
-      image: a.image || 'https://via.placeholder.com/150',
-      provider: 'jamendo',
+      artworkUrl: a.image || 'https://via.placeholder.com/150',
+      genres: [],
       type: 'artist'
     };
   }
@@ -97,11 +93,10 @@ export class JamendoProvider implements MusicProvider {
     const a = results[0];
     return {
       id: `jamendo-album-${a.id}`,
-      name: a.name,
-      artist: a.artist_name,
-      image: a.image || 'https://via.placeholder.com/150',
-      tracks: [],
-      provider: 'jamendo',
+      title: a.name,
+      artistId: `jamendo-artist-${a.artist_id}`,
+      artworkUrl: a.image || 'https://via.placeholder.com/150',
+      trackIds: [],
       type: 'album'
     };
   }
@@ -113,12 +108,11 @@ export class JamendoProvider implements MusicProvider {
     const p = results[0];
     return {
       id: `jamendo-playlist-${p.id}`,
-      name: p.name,
+      title: p.name,
       description: '',
       owner: p.user_name,
-      image: p.shareurl, // Jamendo playlists don't always have simple images
-      tracks: [],
-      provider: 'jamendo',
+      artworkUrl: p.shareurl,
+      trackIds: [],
       type: 'playlist'
     };
   }

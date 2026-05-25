@@ -1,107 +1,140 @@
-@import '../styles/mixins.scss';
-
 .settings-screen {
-  .settings-header {
-    @include flex-between;
-    margin-bottom: var(--spacing-xl);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--spotify-base);
 
-    h1 {
+  .settings-header {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    gap: 16px;
+    background-color: var(--spotify-base);
+
+    h2 {
       font-size: 16px;
       font-weight: 700;
     }
   }
 
-  .settings-section {
-    margin-bottom: var(--spacing-xl);
+  .settings-content {
+    flex: 1;
+    padding-bottom: 120px;
 
-    h2 {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: var(--spacing-md);
+    section {
+      margin-top: 24px;
+
+      h3 {
+        padding: 0 16px;
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+
+      .account-item {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 12px;
+
+        .avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: #f57c00;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 20px;
+        }
+
+        .info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+
+          .name {
+            font-size: 16px;
+            font-weight: 500;
+          }
+          .view-profile {
+            font-size: 12px;
+            color: var(--text-secondary);
+          }
+        }
+      }
     }
 
-    .settings-item {
-      @include flex-between;
-      padding: var(--spacing-md) 0;
+    .setting-row {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      gap: 16px;
       cursor: pointer;
 
-      .item-text {
+      .text {
+        flex: 1;
         display: flex;
         flex-direction: column;
         gap: 2px;
 
-        .label {
-          font-size: 14px;
+        .title {
+          font-size: 15px;
           font-weight: 500;
         }
-
-        .subtitle {
+        .desc {
           font-size: 12px;
           color: var(--text-secondary);
         }
       }
 
-      .toggle-switch {
-        width: 40px;
-        height: 20px;
-        background-color: #535353;
-        border-radius: 10px;
+      .toggle {
+        width: 44px;
+        height: 24px;
+        background: #727272;
+        border-radius: 12px;
         position: relative;
-        transition: background-color 0.2s;
+        transition: background 0.2s;
 
-        &.active {
-          background-color: var(--spotify-green);
-          .toggle-thumb {
+        &.on {
+          background: var(--spotify-green);
+          .knob {
             left: 22px;
           }
         }
 
-        .toggle-thumb {
+        .knob {
+          width: 20px;
+          height: 20px;
+          background: white;
+          border-radius: 50%;
           position: absolute;
           top: 2px;
           left: 2px;
-          width: 16px;
-          height: 16px;
-          background-color: #fff;
-          border-radius: 50%;
           transition: left 0.2s;
         }
       }
     }
-  }
 
-  .logout-btn {
-    width: 100%;
-    @include flex-center;
-    padding: var(--spacing-md);
-    font-weight: 700;
-    margin-top: var(--spacing-xl);
-    border: 1px solid var(--text-secondary);
-    border-radius: var(--radius-full);
-  }
+    .logout-section {
+      padding: 48px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
 
-  .debug-panel-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 1000;
-    @include flex-center;
-
-    .debug-panel {
-      background: #282828;
-      padding: 24px;
-      border-radius: 8px;
-      width: 300px;
-
-      h3 { margin-bottom: 16px; font-weight: 700; }
-      ul {
-        list-style: none; margin-bottom: 24px;
-        li { margin-bottom: 8px; font-size: 14px; }
+      .logout-btn {
+        padding: 12px 32px;
+        background: white;
+        color: black;
+        border-radius: 24px;
+        font-weight: 700;
       }
-      .status-ok { color: var(--spotify-green); }
-      button {
-        width: 100%; background: var(--spotify-green); color: #000;
-        padding: 8px; border-radius: 4px; font-weight: 700;
+
+      .version {
+        font-size: 11px;
+        color: var(--text-secondary);
       }
     }
   }

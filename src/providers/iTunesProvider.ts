@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MusicProvider, Track, Artist, Album, Playlist } from './types';
+import { MusicProvider, Track, Artist, Album, Playlist, MediaItem } from './types';
 
 const ITUNES_URL = 'https://itunes.apple.com/search';
 
@@ -21,46 +21,42 @@ export class iTunesProvider implements MusicProvider {
       id: `itunes-${item.trackId || item.collectionId}`,
       name: item.trackName || item.collectionName || 'Unknown',
       artist: item.artistName || 'Unknown Artist',
-      artistId: `itunes-artist-${item.artistId}`,
       album: item.collectionName || '',
-      albumId: `itunes-album-${item.collectionId}`,
       duration: Math.floor((item.trackTimeMillis || 0) / 1000),
-      image: item.artworkUrl100?.replace('100x100bb', '600x600bb') || 'https://via.placeholder.com/600',
-      previewUrl: item.previewUrl || '',
-      provider: 'itunes',
-      type: 'track',
-      isFull: false,
-      availability: 'preview'
+      artworkUrl: item.artworkUrl100?.replace('100x100bb', '600x600bb') || 'https://via.placeholder.com/600',
+      streamUrl: item.previewUrl || '',
+      playability: 'preview',
+      source: 'itunes',
+      type: 'track'
     };
   }
 
-  async searchTracks(query: string): Promise<Track[]> {
+  async searchTracks(query: string): Promise<MediaItem[]> {
     const results = await this.fetch({ term: query, media: 'music', limit: 20 });
     return results ? results.map((t: any) => this.mapTrack(t)) : [];
   }
 
-  async searchArtists(query: string): Promise<Artist[]> {
+  async searchArtists(query: string): Promise<MediaItem[]> {
     const results = await this.fetch({ term: query, entity: 'musicArtist', limit: 10 });
     return results ? results.map((a: any) => ({
       id: `itunes-artist-${a.artistId}`,
       name: a.artistName,
-      image: 'https://via.placeholder.com/300', // iTunes doesn't easily provide artist images in search
-      provider: 'itunes',
+      artworkUrl: 'https://via.placeholder.com/300',
+      genres: [],
       type: 'artist'
-    })) : [];
+    } as MediaItem)) : [];
   }
 
-  async searchAlbums(query: string): Promise<Album[]> {
+  async searchAlbums(query: string): Promise<MediaItem[]> {
     const results = await this.fetch({ term: query, entity: 'album', limit: 10 });
     return results ? results.map((a: any) => ({
       id: `itunes-album-${a.collectionId}`,
-      name: a.collectionName,
-      artist: a.artistName,
-      image: a.artworkUrl100?.replace('100x100bb', '600x600bb'),
-      tracks: [],
-      provider: 'itunes',
+      title: a.collectionName,
+      artistId: `itunes-artist-${a.artistId}`,
+      artworkUrl: a.artworkUrl100?.replace('100x100bb', '600x600bb'),
+      trackIds: [],
       type: 'album'
-    })) : [];
+    } as MediaItem)) : [];
   }
 
   async getTrack(id: string): Promise<Track | null> {
@@ -76,8 +72,8 @@ export class iTunesProvider implements MusicProvider {
     return {
       id: `itunes-artist-${results[0].artistId}`,
       name: results[0].artistName,
-      image: 'https://via.placeholder.com/300',
-      provider: 'itunes',
+      artworkUrl: 'https://via.placeholder.com/300',
+      genres: [],
       type: 'artist'
     };
   }
@@ -87,24 +83,22 @@ export class iTunesProvider implements MusicProvider {
     const results = await this.fetch({ id: cleanId, entity: 'song' });
     if (!results || results.length === 0) return null;
     const albumInfo = results[0];
-    const tracks = results.slice(1).map((t: any) => this.mapTrack(t));
     return {
       id: `itunes-album-${albumInfo.collectionId}`,
-      name: albumInfo.collectionName,
-      artist: albumInfo.artistName,
-      image: albumInfo.artworkUrl100?.replace('100x100bb', '600x600bb'),
-      tracks,
-      provider: 'itunes',
+      title: albumInfo.collectionName,
+      artistId: `itunes-artist-${albumInfo.artistId}`,
+      artworkUrl: albumInfo.artworkUrl100?.replace('100x100bb', '600x600bb'),
+      trackIds: [],
       type: 'album'
     };
   }
 
   async getPlaylist(id: string): Promise<Playlist | null> {
-    return null; // iTunes API doesn't support public playlists easily
+    return null;
   }
 
   async getStreamUrl(trackId: string): Promise<string | null> {
     const track = await this.getTrack(trackId);
-    return track ? track.previewUrl || null : null;
+    return track ? track.streamUrl || null : null;
   }
 }

@@ -2,7 +2,8 @@ import React from 'react';
 import { Play, Pause, SkipBack, SkipForward, Heart, Speaker, Shuffle, Repeat, ListMusic, Maximize2 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { togglePlay, toggleLike, nextTrack, previousTrack, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
+import { togglePlay, nextTrack, previousTrack, toggleShuffle, toggleRepeat, setProgress } from '../../store/slices/playerSlice';
+import { toggleLike } from '../../store/slices/musicSlice';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import './DesktopPlayer.scss';
 
@@ -12,8 +13,11 @@ interface DesktopPlayerProps {
 }
 
 const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpen }) => {
-  const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, isPlaying, progress, duration, isShuffled, repeatMode } = useSelector((state: RootState) => state.player);
+  const { tracksById, likedTrackIds } = useSelector((state: RootState) => state.music);
   const dispatch = useDispatch();
+
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
 
   if (!currentTrack) return null;
 
@@ -27,11 +31,11 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
   return (
     <footer className="desktop-player">
       <div className="track-section" onClick={onTogglePanel}>
-        <img src={currentTrack.image} alt={currentTrack.name} />
+        <img src={currentTrack.artworkUrl} alt={currentTrack.name} />
         <div className="text">
           <span className="name">{currentTrack.name}</span>
           <div className="meta">
-              {currentTrack.provider === 'itunes' && <span className="preview-tag">Preview only</span>}
+              {currentTrack.playability === 'preview' && <span className="preview-tag">Preview only</span>}
               <span className="artist">{currentTrack.artist}</span>
           </div>
         </div>
@@ -56,7 +60,7 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
         </div>
         <div className="progress-area">
           <span>{formatTime(progress)}</span>
-          <ProgressBar progress={progress} duration={duration} onSeek={(t) => dispatch(seekTo(t))} />
+          <ProgressBar progress={progress} duration={duration} onSeek={(t) => dispatch(setProgress(t))} />
           <span>{formatTime(duration)}</span>
         </div>
       </div>

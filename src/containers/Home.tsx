@@ -1,83 +1,100 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import MediaCard from '../components/MediaCard/MediaCard';
 import HorizontalShelf from '../components/HorizontalShelf/HorizontalShelf';
 import { musicService } from '../providers';
-import { MediaItem } from '../providers/types';
-import { setTrack } from '../store/slices/playerSlice';
+import { MediaItem, Track, Artist } from '../providers/types';
+import { setPlayback } from '../store/slices/playerSlice';
+import { addTracks, addArtists } from '../store/slices/musicSlice';
+import { RootState } from '../store';
+import { useNavigate } from 'react-router-dom';
 import './Home.scss';
 
 const Home: React.FC = () => {
-  const [recentItems, setRecentItems] = useState<MediaItem[]>([]);
-  const [newReleases, setNewReleases] = useState<MediaItem[]>([]);
-  const [featuredArtists, setFeaturedArtists] = useState<MediaItem[]>([]);
-  const [recentlyPlayed, setRecentlyPlayed] = useState<MediaItem[]>([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [recentGridIds, setRecentGridIds] = useState<string[]>([]);
+  const [newReleaseIds, setNewReleaseIds] = useState<string[]>([]);
+  const [featuredArtistIds, setFeaturedArtistIds] = useState<string[]>([]);
+
+  const { tracksById, artistsById, fullSongOnly } = useSelector((state: RootState) => state.music);
 
   useEffect(() => {
     const loadData = async () => {
-      // Load real recently played from storage
-      try {
-        const saved = localStorage.getItem('spotify_recentlyPlayed');
-        if (saved) setRecentlyPlayed(JSON.parse(saved));
-      } catch (e) {}
-
-      // Personalized discovery focused on full songs
+      const options = { filterFull: fullSongOnly };
       const [recent, releases, artists, assamese] = await Promise.all([
-        musicService.search('discovery', { filterFull: true }),
-        musicService.search('New Music', { filterFull: true }),
-        musicService.search('popular artists', { filterFull: true }),
-        musicService.search('Assamese EDM', { filterFull: true })
+        musicService.search('discovery', options),
+        musicService.search('New Music', options),
+        musicService.search('popular artists', options),
+        musicService.search('Assamese EDM', options)
       ]);
 
-      setRecentItems(assamese.slice(0, 8));
-      setNewReleases(releases.slice(0, 16));
-      setFeaturedArtists(artists.filter(a => a.type === 'artist').slice(0, 10));
+      const allTracks = [...recent, ...releases, ...assamese].filter(i => i.type === 'track') as Track[];
+      dispatch(addTracks(allTracks));
+
+      const allArtists = artists.filter(i => i.type === 'artist') as Artist[];
+      dispatch(addArtists(allArtists.map(a => ({
+        id: a.id,
+        name: a.name,
+        artworkUrl: a.artworkUrl || '',
+        genres: [],
+        type: 'artist' as const
+      }))));
+
+      setRecentGridIds(assamese.slice(0, 8).map(i => i.id));
+      setNewReleaseIds(releases.slice(0, 16).map(i => i.id));
+      setFeaturedArtistIds(allArtists.slice(0, 10).map(i => i.id));
     };
 
     loadData();
-  }, []);
+  }, [dispatch, fullSongOnly]);
 
-  const dispatch = useDispatch();
-
-  const handlePlay = (item: MediaItem) => {
-    if (item.type === 'track') {
-      dispatch(setTrack({ track: item }));
+  const handlePlay = (id: string) => {
+    const track = tracksById[id];
+    if (track) {
+      dispatch(setPlayback({
+        trackId: id,
+        queue: [...newReleaseIds, ...recentGridIds]
+      }));
     }
-    // Handle other types as needed
+  };
+
+  const handleArtistClick = (id: string) => {
+     navigate(`/artist?id=${id}`);
   };
 
   return (
-    <div className="home-screen">
+    <div className="home-screen scroll-container">
       <section className="recent-grid">
-        {recentItems.slice(0, 6).map((item) => (
-          <MediaCard key={item.id} item={item} variant="tile" onClick={() => handlePlay(item)} />
-        ))}
+        {recentGridIds.slice(0, 6).map((id) => {
+          const item = tracksById[id];
+          if (!item) return null;
+          return <MediaCard key={id} item={item} variant="tile" onClick={() => handlePlay(id)} />;
+        })}
       </section>
 
-      {recentlyPlayed.length > 0 && (
-        <HorizontalShelf title="Recently played" onSeeAll={() => {}}>
-          {recentlyPlayed.map((item) => (
-            <MediaCard key={item.id} item={item} />
-          ))}
-        </HorizontalShelf>
-      )}
-
-      <HorizontalShelf title="Full songs you can play now" onSeeAll={() => {}}>
-        {newReleases.map((item) => (
-          <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
-        ))}
+      <HorizontalShelf title="New Releases" onSeeAll={() => {}}>
+        {newReleaseIds.map((id) => {
+          const item = tracksById[id];
+          if (!item) return null;
+          return <MediaCard key={id} item={item} onClick={() => handlePlay(id)} />;
+        })}
       </HorizontalShelf>
 
       <HorizontalShelf title="Assamese / Indian discovery" onSeeAll={() => {}}>
-        {recentItems.map((item) => (
-          <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
-        ))}
+        {recentGridIds.map((id) => {
+          const item = tracksById[id];
+          if (!item) return null;
+          return <MediaCard key={id} item={item} onClick={() => handlePlay(id)} />;
+        })}
       </HorizontalShelf>
 
       <HorizontalShelf title="Popular artists" onSeeAll={() => {}}>
-        {featuredArtists.map((item) => (
-          <MediaCard key={item.id} item={item} variant="circle" onClick={() => handlePlay(item)} />
-        ))}
+        {featuredArtistIds.map((id) => {
+          const artist = artistsById[id];
+          if (!artist) return null;
+          return <MediaCard key={id} item={artist} variant="circle" onClick={() => handleArtistClick(id)} />;
+        })}
       </HorizontalShelf>
     </div>
   );

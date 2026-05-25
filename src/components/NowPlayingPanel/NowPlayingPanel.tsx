@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Heart } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { toggleLike } from '../../store/slices/playerSlice';
+import { toggleLike } from '../../store/slices/musicSlice';
 import './NowPlayingPanel.scss';
 
 interface NowPlayingPanelProps {
@@ -12,8 +12,11 @@ interface NowPlayingPanelProps {
 }
 
 const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) => {
-  const { currentTrack, likedTrackIds } = useSelector((state: RootState) => state.player);
+  const { currentTrackId } = useSelector((state: RootState) => state.player);
+  const { tracksById, likedTrackIds } = useSelector((state: RootState) => state.music);
   const dispatch = useDispatch();
+
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
 
   if (!currentTrack) return null;
 
@@ -37,7 +40,7 @@ const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) =>
           </div>
 
           <div className="panel-content scroll-container">
-            <img src={currentTrack.image} alt={currentTrack.name} className="main-art" />
+            <img src={currentTrack.artworkUrl} alt={currentTrack.name} className="main-art" />
 
             <div className="track-info">
               <div className="text">
@@ -50,7 +53,7 @@ const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) =>
             </div>
 
             <div className="artist-card">
-              <div className="banner" style={{ backgroundImage: `url(${currentTrack.image})` }}>
+              <div className="banner" style={{ backgroundImage: `url(${currentTrack.artworkUrl})` }}>
                 <span>About the artist</span>
               </div>
               <div className="content">

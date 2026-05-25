@@ -25,8 +25,14 @@ const CreateSheet: React.FC<CreateSheetProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  const handleCancel = () => {
+    setIsNaming(false);
+    setPlaylistName('');
+    onClose();
+  };
+
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title="Create">
+    <BottomSheet isOpen={isOpen} onClose={handleCancel} title={isNaming ? "Give your playlist a name" : "Create"}>
       <div className="create-sheet-content">
         {!isNaming ? (
           <div className="options">
@@ -54,17 +60,17 @@ const CreateSheet: React.FC<CreateSheetProps> = ({ isOpen, onClose }) => {
           </div>
         ) : (
           <div className="naming-flow">
-            <h3>Give your playlist a name</h3>
             <input
               type="text"
               value={playlistName}
               onChange={(e) => setPlaylistName(e.target.value)}
               placeholder="My Playlist #1"
               autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
             />
             <div className="actions">
-              <button onClick={() => setIsNaming(false)}>Cancel</button>
-              <button className="create-btn" onClick={handleCreate}>Create</button>
+              <button className="cancel-btn" onClick={() => setIsNaming(false)}>Cancel</button>
+              <button className="create-btn" onClick={handleCreate} disabled={!playlistName.trim()}>Create</button>
             </div>
           </div>
         )}

@@ -1,4 +1,4 @@
-import { Playlist, Track } from '../providers/types';
+import { Playlist } from '../providers/types';
 
 const PLAYLISTS_KEY = 'spotify_clone_user_playlists';
 
@@ -12,16 +12,15 @@ export const getUserPlaylists = (): Playlist[] => {
   }
 };
 
-export const saveUserPlaylist = (name: string): Playlist => {
+export const saveUserPlaylist = (title: string): Playlist => {
   const playlists = getUserPlaylists();
   const newPlaylist: Playlist = {
     id: `local-playlist-${Date.now()}`,
-    name,
+    title,
     description: 'A new custom playlist',
-    image: 'https://picsum.photos/seed/playlist/300/300',
+    artworkUrl: 'https://picsum.photos/seed/playlist/300/300',
     owner: 'Mriganka',
-    tracks: [],
-    provider: 'local',
+    trackIds: [],
     type: 'playlist'
   };
   playlists.push(newPlaylist);
@@ -30,12 +29,12 @@ export const saveUserPlaylist = (name: string): Playlist => {
   return newPlaylist;
 };
 
-export const addTrackToPlaylist = (playlistId: string, track: Track) => {
+export const addTrackToPlaylist = (playlistId: string, trackId: string) => {
   const playlists = getUserPlaylists();
   const playlist = playlists.find(p => p.id === playlistId);
   if (playlist) {
-    if (!playlist.tracks.some(t => t.id === track.id)) {
-      playlist.tracks.push(track);
+    if (!playlist.trackIds.includes(trackId)) {
+      playlist.trackIds.push(trackId);
       localStorage.setItem(PLAYLISTS_KEY, JSON.stringify(playlists));
       window.dispatchEvent(new Event('playlists_updated'));
     }

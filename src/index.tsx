@@ -6,6 +6,7 @@ import { store } from './store';
 import AppShell from './layouts/AppShell';
 import Home from './containers/Home';
 import Search from './containers/Search';
+import Library from './containers/Library';
 import Playlist from './containers/Playlist';
 import Artist from './containers/Artist';
 import Settings from './containers/Settings';
@@ -22,7 +23,7 @@ root.render(
           <Route path="/" element={<AppShell />}>
             <Route index element={<Home />} />
             <Route path="search" element={<Search />} />
-            <Route path="library" element={<Playlist />} />
+            <Route path="library" element={<Library />} />
             <Route path="liked" element={<Playlist />} />
             <Route path="playlist/:id" element={<Playlist />} />
             <Route path="artist" element={<Artist />} />

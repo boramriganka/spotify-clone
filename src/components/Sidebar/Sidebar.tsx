@@ -5,13 +5,18 @@ import { getUserPlaylists } from '../../providers/localProvider';
 import './Sidebar.scss';
 
 const Sidebar: React.FC = () => {
-  const [localPlaylists, setLocalPlaylists] = useState(getUserPlaylists());
+  const [localPlaylists, setLocalPlaylists] = useState<any[]>(getUserPlaylists());
 
   useEffect(() => {
     const update = () => setLocalPlaylists(getUserPlaylists());
     window.addEventListener('playlists_updated', update);
     return () => window.removeEventListener('playlists_updated', update);
   }, []);
+
+  const handleCreate = () => {
+    (window as any).toggleCreate?.();
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-nav">
@@ -30,7 +35,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       <div className="sidebar-actions">
-        <button className="action-item">
+        <button className="action-item" onClick={handleCreate}>
           <div className="icon-box create-playlist">
             <PlusSquare size={20} />
           </div>
@@ -49,7 +54,7 @@ const Sidebar: React.FC = () => {
       <div className="sidebar-playlists scroll-container">
         {localPlaylists.map((p) => (
           <NavLink key={p.id} to={`/playlist/${p.id}`} className="playlist-item">
-            {p.name}
+            {p.title || p.name}
           </NavLink>
         ))}
         <div className="sidebar-divider" style={{ margin: '8px 0' }} />

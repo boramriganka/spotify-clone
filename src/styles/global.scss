@@ -1,74 +1,93 @@
-@import './tokens.scss';
-@import './mixins.scss';
-
-// Import component styles
-@import '../components/Sidebar/Sidebar.scss';
-@import '../components/BottomNav/BottomNav.scss';
-@import '../components/AccountDrawer/AccountDrawer.scss';
-@import '../components/MediaCard/MediaCard.scss';
-@import '../components/TrackRow/TrackRow.scss';
-@import '../components/HorizontalShelf/HorizontalShelf.scss';
-@import '../components/MiniPlayer/MiniPlayer.scss';
-@import '../components/FullPlayer/FullPlayer.scss';
-@import '../components/BottomSheet/BottomSheet.scss';
-@import '../components/FullPlayer/BottomSheetContent.scss';
-
-// Import layout and screen styles
-@import '../layouts/AppShell.scss';
-@import '../containers/Home.scss';
-@import '../containers/Search.scss';
-@import '../containers/Playlist.scss';
-@import '../containers/Artist.scss';
-@import '../containers/Settings.scss';
+:root {
+  --spotify-green: #1ED760;
+  --spotify-black: #000000;
+  --spotify-base: #121212;
+  --spotify-surface: #181818;
+  --spotify-surface-elevated: #242424;
+  --spotify-highlight: #2a2a2a;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B3B3B3;
+  --nav-height: 64px;
+  --player-height: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: var(--black);
+  margin: 0;
+  background-color: var(--spotify-black);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
+  font-family: 'Circular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden; /* AppShell handles scrolling */
+  user-select: none;
 }
-
-button {
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  font-family: inherit;
-  outline: none;
-  display: flex;
-  align-items: center;
-  transition: transform 0.1s ease;
-
-  &:active {
-    transform: scale(0.95);
-  }
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-ul {
-  list-style: none;
-}
-
-.spotify-green { color: var(--spotify-green) !important; }
-.text-secondary { color: var(--text-secondary); }
 
 .scroll-container {
   overflow-y: auto;
   overflow-x: hidden;
-  @include scrollbar;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+}
+
+/* Common Tags */
+.preview-tag {
+  background: #555;
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.full-tag {
+  background: var(--spotify-green);
+  color: #000;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+@media (max-width: 360px) {
+  :root {
+    --nav-height: 56px;
+    --player-height: 56px;
+  }
+
+  body {
+    font-size: 14px;
+  }
 }

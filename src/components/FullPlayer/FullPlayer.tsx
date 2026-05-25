@@ -8,7 +8,8 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../store';
-import { togglePlay, nextTrack, previousTrack, toggleLike, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
+import { togglePlay, nextTrack, previousTrack, toggleShuffle, toggleRepeat, setProgress } from '../../store/slices/playerSlice';
+import { toggleLike } from '../../store/slices/musicSlice';
 import { FastAverageColor } from 'fast-average-color';
 import BottomSheet from '../BottomSheet/BottomSheet';
 import ProgressBar from '../ProgressBar/ProgressBar';
@@ -20,17 +21,20 @@ interface FullPlayerProps {
 }
 
 const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
-  const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, isPlaying, progress, duration, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
+  const { tracksById, likedTrackIds } = useSelector((state: RootState) => state.music);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [bgColor, setBgColor] = useState('#121212');
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
   const [isDevicePickerOpen, setIsDevicePickerOpen] = useState(false);
 
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
+
   useEffect(() => {
-    if (currentTrack?.image) {
+    if (currentTrack?.artworkUrl) {
       const fac = new FastAverageColor();
-      fac.getColorAsync(currentTrack.image)
+      fac.getColorAsync(currentTrack.artworkUrl)
         .then(color => {
           setBgColor(color.hex);
         })
@@ -41,7 +45,6 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
   if (!currentTrack) return null;
 
   const isLiked = likedTrackIds.includes(currentTrack.id);
-  const progressPercent = (progress / duration) * 100;
 
   const formatTime = (time: number) => {
     const mins = Math.floor(time / 60);
@@ -72,20 +75,20 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
 
             <div className="player-content scroll-container">
               <div className="album-art-container">
-                <img src={currentTrack.image} alt={currentTrack.name} className="album-art" />
+                <img src={currentTrack.artworkUrl} alt={currentTrack.name} className="album-art" />
               </div>
 
               <div className="track-info-container">
                 <div className="track-text">
                   <h1>{currentTrack.name}</h1>
                   <div className="meta">
-                    {currentTrack.availability === 'preview' && <span className="preview-tag">Preview only</span>}
-                    {currentTrack.availability === 'full' && <span className="full-tag">Full Song</span>}
+                    {currentTrack.playability === 'preview' && <span className="preview-tag">Preview only</span>}
+                    {currentTrack.playability === 'full' && <span className="full-tag">Full Song</span>}
                     <p>{currentTrack.artist}</p>
                   </div>
                 </div>
                 <div className="info-actions">
-                  {currentTrack.availability === 'preview' && (
+                  {currentTrack.playability === 'preview' && (
                     <button className="find-alt-btn" onClick={() => {
                       onClose();
                       navigate('/search?q=' + encodeURIComponent(currentTrack.name + ' ' + currentTrack.artist));
@@ -103,7 +106,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
               <ProgressBar
                 progress={progress}
                 duration={duration}
-                onSeek={(t) => dispatch(seekTo(t))}
+                onSeek={(t) => dispatch(setProgress(t))}
               />
                 <div className="time-info">
                   <span>{formatTime(progress)}</span>
@@ -149,7 +152,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
 
               <div className="artist-card-section">
                  <div className="artist-card">
-                    <div className="artist-banner" style={{backgroundImage: `url(${currentTrack.image})`}}>
+                    <div className="artist-banner" style={{backgroundImage: `url(${currentTrack.artworkUrl})`}}>
                       <span>About the artist</span>
                     </div>
                     <div className="artist-card-content">
@@ -231,7 +234,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
           </div>
           <div className="credits-section">
             <h4>Source</h4>
-            <p className="source-text">{currentTrack.provider.toUpperCase()}</p>
+            <p className="source-text">{currentTrack.source?.toUpperCase()}</p>
           </div>
           <button className="report-btn">Report an error</button>
         </div>

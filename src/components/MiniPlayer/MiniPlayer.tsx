@@ -2,7 +2,8 @@ import React from 'react';
 import { Play, Pause, Heart, Speaker } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { togglePlay, toggleLike, seekTo } from '../../store/slices/playerSlice';
+import { togglePlay, setProgress } from '../../store/slices/playerSlice';
+import { toggleLike } from '../../store/slices/musicSlice';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import './MiniPlayer.scss';
 
@@ -11,8 +12,11 @@ interface MiniPlayerProps {
 }
 
 const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
-  const { currentTrack, isPlaying, progress, duration, likedTrackIds, currentDevice } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, isPlaying, progress, duration, playbackError } = useSelector((state: RootState) => state.player);
+  const { tracksById, likedTrackIds } = useSelector((state: RootState) => state.music);
   const dispatch = useDispatch();
+
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
 
   if (!currentTrack) return null;
 
@@ -22,11 +26,11 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
     <div className="mini-player-wrapper">
       <div className="mini-player" onClick={onExpand}>
         <div className="track-info">
-          <img src={currentTrack.image} alt={currentTrack.name} />
+          <img src={currentTrack.artworkUrl} alt={currentTrack.name} />
           <div className="text">
             <span className="name">{currentTrack.name}</span>
             <div className="meta">
-                {currentTrack.provider === 'itunes' && <span className="preview-tag">Preview only</span>}
+                {currentTrack.playability === 'preview' && <span className="preview-tag">Preview only</span>}
                 <span className="artist">{currentTrack.artist}</span>
             </div>
           </div>
@@ -44,10 +48,11 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
           <ProgressBar
             progress={progress}
             duration={duration}
-            onSeek={(t) => dispatch(seekTo(t))}
+            onSeek={(t) => dispatch(setProgress(t))}
             showKnob={false}
           />
         </div>
+        {playbackError && <div className="player-toast">{playbackError}</div>}
       </div>
     </div>
   );

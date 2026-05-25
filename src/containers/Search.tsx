@@ -1,26 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { Search as SearchIcon, X } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { musicService } from '../providers';
-import { MediaItem, Track } from '../providers/types';
-import { setTrack } from '../store/slices/playerSlice';
+import { MediaItem, Track, Artist } from '../providers/types';
+import { setPlayback } from '../store/slices/playerSlice';
+import { addTracks, addArtists } from '../store/slices/musicSlice';
+import { RootState } from '../store';
 import MediaCard from '../components/MediaCard/MediaCard';
 import './Search.scss';
+
+const CATEGORIES = [
+  { name: 'Podcasts', color: '#27856A' },
+  { name: 'Made For You', color: '#1E3264' },
+  { name: 'New Releases', color: '#E8115B' },
+  { name: 'Pop', color: '#8D67AB' },
+  { name: 'Hip-Hop', color: '#BC5900' },
+  { name: 'Rock', color: '#E91429' },
+  { name: 'Latin', color: '#E1118C' },
+  { name: 'Dance & Electronic', color: '#D84000' },
+  { name: 'Assamese', color: '#503750' },
+  { name: 'Indie', color: '#E91429' }
+];
 
 const Search: React.FC = () => {
   const dispatch = useDispatch();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<MediaItem[]>([]);
+  const [resultIds, setResultIds] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [activeChip, setActiveChip] = useState('Full songs');
+  const [activeChip, setActiveChip] = useState('All');
 
-  const handleSearch = async () => {
-    if (!query.trim()) return;
+  const { tracksById, artistsById, fullSongOnly } = useSelector((state: RootState) => state.music);
+
+  const handleSearch = async (searchTerm: string) => {
+    if (!searchTerm.trim()) return;
 
     setIsSearching(true);
-    const filterFull = activeChip === 'Full songs';
-    const data = await musicService.search(query, { filterFull });
-    setResults(data);
+    const options = { filterFull: activeChip === 'Full songs' || fullSongOnly };
+    const data = await musicService.search(searchTerm, options);
+
+    const tracks = data.filter(i => i.type === 'track') as Track[];
+    dispatch(addTracks(tracks));
+
+    const artists = data.filter(i => i.type === 'artist') as Artist[];
+    dispatch(addArtists(artists.map(a => ({
+      id: a.id,
+      name: a.name,
+      artworkUrl: a.artworkUrl || '',
+      genres: [],
+      type: 'artist'
+    }))));
+
+    setResultIds(data.map(i => i.id));
     setIsSearching(false);
   };
 
@@ -34,27 +64,32 @@ const Search: React.FC = () => {
 
   useEffect(() => {
     if (query.trim()) {
-      handleSearch();
+      const timer = setTimeout(() => handleSearch(query), 300);
+      return () => clearTimeout(timer);
     } else {
-      setResults([]);
+      setResultIds([]);
     }
-  }, [activeChip, query]);
+  }, [activeChip, query, fullSongOnly]);
 
-  const handlePlay = (item: MediaItem) => {
-    if (item.type === 'track') {
-      const trackResults = results.filter(i => i.type === 'track') as Track[];
-      const index = trackResults.findIndex(t => t.id === item.id);
-      dispatch(setTrack({
-        track: item as Track,
-        queue: trackResults,
-        index: index !== -1 ? index : 0
+  const handlePlay = (id: string) => {
+    const track = tracksById[id];
+    if (track) {
+      const queueIds = resultIds.filter(rid => tracksById[rid]);
+      dispatch(setPlayback({
+        trackId: id,
+        queue: queueIds
       }));
     }
   };
 
+  const handleCategoryClick = (catName: string) => {
+     setQuery(catName);
+     handleSearch(catName);
+  };
+
   const clearSearch = () => {
     setQuery('');
-    setResults([]);
+    setResultIds([]);
   };
 
   return (
@@ -66,7 +101,7 @@ const Search: React.FC = () => {
            </button>
            <h2>Search</h2>
         </div>
-        <form className="search-input-wrapper" onSubmit={(e) => { e.preventDefault(); handleSearch(); }}>
+        <form className="search-input-wrapper" onSubmit={(e) => { e.preventDefault(); handleSearch(query); }}>
           <SearchIcon className="search-icon" size={20} />
           <input
             type="text"
@@ -82,7 +117,7 @@ const Search: React.FC = () => {
           )}
         </form>
         <div className="search-chips scroll-container">
-          {['All', 'Full songs', 'Artists', 'Albums', 'Playlists', 'Preview only'].map(chip => (
+          {['All', 'Full songs', 'Artists', 'Albums', 'Playlists'].map(chip => (
             <button
               key={chip}
               className={`chip ${activeChip === chip ? 'active' : ''}`}
@@ -97,15 +132,16 @@ const Search: React.FC = () => {
       <div className="search-content">
         {isSearching ? (
           <div className="loading">Searching...</div>
-        ) : results.length > 0 ? (
+        ) : resultIds.length > 0 ? (
           <>
-            {results.some(i => i.type === 'artist') && (
+            {resultIds.some(id => artistsById[id]) && (
               <div className="search-section">
                 <h2>Artists</h2>
                 <div className="results-grid">
-                  {results.filter(i => i.type === 'artist').map((item) => (
-                    <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
-                  ))}
+                  {resultIds.filter(id => artistsById[id]).map((id) => {
+                    const artist = artistsById[id];
+                    return <MediaCard key={id} item={artist} variant="circle" onClick={() => {}} />;
+                  })}
                 </div>
               </div>
             )}
@@ -113,36 +149,43 @@ const Search: React.FC = () => {
             <div className="search-section">
               <h2>{activeChip === 'Full songs' ? 'Full songs' : 'Results'}</h2>
               <div className="results-grid">
-                {results.filter(i => i.type === 'track' && (i as Track).availability !== 'preview').map((item) => (
-                  <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
-                ))}
+                {resultIds.filter(id => tracksById[id] && tracksById[id].playability !== 'preview').map((id) => {
+                  const track = tracksById[id];
+                  return <MediaCard key={id} item={track} onClick={() => handlePlay(id)} />;
+                })}
               </div>
             </div>
 
-            {(activeChip === 'All' || activeChip === 'Preview only') && results.some(i => (i as Track).availability === 'preview') && (
+            {(activeChip === 'All') && resultIds.some(id => tracksById[id]?.playability === 'preview') && (
               <div className="search-section">
                 <h2>Preview-only matches</h2>
                 <div className="results-grid">
-                  {results.filter(i => i.type === 'track' && (i as Track).availability === 'preview').map((item) => (
-                    <MediaCard key={item.id} item={item} onClick={() => handlePlay(item)} />
-                  ))}
+                  {resultIds.filter(id => tracksById[id]?.playability === 'preview').map((id) => {
+                    const track = tracksById[id];
+                    return <MediaCard key={id} item={track} onClick={() => handlePlay(id)} />;
+                  })}
                 </div>
               </div>
             )}
           </>
         ) : query ? (
           <div className="no-results">
-            <p>No {activeChip.toLowerCase()} found for "{query}"</p>
-            <p className="subtitle">Try another artist, remix, live version, or related genre.</p>
+            <p>No results found for "{query}"</p>
+            <p className="subtitle">Try another artist, remix, or related genre.</p>
           </div>
         ) : (
           <div className="browse-all">
             <h2>Browse all</h2>
             <div className="category-grid">
-              {['Podcasts', 'Live Events', 'Made For You', 'New Releases', 'Pop', 'Hip-Hop', 'Rock', 'Latin'].map((cat, i) => (
-                <div key={cat} className={`category-card color-${i % 8}`}>
-                  <span>{cat}</span>
-                  <img src={`https://picsum.photos/seed/${cat}/100/100`} alt="" />
+              {CATEGORIES.map((cat, i) => (
+                <div
+                  key={cat.name}
+                  className="category-card"
+                  style={{ backgroundColor: cat.color }}
+                  onClick={() => handleCategoryClick(cat.name)}
+                >
+                  <span>{cat.name}</span>
+                  <img src={`https://picsum.photos/seed/${cat.name}/100/100`} alt="" />
                 </div>
               ))}
             </div>

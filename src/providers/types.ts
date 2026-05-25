@@ -2,51 +2,39 @@ export interface Track {
   id: string;
   name: string;
   artist: string;
-  artistId?: string;
   album: string;
-  albumId?: string;
   duration: number; // in seconds
-  image: string;
-  streamUrl?: string;
-  previewUrl?: string;
-  provider: 'audius' | 'jamendo' | 'itunes';
+  artworkUrl: string;
+  streamUrl: string;
+  playability: 'full' | 'preview' | 'unavailable';
+  source: string;
   type: 'track';
-  liked?: boolean;
-  isFull: boolean;
-  availability: 'full' | 'preview' | 'unavailable' | 'loading';
 }
 
 export interface Artist {
   id: string;
   name: string;
-  image: string;
-  followers?: number;
-  monthlyListeners?: number;
-  bio?: string;
-  provider: 'audius' | 'jamendo' | 'itunes';
+  artworkUrl: string;
+  genres: string[];
   type: 'artist';
 }
 
 export interface Album {
   id: string;
-  name: string;
-  artist: string;
-  artistId?: string;
-  image: string;
-  releaseDate?: string;
-  tracks: Track[];
-  provider: 'audius' | 'jamendo' | 'itunes';
+  title: string;
+  artistId: string;
+  artworkUrl: string;
+  trackIds: string[];
   type: 'album';
 }
 
 export interface Playlist {
   id: string;
-  name: string;
+  title: string;
   description: string;
-  image: string;
+  artworkUrl: string;
+  trackIds: string[];
   owner: string;
-  tracks: Track[];
-  provider: 'audius' | 'jamendo' | 'itunes' | 'local';
   type: 'playlist';
 }
 
@@ -54,9 +42,9 @@ export type MediaItem = Track | Artist | Album | Playlist;
 
 export interface MusicProvider {
   name: string;
-  searchTracks(query: string): Promise<Track[]>;
-  searchArtists(query: string): Promise<Artist[]>;
-  searchAlbums(query: string): Promise<Album[]>;
+  searchTracks(query: string): Promise<MediaItem[]>;
+  searchArtists(query: string): Promise<MediaItem[]>;
+  searchAlbums(query: string): Promise<MediaItem[]>;
   getTrack(id: string): Promise<Track | null>;
   getArtist(id: string): Promise<Artist | null>;
   getAlbum(id: string): Promise<Album | null>;
