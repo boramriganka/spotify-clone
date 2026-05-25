@@ -1,92 +1,109 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Track } from '../../providers/types';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { Track, Artist, Album, Playlist, MediaItem } from '../../providers/types';
+import { persistenceService } from '../../services/persistenceService';
 
 interface PlayerState {
-  currentTrack: Track | null;
-  queue: Track[];
+  // Normalized Data
+  tracksById: Record<string, Track>;
+  artistsById: Record<string, Artist>;
+  albumsById: Record<string, Album>;
+  playlistsById: Record<string, Playlist>;
+
+  // Playback State
+  currentTrackId: string | null;
+  queue: string[]; // array of track IDs
   currentIndex: number;
   isPlaying: boolean;
   progress: number;
   duration: number;
   volume: number;
   isShuffled: boolean;
-  shuffledQueue: Track[];
+  shuffledQueue: string[];
   repeatMode: 'off' | 'one' | 'all';
+
+  // Library State
   likedTrackIds: string[];
+  recentlyPlayedIds: string[];
+  createdPlaylistIds: string[];
   currentDevice: string;
+
+  // UI State
+  searchResults: string[]; // MediaItem IDs
+  searchLoading: boolean;
 }
 
-const loadState = (key: string, defaultValue: any) => {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-};
+const settings = persistenceService.getSettings();
 
 const initialState: PlayerState = {
-  currentTrack: loadState('spotify_currentTrack', null),
-  queue: loadState('spotify_queue', []),
-  currentIndex: loadState('spotify_currentIndex', -1),
+  tracksById: {},
+  artistsById: {},
+  albumsById: {},
+  playlistsById: {},
+
+  currentTrackId: persistenceService.getCurrentTrack()?.id || null,
+  queue: persistenceService.getQueue().map(t => t.id),
+  currentIndex: -1,
   isPlaying: false,
   progress: 0,
   duration: 0,
-  volume: loadState('spotify_volume', 0.7),
-  isShuffled: loadState('spotify_isShuffled', false),
-  shuffledQueue: loadState('spotify_shuffledQueue', []),
-  repeatMode: loadState('spotify_repeatMode', 'off'),
-  likedTrackIds: loadState('spotify_likedTrackIds', []),
+  volume: settings.volume,
+  isShuffled: settings.isShuffled,
+  shuffledQueue: [],
+  repeatMode: settings.repeatMode,
+
+  likedTrackIds: persistenceService.getLikedTrackIds(),
+  recentlyPlayedIds: persistenceService.getRecentlyPlayed().map(t => t.id),
+  createdPlaylistIds: persistenceService.getCreatedPlaylists().map(p => p.id),
   currentDevice: "Mriganka’s OnePlus Buds 4",
+
+  searchResults: [],
+  searchLoading: false,
 };
+
+// Pre-populate tracksById from persisted data
+const persistedTracks = [
+  ...(persistenceService.getCurrentTrack() ? [persistenceService.getCurrentTrack()!] : []),
+  ...persistenceService.getQueue(),
+  ...persistenceService.getRecentlyPlayed(),
+];
+
+persistedTracks.forEach(t => {
+  if (t) initialState.tracksById[t.id] = t;
+});
 
 const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    setTrack: (state, action: PayloadAction<{ track: Track; queue?: Track[]; index?: number }>) => {
-      state.currentTrack = action.payload.track;
-
-      if (action.payload.queue) {
-        state.queue = action.payload.queue;
-        state.currentIndex = action.payload.index !== undefined
-          ? action.payload.index
-          : state.queue.findIndex(t => t.id === action.payload.track.id);
-      } else {
-        // If track not in queue, add it to end
-        const existingIdx = state.queue.findIndex(t => t.id === action.payload.track.id);
-        if (existingIdx === -1) {
-          state.queue.push(action.payload.track);
-          state.currentIndex = state.queue.length - 1;
-        } else {
-          state.currentIndex = existingIdx;
-        }
-      }
-
-      if (state.isShuffled) {
-        // If we just set a new queue and shuffle is on, reshuffle
-        const otherTracks = state.queue.filter(t => t.id !== state.currentTrack?.id);
-        state.shuffledQueue = [state.currentTrack!, ...otherTracks.sort(() => Math.random() - 0.5)];
-        state.currentIndex = 0;
-        localStorage.setItem('spotify_shuffledQueue', JSON.stringify(state.shuffledQueue));
-      }
-
-      state.isPlaying = true;
-      state.progress = 0;
-      state.duration = action.payload.track.duration;
-
-      // Persist
-      localStorage.setItem('spotify_currentTrack', JSON.stringify(state.currentTrack));
-      localStorage.setItem('spotify_queue', JSON.stringify(state.queue));
-      localStorage.setItem('spotify_currentIndex', JSON.stringify(state.currentIndex));
-
-      // Add to recently played
-      const recent = loadState('spotify_recentlyPlayed', []);
-      const updatedRecent = [action.payload.track, ...recent.filter((t: any) => t.id !== action.payload.track.id)].slice(0, 20);
-      localStorage.setItem('spotify_recentlyPlayed', JSON.stringify(updatedRecent));
+    setTracks: (state, action: PayloadAction<Track[]>) => {
+      action.payload.forEach(track => {
+        state.tracksById[track.id] = track;
+      });
     },
-    togglePlay: (state) => {
-      state.isPlaying = !state.isPlaying;
+    setArtists: (state, action: PayloadAction<Artist[]>) => {
+      action.payload.forEach(artist => {
+        state.artistsById[artist.id] = artist;
+      });
+    },
+    setCurrentTrack: (state, action: PayloadAction<string | null>) => {
+      state.currentTrackId = action.payload;
+      if (action.payload && state.tracksById[action.payload]) {
+        persistenceService.setCurrentTrack(state.tracksById[action.payload]);
+
+        // Add to recently played
+        const id = action.payload;
+        state.recentlyPlayedIds = [id, ...state.recentlyPlayedIds.filter(i => i !== id)].slice(0, 50);
+        persistenceService.setRecentlyPlayed(state.recentlyPlayedIds.map(i => state.tracksById[i]));
+      }
+    },
+    setQueue: (state, action: PayloadAction<string[]>) => {
+      state.queue = action.payload;
+      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
+
+      if (state.isShuffled && state.currentTrackId) {
+        const otherIds = state.queue.filter(id => id !== state.currentTrackId);
+        state.shuffledQueue = [state.currentTrackId, ...otherIds.sort(() => Math.random() - 0.5)];
+      }
     },
     setIsPlaying: (state, action: PayloadAction<boolean>) => {
       state.isPlaying = action.payload;
@@ -94,18 +111,31 @@ const playerSlice = createSlice({
     setProgress: (state, action: PayloadAction<number>) => {
       state.progress = action.payload;
     },
+    setDuration: (state, action: PayloadAction<number>) => {
+      state.duration = action.payload;
+    },
     seekTo: (state, action: PayloadAction<number>) => {
       state.progress = action.payload;
     },
     setVolume: (state, action: PayloadAction<number>) => {
       state.volume = action.payload;
-      localStorage.setItem('spotify_volume', JSON.stringify(state.volume));
+      const settings = persistenceService.getSettings();
+      persistenceService.setSettings({ ...settings, volume: action.payload });
+    },
+    toggleLike: (state, action: PayloadAction<string>) => {
+      const id = action.payload;
+      if (state.likedTrackIds.includes(id)) {
+        state.likedTrackIds = state.likedTrackIds.filter(i => i !== id);
+      } else {
+        state.likedTrackIds.push(id);
+      }
+      persistenceService.setLikedTrackIds(state.likedTrackIds);
     },
     nextTrack: (state) => {
       const activeQueue = state.isShuffled ? state.shuffledQueue : state.queue;
       if (activeQueue.length === 0) return;
 
-      let nextIndex = state.currentIndex + 1;
+      let nextIndex = activeQueue.indexOf(state.currentTrackId || '') + 1;
       if (nextIndex >= activeQueue.length) {
         if (state.repeatMode === 'all') {
           nextIndex = 0;
@@ -115,25 +145,21 @@ const playerSlice = createSlice({
         }
       }
 
-      state.currentIndex = nextIndex;
-      state.currentTrack = activeQueue[nextIndex];
+      state.currentTrackId = activeQueue[nextIndex];
       state.progress = 0;
-      state.duration = state.currentTrack.duration;
       state.isPlaying = true;
-      localStorage.setItem('spotify_currentTrack', JSON.stringify(state.currentTrack));
-      localStorage.setItem('spotify_currentIndex', JSON.stringify(state.currentIndex));
+      persistenceService.setCurrentTrack(state.tracksById[state.currentTrackId]);
     },
     previousTrack: (state) => {
       const activeQueue = state.isShuffled ? state.shuffledQueue : state.queue;
       if (activeQueue.length === 0) return;
 
-      // If more than 3 seconds in, restart track
       if (state.progress > 3) {
         state.progress = 0;
         return;
       }
 
-      let prevIndex = state.currentIndex - 1;
+      let prevIndex = activeQueue.indexOf(state.currentTrackId || '') - 1;
       if (prevIndex < 0) {
         if (state.repeatMode === 'all') {
           prevIndex = activeQueue.length - 1;
@@ -143,75 +169,61 @@ const playerSlice = createSlice({
         }
       }
 
-      state.currentIndex = prevIndex;
-      state.currentTrack = activeQueue[prevIndex];
+      state.currentTrackId = activeQueue[prevIndex];
       state.progress = 0;
-      state.duration = state.currentTrack.duration;
       state.isPlaying = true;
-      localStorage.setItem('spotify_currentTrack', JSON.stringify(state.currentTrack));
-      localStorage.setItem('spotify_currentIndex', JSON.stringify(state.currentIndex));
+      persistenceService.setCurrentTrack(state.tracksById[state.currentTrackId]);
     },
     toggleShuffle: (state) => {
       state.isShuffled = !state.isShuffled;
-      if (state.isShuffled && state.currentTrack) {
-        const otherTracks = state.queue.filter(t => t.id !== state.currentTrack?.id);
-        state.shuffledQueue = [state.currentTrack, ...otherTracks.sort(() => Math.random() - 0.5)];
-        state.currentIndex = 0;
-        localStorage.setItem('spotify_shuffledQueue', JSON.stringify(state.shuffledQueue));
-        localStorage.setItem('spotify_currentIndex', JSON.stringify(state.currentIndex));
+      if (state.isShuffled && state.currentTrackId) {
+        const otherIds = state.queue.filter(id => id !== state.currentTrackId);
+        state.shuffledQueue = [state.currentTrackId, ...otherIds.sort(() => Math.random() - 0.5)];
       }
-      localStorage.setItem('spotify_isShuffled', JSON.stringify(state.isShuffled));
+      const settings = persistenceService.getSettings();
+      persistenceService.setSettings({ ...settings, isShuffled: state.isShuffled });
     },
     toggleRepeat: (state) => {
       const modes: PlayerState['repeatMode'][] = ['off', 'all', 'one'];
       const nextIdx = (modes.indexOf(state.repeatMode) + 1) % modes.length;
       state.repeatMode = modes[nextIdx];
-      localStorage.setItem('spotify_repeatMode', JSON.stringify(state.repeatMode));
+      const settings = persistenceService.getSettings();
+      persistenceService.setSettings({ ...settings, repeatMode: state.repeatMode });
     },
-    toggleLike: (state, action: PayloadAction<string>) => {
-      const id = action.payload;
-      if (state.likedTrackIds.includes(id)) {
-        state.likedTrackIds = state.likedTrackIds.filter(i => i !== id);
-      } else {
-        state.likedTrackIds.push(id);
-      }
-      localStorage.setItem('spotify_likedTrackIds', JSON.stringify(state.likedTrackIds));
-    },
-    setQueue: (state, action: PayloadAction<Track[]>) => {
-      state.queue = action.payload;
-      localStorage.setItem('spotify_queue', JSON.stringify(state.queue));
-    },
-    addToQueue: (state, action: PayloadAction<Track>) => {
+    addToQueue: (state, action: PayloadAction<string>) => {
       state.queue.push(action.payload);
-      localStorage.setItem('spotify_queue', JSON.stringify(state.queue));
+      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
     },
-    playNext: (state, action: PayloadAction<Track>) => {
-      state.queue.splice(state.currentIndex + 1, 0, action.payload);
-      localStorage.setItem('spotify_queue', JSON.stringify(state.queue));
+    playNext: (state, action: PayloadAction<string>) => {
+      const currentIndex = state.queue.indexOf(state.currentTrackId || '');
+      state.queue.splice(currentIndex + 1, 0, action.payload);
+      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
     },
     removeFromQueue: (state, action: PayloadAction<string>) => {
-      state.queue = state.queue.filter(t => t.id !== action.payload);
-      localStorage.setItem('spotify_queue', JSON.stringify(state.queue));
+      state.queue = state.queue.filter(id => id !== action.payload);
+      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
     }
   },
 });
 
 export const {
-  setTrack,
-  togglePlay,
+  setTracks,
+  setArtists,
+  setCurrentTrack,
+  setQueue,
   setIsPlaying,
   setProgress,
+  setDuration,
   setVolume,
+  toggleLike,
   nextTrack,
   previousTrack,
   toggleShuffle,
   toggleRepeat,
-  toggleLike,
-  setQueue,
-  seekTo,
   addToQueue,
   playNext,
   removeFromQueue,
+  seekTo,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

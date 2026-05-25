@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { togglePlay, nextTrack, previousTrack, toggleLike, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
+import { setIsPlaying, nextTrack, previousTrack, toggleLike, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
 import { FastAverageColor } from 'fast-average-color';
 import BottomSheet from '../BottomSheet/BottomSheet';
 import ProgressBar from '../ProgressBar/ProgressBar';
@@ -19,7 +19,8 @@ interface FullPlayerProps {
 }
 
 const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
-  const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, tracksById, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
   const dispatch = useDispatch();
   const [bgColor, setBgColor] = useState('#121212');
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
@@ -108,7 +109,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                 <button className="skip" onClick={() => dispatch(previousTrack())}>
                   <SkipBack size={36} fill="white" />
                 </button>
-                <button className="play-pause" onClick={() => dispatch(togglePlay())}>
+                <button className="play-pause" onClick={() => dispatch(setIsPlaying(!isPlaying))}>
                   {isPlaying ? <Pause size={48} fill="black" /> : <Play size={48} fill="black" />}
                 </button>
                 <button className="skip" onClick={() => dispatch(nextTrack())}>

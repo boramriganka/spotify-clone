@@ -1,3 +1,5 @@
+export type PlayabilityStatus = 'full' | 'preview' | 'unavailable';
+
 export interface Track {
   id: string;
   name: string;
@@ -9,6 +11,7 @@ export interface Track {
   image: string;
   streamUrl?: string;
   previewUrl?: string;
+  playability: PlayabilityStatus;
   provider: 'audius' | 'jamendo' | 'itunes';
   type: 'track';
   liked?: boolean;

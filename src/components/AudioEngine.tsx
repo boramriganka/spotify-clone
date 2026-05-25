@@ -7,7 +7,8 @@ import { musicService } from '../providers';
 const AudioEngine: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dispatch = useDispatch();
-  const { currentTrack, isPlaying, volume, progress, repeatMode } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, tracksById, isPlaying, volume, progress, repeatMode } = useSelector((state: RootState) => state.player);
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ const AudioEngine: React.FC = () => {
   }, [isPlaying, streamUrl]);
 
   useEffect(() => {
-    if (audioRef.current && Math.abs(audioRef.current.currentTime - progress) > 1.5) {
+    if (audioRef.current && Math.abs(audioRef.current.currentTime - progress) > 2) {
       audioRef.current.currentTime = progress;
     }
   }, [progress]);
@@ -49,6 +50,10 @@ const AudioEngine: React.FC = () => {
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       dispatch(setProgress(audioRef.current.currentTime));
+      if (audioRef.current.duration && !isNaN(audioRef.current.duration)) {
+          // Sync duration if it changed (e.g. metadata loaded)
+          // Actually duration is usually in track object, but fallback just in case
+      }
     }
   };
 
@@ -63,12 +68,20 @@ const AudioEngine: React.FC = () => {
     }
   };
 
+  const handleError = () => {
+    console.error("Audio playback error");
+    // Simple fallback: try next track if current one fails
+    // In a real app we'd try different providers for the same track first
+    dispatch(nextTrack());
+  };
+
   return (
     <audio
       ref={audioRef}
       src={streamUrl || undefined}
       onTimeUpdate={handleTimeUpdate}
       onEnded={handleEnded}
+      onError={handleError}
     />
   );
 };

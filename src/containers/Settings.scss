@@ -41,6 +41,12 @@
         }
       }
 
+      .status-text {
+        color: var(--spotify-green);
+        font-weight: 700;
+        font-size: 14px;
+      }
+
       .toggle-switch {
         width: 40px;
         height: 20px;

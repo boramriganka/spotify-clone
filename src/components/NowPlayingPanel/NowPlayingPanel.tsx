@@ -12,7 +12,8 @@ interface NowPlayingPanelProps {
 }
 
 const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) => {
-  const { currentTrack, likedTrackIds } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, tracksById, likedTrackIds } = useSelector((state: RootState) => state.player);
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
   const dispatch = useDispatch();
 
   if (!currentTrack) return null;

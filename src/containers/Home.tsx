@@ -3,8 +3,8 @@ import { useDispatch } from 'react-redux';
 import MediaCard from '../components/MediaCard/MediaCard';
 import HorizontalShelf from '../components/HorizontalShelf/HorizontalShelf';
 import { musicService } from '../providers';
-import { MediaItem } from '../providers/types';
-import { setTrack } from '../store/slices/playerSlice';
+import { MediaItem, Track } from '../providers/types';
+import { setTracks, setCurrentTrack, setQueue } from '../store/slices/playerSlice';
 import './Home.scss';
 
 const Home: React.FC = () => {
@@ -17,8 +17,12 @@ const Home: React.FC = () => {
     const loadData = async () => {
       // Load real recently played from storage
       try {
-        const saved = localStorage.getItem('spotify_recentlyPlayed');
-        if (saved) setRecentlyPlayed(JSON.parse(saved));
+        const saved = localStorage.getItem('spotify_neo_recentlyPlayed');
+        if (saved) {
+           const parsed = JSON.parse(saved);
+           setRecentlyPlayed(parsed);
+           dispatch(setTracks(parsed));
+        }
       } catch (e) {}
 
       // Personalized demo data
@@ -30,6 +34,9 @@ const Home: React.FC = () => {
 
       setRecentItems(recent.slice(0, 8));
       setNewReleases(releases.slice(0, 16));
+
+      const allTracks = [...recent, ...releases].filter(i => i.type === 'track') as Track[];
+      dispatch(setTracks(allTracks));
 
       // Merge with some specified artists
       const featured = await musicService.search('Pink Floyd AP Dhillon Drake');
@@ -43,9 +50,11 @@ const Home: React.FC = () => {
 
   const handlePlay = (item: MediaItem) => {
     if (item.type === 'track') {
-      dispatch(setTrack({ track: item }));
+      dispatch(setTracks([item as Track]));
+      dispatch(setCurrentTrack(item.id));
+    } else if (item.type === 'artist') {
+      window.location.href = `/search?q=${encodeURIComponent(item.name)}`;
     }
-    // Handle other types as needed
   };
 
   return (

@@ -2,7 +2,7 @@ import React from 'react';
 import { Play, Pause, SkipBack, SkipForward, Heart, Speaker, Shuffle, Repeat, ListMusic, Maximize2 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { togglePlay, toggleLike, nextTrack, previousTrack, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
+import { setIsPlaying, toggleLike, nextTrack, previousTrack, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import './DesktopPlayer.scss';
 
@@ -12,7 +12,8 @@ interface DesktopPlayerProps {
 }
 
 const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpen }) => {
-  const { currentTrack, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, tracksById, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode } = useSelector((state: RootState) => state.player);
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
   const dispatch = useDispatch();
 
   if (!currentTrack) return null;
@@ -46,7 +47,7 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
             <Shuffle size={16} />
           </button>
           <button onClick={() => dispatch(previousTrack())}><SkipBack size={20} fill="white" /></button>
-          <button className="play-pause" onClick={() => dispatch(togglePlay())}>
+          <button className="play-pause" onClick={() => dispatch(setIsPlaying(!isPlaying))}>
             {isPlaying ? <Pause size={20} fill="black" /> : <Play size={20} fill="black" />}
           </button>
           <button onClick={() => dispatch(nextTrack())}><SkipForward size={20} fill="white" /></button>

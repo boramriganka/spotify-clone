@@ -34,6 +34,7 @@ export class JamendoProvider implements MusicProvider {
       duration: t.duration,
       image: t.album_image || t.image || 'https://via.placeholder.com/150',
       streamUrl: t.audio,
+      playability: 'full',
       provider: 'jamendo',
       type: 'track'
     };

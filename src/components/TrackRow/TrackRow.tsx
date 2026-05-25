@@ -1,6 +1,9 @@
 import React from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Heart } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Track } from '../../providers/types';
+import { toggleLike } from '../../store/slices/playerSlice';
+import { RootState } from '../../store';
 import './TrackRow.scss';
 
 interface TrackRowProps {
@@ -12,6 +15,15 @@ interface TrackRowProps {
 }
 
 const TrackRow: React.FC<TrackRowProps> = ({ track, index, isActive, onPlay, showAlbum = true }) => {
+  const dispatch = useDispatch();
+  const likedTrackIds = useSelector((state: RootState) => state.player.likedTrackIds);
+  const isLiked = likedTrackIds.includes(track.id);
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(toggleLike(track.id));
+  };
+
   return (
     <div className={`track-row ${isActive ? 'active' : ''}`} onClick={onPlay}>
       <div className="track-start">
@@ -33,6 +45,9 @@ const TrackRow: React.FC<TrackRowProps> = ({ track, index, isActive, onPlay, sho
       )}
 
       <div className="track-end">
+        <button className={`like-button ${isLiked ? 'liked' : ''}`} onClick={handleLike}>
+          <Heart size={16} fill={isLiked ? "var(--spotify-green)" : "none"} color={isLiked ? "var(--spotify-green)" : "currentColor"} />
+        </button>
         <span className="track-duration">
           {Math.floor(track.duration / 60)}:{String(track.duration % 60).padStart(2, '0')}
         </span>

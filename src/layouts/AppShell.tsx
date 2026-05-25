@@ -9,12 +9,14 @@ import AudioEngine from '../components/AudioEngine';
 import NowPlayingPanel from '../components/NowPlayingPanel/NowPlayingPanel';
 import DesktopPlayer from '../components/DesktopPlayer/DesktopPlayer';
 import CreateSheet from '../components/CreateSheet/CreateSheet';
+import AiDj from '../containers/AiDj';
 import './AppShell.scss';
 
 const AppShell: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isAiDjOpen, setIsAiDjOpen] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(() => {
     return localStorage.getItem('desktop_panel_open') === 'true';
   });
@@ -30,6 +32,11 @@ const AppShell: React.FC = () => {
       return newState;
     });
   };
+
+  React.useEffect(() => {
+    (window as any).toggleAiDj = () => setIsAiDjOpen(prev => !prev);
+    (window as any).toggleCreateSheet = () => setIsCreateOpen(prev => !prev);
+  }, []);
 
   return (
     <div className="app-shell">
@@ -70,6 +77,9 @@ const AppShell: React.FC = () => {
 
       <DesktopPlayer onTogglePanel={togglePanel} isPanelOpen={isPanelOpen} />
       <BottomNav />
+
+      {isAiDjOpen && <AiDj onClose={() => setIsAiDjOpen(false)} />}
+      <CreateSheet isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import React from 'react';
 import { Play, Pause, Heart, Speaker } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { togglePlay, toggleLike, seekTo } from '../../store/slices/playerSlice';
+import { setIsPlaying, toggleLike, seekTo } from '../../store/slices/playerSlice';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import './MiniPlayer.scss';
 
@@ -11,7 +11,8 @@ interface MiniPlayerProps {
 }
 
 const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
-  const { currentTrack, isPlaying, progress, duration, likedTrackIds, currentDevice } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, tracksById, isPlaying, progress, duration, likedTrackIds, currentDevice } = useSelector((state: RootState) => state.player);
+  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
   const dispatch = useDispatch();
 
   if (!currentTrack) return null;
@@ -36,7 +37,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
           <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack.id)); }}>
             <Heart size={20} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
           </button>
-          <button onClick={(e) => { e.stopPropagation(); dispatch(togglePlay()); }}>
+          <button onClick={(e) => { e.stopPropagation(); dispatch(setIsPlaying(!isPlaying)); }}>
             {isPlaying ? <Pause size={28} fill="white" /> : <Play size={28} fill="white" />}
           </button>
         </div>

@@ -28,6 +28,14 @@ const Settings: React.FC = () => {
 
   const sections = [
     {
+      title: 'Provider Status (Neo Debug)',
+      items: [
+        { label: 'Audius API', type: 'status', status: 'Active' },
+        { label: 'Jamendo API', type: 'status', status: 'Active' },
+        { label: 'iTunes Fallback', type: 'status', status: 'Ready' },
+      ]
+    },
+    {
       title: 'Account',
       items: [
         { label: 'Private session', type: 'toggle', key: 'privateSession', subtitle: 'Hide your listening activity' },
@@ -80,6 +88,8 @@ const Settings: React.FC = () => {
                   <div className={`toggle-switch ${toggles[item.key] ? 'active' : ''}`}>
                     <div className="toggle-thumb" />
                   </div>
+                ) : item.type === 'status' ? (
+                  <span className="status-text">{item.status}</span>
                 ) : (
                   <ChevronRight size={20} color="var(--text-secondary)" />
                 )}
