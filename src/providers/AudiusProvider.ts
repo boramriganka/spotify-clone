@@ -28,6 +28,7 @@ export class AudiusProvider implements MusicProvider {
       duration: t.duration,
       image: t.artwork ? t.artwork['150x150'] || t.artwork['480x480'] : 'https://via.placeholder.com/150',
       streamUrl: `${AUDIUS_API_BASE}/tracks/${t.id}/stream`,
+      playability: 'full',
       provider: 'audius',
       type: 'track'
     };

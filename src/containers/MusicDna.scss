@@ -1,0 +1,110 @@
+@import '../styles/mixins.scss';
+
+.music-dna-screen {
+  padding: var(--spacing-lg);
+
+  .dna-header {
+    margin-bottom: var(--spacing-xl);
+    h1 { font-size: 32px; font-weight: 800; }
+    p { color: var(--text-secondary); }
+  }
+
+  .dna-card-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-xl);
+
+    .dna-card {
+      width: 100%;
+      max-width: 400px;
+      aspect-ratio: 4/5;
+      background: linear-gradient(135deg, #1DB954 0%, #121212 100%);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1px;
+      }
+
+      .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: var(--spacing-lg);
+
+        h2 { font-size: 36px; font-weight: 900; line-height: 1; }
+
+        .label { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.7); display: block; margin-bottom: 4px; }
+
+        .artists-list {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          span { font-size: 18px; font-weight: 700; }
+        }
+
+        .tag {
+          background: rgba(255,255,255,0.2);
+          padding: 4px 12px;
+          border-radius: var(--radius-sm);
+          font-size: 12px;
+          font-weight: 600;
+        }
+      }
+
+      .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .brand { font-weight: 900; font-size: 14px; }
+        .share-btn {
+          background-color: white;
+          color: black;
+          border: none;
+          padding: 6px 12px;
+          border-radius: var(--radius-full);
+          font-weight: 700;
+          font-size: 12px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .recommendations {
+    h3 { margin-bottom: var(--spacing-md); }
+    .rec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: var(--spacing-md);
+
+      .rec-item {
+        img { width: 100%; aspect-ratio: 1/1; border-radius: var(--radius-sm); margin-bottom: 8px; }
+        .info {
+          .name { display: block; font-weight: 700; font-size: 14px; @include text-truncate; }
+          .artist { font-size: 12px; color: var(--text-secondary); }
+        }
+      }
+    }
+
+    .empty-state {
+      padding: var(--spacing-xl);
+      text-align: center;
+      background: var(--surface-grey);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+    }
+  }
+}

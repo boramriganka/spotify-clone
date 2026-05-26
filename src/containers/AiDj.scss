@@ -1,0 +1,116 @@
+@import '../styles/mixins.scss';
+
+.ai-dj-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--dark-grey);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+
+  .ai-dj-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+      h1 { font-size: 24px; font-weight: 800; }
+      .sparkle-icon { color: var(--spotify-green); }
+    }
+  }
+
+  .ai-dj-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg);
+
+    .welcome {
+      text-align: center;
+      margin-top: 100px;
+      h2 { margin-bottom: var(--spacing-lg); }
+      .suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--spacing-sm);
+        button {
+          background-color: #2a2a2a;
+          border: none;
+          color: white;
+          padding: 8px 16px;
+          border-radius: var(--radius-full);
+          cursor: pointer;
+          &:hover { background-color: #3e3e3e; }
+        }
+      }
+    }
+
+    .vibe-explanation {
+      margin-bottom: var(--spacing-lg);
+      p { font-size: 18px; font-weight: 600; color: var(--spotify-green); margin-bottom: var(--spacing-md); }
+      .play-btn {
+        background-color: var(--spotify-green);
+        border: none;
+        padding: 10px 24px;
+        border-radius: var(--radius-full);
+        font-weight: 700;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .ai-dj-input {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background-color: #1a1a1a;
+    display: flex;
+    gap: var(--spacing-md);
+
+    input {
+      flex: 1;
+      background-color: #333;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 12px var(--spacing-md);
+      color: white;
+      outline: none;
+    }
+
+    button {
+      background-color: var(--spotify-green);
+      border: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+    }
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    &:hover {
+      background: rgba(255,255,255,0.1);
+    }
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    color: var(--text-secondary);
+  }
+}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Play, Shuffle, Download, ArrowLeft, MoreVertical } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { setTrack, setQueue } from '../store/slices/playerSlice';
+import { setTracks, setCurrentTrack, setQueue, toggleShuffle } from '../store/slices/playerSlice';
 import TrackRow from '../components/TrackRow/TrackRow';
 import { useParams } from 'react-router-dom';
 import { musicService } from '../providers';
@@ -14,51 +14,74 @@ const Playlist: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [playlist, setPlaylist] = useState<PlaylistType | null>(null);
   const dispatch = useDispatch();
-  const currentTrackId = useSelector((state: RootState) => state.player.currentTrack?.id);
+  const { currentTrackId, likedTrackIds, tracksById } = useSelector((state: RootState) => state.player);
+
+  const { createdPlaylistIds, playlistsById } = useSelector((state: RootState) => state.player);
 
   useEffect(() => {
     const loadPlaylist = async () => {
-      if (id && id.startsWith('local-')) {
+      if (id && playlistsById[id]) {
+        setPlaylist(playlistsById[id]);
+      } else if (window.location.pathname === '/liked' || id === 'liked') {
+         const likedTracks = likedTrackIds.map(tid => tracksById[tid]).filter(Boolean);
+         setPlaylist({
+            id: 'liked',
+            name: 'Liked Songs',
+            description: 'Your liked songs, always with you.',
+            image: '',
+            owner: 'Mriganka',
+            tracks: likedTracks,
+            provider: 'local',
+            type: 'playlist'
+          });
+      } else if (id && id.startsWith('local-')) {
         const locals = getUserPlaylists();
         const found = locals.find(p => p.id === id);
         if (found) setPlaylist(found);
-      } else {
-        const results = await musicService.search('Liked Songs');
-        const tracks = results.filter(i => i.type === 'track') as Track[];
-        setPlaylist({
-          id: id || 'liked',
-          name: 'Liked Songs',
-          description: '',
-          image: '',
-          owner: 'Mriganka',
-          tracks,
-          provider: 'local',
-          type: 'playlist'
-        });
       }
     };
     loadPlaylist();
-  }, [id]);
+  }, [id, likedTrackIds, tracksById, playlistsById]);
 
   const tracks = playlist?.tracks || [];
 
   const handlePlayAll = () => {
     if (tracks.length > 0) {
-      dispatch(setTrack({ track: tracks[0], queue: tracks, index: 0 }));
+      dispatch(setTracks(tracks));
+      dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'playlist',
+        contextId: playlist?.id,
+        addedAt: Date.now()
+      }))));
+      dispatch(setCurrentTrack(tracks[0].id));
     }
   };
 
   const handleShufflePlay = () => {
     if (tracks.length > 0) {
-       // Toggle shuffle on and play
-       dispatch({ type: 'player/toggleShuffle' });
+       dispatch(toggleShuffle());
        const randomIndex = Math.floor(Math.random() * tracks.length);
-       dispatch(setTrack({ track: tracks[randomIndex], queue: tracks }));
+       dispatch(setTracks(tracks));
+       dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'playlist',
+        contextId: playlist?.id,
+        addedAt: Date.now()
+       }))));
+       dispatch(setCurrentTrack(tracks[randomIndex].id));
     }
   };
 
-  const handlePlayTrack = (track: Track, index: number) => {
-    dispatch(setTrack({ track, queue: tracks, index }));
+  const handlePlayTrack = (track: Track) => {
+    dispatch(setTracks(tracks));
+    dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'playlist',
+        contextId: playlist?.id,
+        addedAt: Date.now()
+    }))));
+    dispatch(setCurrentTrack(track.id));
   };
 
   return (
@@ -108,7 +131,7 @@ const Playlist: React.FC = () => {
             track={track}
             index={i}
             isActive={track.id === currentTrackId}
-            onPlay={() => handlePlayTrack(track, i)}
+            onPlay={() => handlePlayTrack(track)}
           />
         ))}
       </div>

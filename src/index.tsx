@@ -9,6 +9,8 @@ import Search from './containers/Search';
 import Playlist from './containers/Playlist';
 import Artist from './containers/Artist';
 import Settings from './containers/Settings';
+import MusicDna from './containers/MusicDna';
+import DebugProviders from './containers/DebugProviders';
 import './styles/global.scss';
 
 const container = document.getElementById('root');
@@ -26,7 +28,9 @@ root.render(
             <Route path="liked" element={<Playlist />} />
             <Route path="playlist/:id" element={<Playlist />} />
             <Route path="artist" element={<Artist />} />
+            <Route path="dna" element={<MusicDna />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="debug/providers" element={<DebugProviders />} />
           </Route>
         </Routes>
       </BrowserRouter>

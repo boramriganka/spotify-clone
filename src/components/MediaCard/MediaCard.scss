@@ -9,6 +9,7 @@
   overflow: hidden;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  position: relative;
 
   &:hover {
     background-color: var(--surface-grey-hover);
@@ -21,11 +22,28 @@
   }
 
   .tile-title {
-    font-size: 14px; // Specified 13-15px
+    font-size: 13px; // Specified 13-15px
     font-weight: 700;
     padding: 0 var(--spacing-sm);
     @include line-clamp(2); // Specified max 2 lines
     flex: 1;
+  }
+
+  .badge {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    background-color: var(--spotify-green);
+    color: black;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0.9;
   }
 }
 
@@ -78,6 +96,33 @@
       object-fit: cover;
     }
 
+    .badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      z-index: 2;
+
+      &.badge-full {
+        background-color: var(--spotify-green);
+        color: black;
+      }
+
+      &.badge-preview {
+        background-color: #3e3e3e;
+        color: white;
+      }
+
+      &.badge-unavailable {
+        background-color: #f44336;
+        color: white;
+      }
+    }
+
     .play-button {
       position: absolute;
       bottom: 8px;
@@ -112,6 +157,24 @@
       font-size: 13px;
       color: var(--text-secondary); // #b3b3b3
       @include line-clamp(2); // Specified 2 lines
+    }
+
+    .find-full-cta {
+      background: none;
+      border: 1px solid var(--spotify-green);
+      color: var(--spotify-green);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: var(--radius-full);
+      margin-top: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: var(--spotify-green);
+        color: black;
+      }
     }
   }
 

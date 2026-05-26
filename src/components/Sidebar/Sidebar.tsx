@@ -30,7 +30,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       <div className="sidebar-actions">
-        <button className="action-item">
+        <button className="action-item" onClick={() => (window as any).toggleCreateSheet?.()}>
           <div className="icon-box create-playlist">
             <PlusSquare size={20} />
           </div>
@@ -54,9 +54,9 @@ const Sidebar: React.FC = () => {
         ))}
         <div className="sidebar-divider" style={{ margin: '8px 0' }} />
         {['Chill Vibes', 'Driving Mix', 'Morning Coffee', 'Focus', 'Top Hits 2023', 'Oldies but Goldies'].map((name) => (
-          <div key={name} className="playlist-item">
+          <NavLink key={name} to={`/search?q=${encodeURIComponent(name)}`} className="playlist-item">
             {name}
-          </div>
+          </NavLink>
         ))}
       </div>
     </aside>

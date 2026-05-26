@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Play, Shuffle, ArrowLeft, MoreVertical } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { setTrack } from '../store/slices/playerSlice';
+import { setTracks as setGlobalTracks, setCurrentTrack, setQueue } from '../store/slices/playerSlice';
 import TrackRow from '../components/TrackRow/TrackRow';
 import { musicService } from '../providers';
 import { Track, Artist } from '../providers/types';
@@ -12,7 +12,7 @@ const ArtistPage: React.FC = () => {
   const [artist, setArtist] = useState<Artist | null>(null);
   const [tracks, setTracks] = useState<Track[]>([]);
   const dispatch = useDispatch();
-  const currentTrackId = useSelector((state: RootState) => state.player.currentTrack?.id);
+  const { currentTrackId } = useSelector((state: RootState) => state.player);
 
   useEffect(() => {
     const loadArtist = async () => {
@@ -27,8 +27,14 @@ const ArtistPage: React.FC = () => {
     loadArtist();
   }, []);
 
-  const handlePlayTrack = (track: Track, index: number) => {
-    dispatch(setTrack({ track, queue: tracks, index }));
+  const handlePlayTrack = (track: Track) => {
+    dispatch(setGlobalTracks(tracks));
+    dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'search',
+        addedAt: Date.now()
+    }))));
+    dispatch(setCurrentTrack(track.id));
   };
 
   if (!artist) return null;
@@ -64,7 +70,7 @@ const ArtistPage: React.FC = () => {
               track={track}
               index={i}
               isActive={track.id === currentTrackId}
-              onPlay={() => handlePlayTrack(track, i)}
+              onPlay={() => handlePlayTrack(track)}
               showAlbum={false}
             />
           ))}

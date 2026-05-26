@@ -27,6 +27,7 @@ export class iTunesProvider implements MusicProvider {
       duration: Math.floor((item.trackTimeMillis || 0) / 1000),
       image: item.artworkUrl100?.replace('100x100bb', '600x600bb') || 'https://via.placeholder.com/600',
       previewUrl: item.previewUrl || '',
+      playability: item.previewUrl ? 'preview' : 'unavailable',
       provider: 'itunes',
       type: 'track'
     };
