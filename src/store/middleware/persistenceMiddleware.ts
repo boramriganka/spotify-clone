@@ -1,8 +1,7 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { RootState } from '../store';
-import { persistenceService } from '../services/persistenceService';
+import { persistenceService } from '../../services/persistenceService';
 
-export const persistenceMiddleware: Middleware<{}, RootState> = store => next => action => {
+export const persistenceMiddleware: Middleware = store => next => action => {
   const result = next(action);
   const state = store.getState().player;
 
@@ -15,11 +14,11 @@ export const persistenceMiddleware: Middleware<{}, RootState> = store => next =>
       persistenceService.setCurrentTrack(track);
 
       // Sync recently played
-      persistenceService.setRecentlyPlayed(state.recentlyPlayedIds.map(id => state.tracksById[id]));
+      persistenceService.setRecentlyPlayed(state.recentlyPlayedIds.map((id: string) => state.tracksById[id]));
     }
 
     if (type.includes('setQueue') || type.includes('addToQueue') || type.includes('playNext') || type.includes('removeFromQueue')) {
-      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
+      persistenceService.setQueue(state.queue.map((id: string) => state.tracksById[id]));
     }
 
     if (type.includes('toggleLike')) {
