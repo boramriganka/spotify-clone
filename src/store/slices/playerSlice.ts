@@ -88,17 +88,13 @@ const playerSlice = createSlice({
     setCurrentTrack: (state, action: PayloadAction<string | null>) => {
       state.currentTrackId = action.payload;
       if (action.payload && state.tracksById[action.payload]) {
-        persistenceService.setCurrentTrack(state.tracksById[action.payload]);
-
         // Add to recently played
         const id = action.payload;
         state.recentlyPlayedIds = [id, ...state.recentlyPlayedIds.filter(i => i !== id)].slice(0, 50);
-        persistenceService.setRecentlyPlayed(state.recentlyPlayedIds.map(i => state.tracksById[i]));
       }
     },
     setQueue: (state, action: PayloadAction<string[]>) => {
       state.queue = action.payload;
-      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
 
       if (state.isShuffled && state.currentTrackId) {
         const otherIds = state.queue.filter(id => id !== state.currentTrackId);
@@ -119,8 +115,6 @@ const playerSlice = createSlice({
     },
     setVolume: (state, action: PayloadAction<number>) => {
       state.volume = action.payload;
-      const settings = persistenceService.getSettings();
-      persistenceService.setSettings({ ...settings, volume: action.payload });
     },
     toggleLike: (state, action: PayloadAction<string>) => {
       const id = action.payload;
@@ -129,7 +123,6 @@ const playerSlice = createSlice({
       } else {
         state.likedTrackIds.push(id);
       }
-      persistenceService.setLikedTrackIds(state.likedTrackIds);
     },
     nextTrack: (state) => {
       const activeQueue = state.isShuffled ? state.shuffledQueue : state.queue;
@@ -148,7 +141,6 @@ const playerSlice = createSlice({
       state.currentTrackId = activeQueue[nextIndex];
       state.progress = 0;
       state.isPlaying = true;
-      persistenceService.setCurrentTrack(state.tracksById[state.currentTrackId]);
     },
     previousTrack: (state) => {
       const activeQueue = state.isShuffled ? state.shuffledQueue : state.queue;
@@ -172,7 +164,6 @@ const playerSlice = createSlice({
       state.currentTrackId = activeQueue[prevIndex];
       state.progress = 0;
       state.isPlaying = true;
-      persistenceService.setCurrentTrack(state.tracksById[state.currentTrackId]);
     },
     toggleShuffle: (state) => {
       state.isShuffled = !state.isShuffled;
@@ -180,28 +171,21 @@ const playerSlice = createSlice({
         const otherIds = state.queue.filter(id => id !== state.currentTrackId);
         state.shuffledQueue = [state.currentTrackId, ...otherIds.sort(() => Math.random() - 0.5)];
       }
-      const settings = persistenceService.getSettings();
-      persistenceService.setSettings({ ...settings, isShuffled: state.isShuffled });
     },
     toggleRepeat: (state) => {
       const modes: PlayerState['repeatMode'][] = ['off', 'all', 'one'];
       const nextIdx = (modes.indexOf(state.repeatMode) + 1) % modes.length;
       state.repeatMode = modes[nextIdx];
-      const settings = persistenceService.getSettings();
-      persistenceService.setSettings({ ...settings, repeatMode: state.repeatMode });
     },
     addToQueue: (state, action: PayloadAction<string>) => {
       state.queue.push(action.payload);
-      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
     },
     playNext: (state, action: PayloadAction<string>) => {
       const currentIndex = state.queue.indexOf(state.currentTrackId || '');
       state.queue.splice(currentIndex + 1, 0, action.payload);
-      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
     },
     removeFromQueue: (state, action: PayloadAction<string>) => {
       state.queue = state.queue.filter(id => id !== action.payload);
-      persistenceService.setQueue(state.queue.map(id => state.tracksById[id]));
     }
   },
 });

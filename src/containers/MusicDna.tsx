@@ -31,6 +31,12 @@ const MusicDna: React.FC = () => {
                  {dna.topArtists.map(a => <span key={a}>{a}</span>)}
                </div>
              </div>
+             <div className="vibe-tags">
+               <span className="label">CURRENT VIBE</span>
+               <div className="tags">
+                 <span className="tag">{(dna as any).currentVibe}</span>
+               </div>
+             </div>
           </div>
           <div className="card-footer">
             <div className="brand">SPOTIFY NEO</div>
@@ -41,17 +47,23 @@ const MusicDna: React.FC = () => {
 
       <section className="recommendations">
         <h3>Recommended for your DNA</h3>
-        <div className="rec-grid">
-           {dna.recommendations.map((t: any) => (
-             <div key={t.id} className="rec-item">
-               <img src={t.image} alt={t.name} />
-               <div className="info">
-                 <span className="name">{t.name}</span>
-                 <span className="artist">{t.artist}</span>
+        {dna.recommendations.length > 0 ? (
+          <div className="rec-grid">
+             {dna.recommendations.map((t: any) => (
+               <div key={t.id} className="rec-item">
+                 <img src={t.image} alt={t.name} />
+                 <div className="info">
+                   <span className="name">{t.name}</span>
+                   <span className="artist">{t.artist}</span>
+                 </div>
                </div>
-             </div>
-           ))}
-        </div>
+             ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <p>Listen to some music to generate recommendations!</p>
+          </div>
+        )}
       </section>
     </div>
   );

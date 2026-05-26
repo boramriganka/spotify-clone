@@ -93,6 +93,9 @@ const Search: React.FC = () => {
         <div className="search-filters">
           <button className={`filter-chip ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All</button>
           <button className={`filter-chip ${filter === 'full' ? 'active' : ''}`} onClick={() => setFilter('full')}>Full Songs</button>
+          <button className="filter-chip">Artists</button>
+          <button className="filter-chip">Playlists</button>
+          <button className="filter-chip">Albums</button>
           <button className={`filter-chip ${filter === 'preview' ? 'active' : ''}`} onClick={() => setFilter('preview')}>Previews</button>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Play, Pause, SkipBack, SkipForward, Heart, Speaker, Shuffle, Repeat, ListMusic, Maximize2 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { setIsPlaying, toggleLike, nextTrack, previousTrack, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
+import { setIsPlaying, toggleLike, nextTrack, previousTrack, toggleShuffle, toggleRepeat, seekTo, setVolume } from '../../store/slices/playerSlice';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import './DesktopPlayer.scss';
 
@@ -67,10 +67,26 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
         <button><ListMusic size={16} /></button>
         <div className="volume-control">
           <Speaker size={16} />
-          <div className="volume-bar" />
+          <VolumeSlider />
         </div>
       </div>
     </footer>
+  );
+};
+
+const VolumeSlider: React.FC = () => {
+  const volume = useSelector((state: RootState) => state.player.volume);
+  const dispatch = useDispatch();
+  return (
+    <input
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      value={volume}
+      onChange={(e) => dispatch(setVolume(parseFloat(e.target.value)))}
+      className="volume-slider"
+    />
   );
 };
 

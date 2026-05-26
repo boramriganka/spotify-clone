@@ -6,8 +6,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: var(--background-base);
-  z-index: 2000;
+  background-color: var(--dark-grey);
+  z-index: 1000;
   display: flex;
   flex-direction: column;
 
@@ -89,5 +89,28 @@
       border-radius: var(--radius-full);
       cursor: pointer;
     }
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    border-radius: 50%;
+    &:hover {
+      background: rgba(255,255,255,0.1);
+    }
+  }
+
+  .loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    color: var(--text-secondary);
   }
 }

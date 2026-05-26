@@ -51,6 +51,14 @@
           gap: 4px;
           span { font-size: 18px; font-weight: 700; }
         }
+
+        .tag {
+          background: rgba(255,255,255,0.2);
+          padding: 4px 12px;
+          border-radius: var(--radius-sm);
+          font-size: 12px;
+          font-weight: 600;
+        }
       }
 
       .card-footer {
@@ -89,6 +97,14 @@
           .artist { font-size: 12px; color: var(--text-secondary); }
         }
       }
+    }
+
+    .empty-state {
+      padding: var(--spacing-xl);
+      text-align: center;
+      background: var(--surface-grey);
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
     }
   }
 }

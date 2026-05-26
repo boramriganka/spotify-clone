@@ -41,19 +41,31 @@ export const aiDjService = {
 export const tasteGraphService = {
   getMusicDNA: () => {
     const recentlyPlayed = JSON.parse(localStorage.getItem('spotify_neo_recentlyPlayed') || '[]');
-    const likedSongs = JSON.parse(localStorage.getItem('spotify_neo_likedTrackIds') || '[]');
+
+    if (recentlyPlayed.length === 0) {
+      return {
+        vibe: "Music Explorer",
+        persona: "The Newbie",
+        topArtists: ["Discovery"],
+        recommendations: [],
+        currentVibe: "Curious"
+      };
+    }
 
     // Deterministic mock analysis based on real local data
-    const genres = recentlyPlayed.map((t: any) => t.artist.includes('EDM') ? 'EDM' : 'Indie');
+    const genres = recentlyPlayed.map((t: any) => (t.artist || '').includes('EDM') ? 'EDM' : 'Indie');
     const topGenre = genres.sort((a: any, b: any) =>
       genres.filter((v: any) => v === a).length - genres.filter((v: any) => v === b).length
     ).pop() || 'Discovery';
 
+    const artists = Array.from(new Set(recentlyPlayed.map((t: any) => t.artist))).filter(Boolean) as string[];
+
     return {
-      vibe: `Your vibe: ${topGenre} Explorer`,
-      persona: "The Nocturnal Discoverer",
-      topArtists: Array.from(new Set(recentlyPlayed.map((t: any) => t.artist))).slice(0, 3) as string[],
-      recommendations: recentlyPlayed.slice(0, 5)
+      vibe: `${topGenre} Enthusiast`,
+      persona: recentlyPlayed.length > 10 ? "The Connoisseur" : "The Nocturnal Discoverer",
+      topArtists: artists.length > 0 ? artists.slice(0, 3) : ["Discovery"],
+      recommendations: recentlyPlayed.slice(0, 10),
+      currentVibe: topGenre
     };
   }
 };
