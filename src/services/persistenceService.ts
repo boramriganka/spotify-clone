@@ -20,8 +20,8 @@ export const persistenceService = {
   },
 
   // Specific helpers
-  getLikedTrackIds: () => persistenceService.load<string[]>('likedTrackIds', []),
-  setLikedTrackIds: (ids: string[]) => persistenceService.save('likedTrackIds', ids),
+  getLikedTracks: () => persistenceService.load<Track[]>('likedTracks', []),
+  setLikedTracks: (tracks: Track[]) => persistenceService.save('likedTracks', tracks),
 
   getQueue: () => persistenceService.load<Track[]>('queue', []),
   setQueue: (queue: Track[]) => persistenceService.save('queue', queue),

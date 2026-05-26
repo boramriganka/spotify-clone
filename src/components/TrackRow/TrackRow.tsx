@@ -21,7 +21,7 @@ const TrackRow: React.FC<TrackRowProps> = ({ track, index, isActive, onPlay, sho
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch(toggleLike(track.id));
+    dispatch(toggleLike(track));
   };
 
   return (

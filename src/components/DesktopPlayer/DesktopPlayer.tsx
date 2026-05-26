@@ -36,7 +36,7 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
               <span className="artist">{currentTrack.artist}</span>
           </div>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack.id)); }}>
+        <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack)); }}>
           <Heart size={16} className={isLiked ? 'liked' : ''} fill={isLiked ? '#1DB954' : 'none'} />
         </button>
       </div>
