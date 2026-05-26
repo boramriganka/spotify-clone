@@ -20,27 +20,28 @@ const Home: React.FC = () => {
         const saved = localStorage.getItem('spotify_neo_recentlyPlayed');
         if (saved) {
            const parsed = JSON.parse(saved);
-           setRecentlyPlayed(parsed);
+           setRecentlyPlayed(parsed.slice(0, 10));
            dispatch(setTracks(parsed));
         }
       } catch (e) {}
 
-      // Personalized demo data
-      const [recent, releases, artists] = await Promise.all([
-        musicService.search('Assamese EDM'),
+      // Personalized discovery data
+      const [discovery, releases, artists, assamese] = await Promise.all([
+        musicService.search('Top full songs'),
         musicService.search('New Music Friday'),
-        musicService.search('Cora Zea')
+        musicService.search('Cora Zea'),
+        musicService.search('Assamese')
       ]);
 
-      setRecentItems(recent.slice(0, 8));
+      setRecentItems(discovery.slice(0, 8));
       setNewReleases(releases.slice(0, 16));
 
-      const allTracks = [...recent, ...releases].filter(i => i.type === 'track') as Track[];
+      const allTracks = [...discovery, ...releases, ...assamese].filter(i => i.type === 'track') as Track[];
       dispatch(setTracks(allTracks));
 
       // Merge with some specified artists
       const featured = await musicService.search('Pink Floyd AP Dhillon Drake');
-      setFeaturedArtists([...artists, ...featured].filter(a => a.type === 'artist').slice(0, 10));
+      setFeaturedArtists([...artists, ...featured, ...assamese].filter(a => a.type === 'artist').slice(0, 10));
     };
 
     loadData();
@@ -53,9 +54,18 @@ const Home: React.FC = () => {
       const tracks = context.filter(i => i.type === 'track') as Track[];
       if (tracks.length > 0) {
         dispatch(setTracks(tracks));
-        dispatch(setQueue(tracks.map(t => t.id)));
+        dispatch(setQueue(tracks.map(t => ({
+            trackId: t.id,
+            origin: 'home',
+            addedAt: Date.now()
+        }))));
       } else {
         dispatch(setTracks([item as Track]));
+        dispatch(setQueue([{
+            trackId: item.id,
+            origin: 'home',
+            addedAt: Date.now()
+        }]));
       }
       dispatch(setCurrentTrack(item.id));
       dispatch(setIsPlaying(true));
@@ -86,7 +96,7 @@ const Home: React.FC = () => {
         ))}
       </HorizontalShelf>
 
-      <HorizontalShelf title="Assamese EDM" onSeeAll={() => {}}>
+      <HorizontalShelf title="Full songs discovery" onSeeAll={() => { window.location.href='/search?q=full%20songs'; }}>
         {recentItems.map((item) => (
           <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, recentItems)} />
         ))}

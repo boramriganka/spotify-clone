@@ -17,12 +17,16 @@ export const persistenceMiddleware: Middleware = store => next => action => {
       persistenceService.setRecentlyPlayed(state.recentlyPlayedIds.map((id: string) => state.tracksById[id]));
     }
 
-    if (type.includes('setQueue') || type.includes('addToQueue') || type.includes('playNext') || type.includes('removeFromQueue')) {
-      persistenceService.setQueue(state.queue.map((id: string) => state.tracksById[id]));
+    if (type.includes('setQueue') || type.includes('addToQueue') || type.includes('playNext') || type.includes('removeFromQueue') || type.includes('clearQueue')) {
+      persistenceService.setQueue(state.queue.map((item: any) => state.tracksById[item.trackId]));
     }
 
     if (type.includes('toggleLike')) {
       persistenceService.setLikedTrackIds(state.likedTrackIds);
+    }
+
+    if (type.includes('addPlaylist') || type.includes('removePlaylist') || type.includes('updatePlaylist')) {
+      persistenceService.setCreatedPlaylists(state.createdPlaylistIds.map((id: string) => state.playlistsById[id]));
     }
 
     if (type.includes('setVolume') || type.includes('toggleShuffle') || type.includes('toggleRepeat')) {

@@ -3,7 +3,8 @@ import { Send, Sparkles, Save, X } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { aiDjService } from '../services/aiService';
 import { Track } from '../providers/types';
-import { setTracks, setQueue, setCurrentTrack } from '../store/slices/playerSlice';
+import { setTracks, setQueue, setCurrentTrack, addPlaylist } from '../store/slices/playerSlice';
+import { Playlist } from '../providers/types';
 import TrackRow from '../components/TrackRow/TrackRow';
 import './AiDj.scss';
 
@@ -31,9 +32,29 @@ const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const handlePlayAll = () => {
     if (tracks.length > 0) {
-      dispatch(setQueue(tracks.map(t => t.id)));
+      dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'ai-dj',
+        addedAt: Date.now()
+      }))));
       dispatch(setCurrentTrack(tracks[0].id));
     }
+  };
+
+  const handleSaveAsPlaylist = () => {
+    if (tracks.length === 0) return;
+    const newPlaylist: Playlist = {
+      id: `ai-dj-${Date.now()}`,
+      name: `AI DJ: ${prompt || 'Vibe'}`,
+      description: vibe,
+      image: tracks[0].image,
+      owner: 'Mriganka',
+      tracks: tracks,
+      provider: 'local',
+      type: 'playlist'
+    };
+    dispatch(addPlaylist(newPlaylist));
+    alert('Vibe saved to your Library!');
   };
 
   return (
@@ -64,7 +85,15 @@ const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <div className="generated-content">
             <div className="vibe-explanation">
               <p>{vibe}</p>
-              <button className="play-btn" onClick={handlePlayAll}>Play all</button>
+              <div className="vibe-actions">
+                <button className="play-btn" onClick={handlePlayAll}>Play all</button>
+                <button className="save-btn" onClick={handleSaveAsPlaylist}><Save size={18} /> Save as Playlist</button>
+              </div>
+              <div className="refine-chips">
+                 <button onClick={() => { setPrompt(p => p + " more energetic"); }}>More energetic</button>
+                 <button onClick={() => { setPrompt(p => p + " full songs only"); }}>Full songs only</button>
+                 <button onClick={() => { setPrompt("surprise me"); }}>Surprise me</button>
+              </div>
             </div>
             <div className="track-list">
               {tracks.map((track, i) => (
@@ -73,7 +102,11 @@ const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   track={track}
                   index={i}
                   onPlay={() => {
-                    dispatch(setQueue(tracks.map(t => t.id)));
+                    dispatch(setQueue(tracks.map(t => ({
+                        trackId: t.id,
+                        origin: 'ai-dj',
+                        addedAt: Date.now()
+                    }))));
                     dispatch(setCurrentTrack(track.id));
                   }}
                 />

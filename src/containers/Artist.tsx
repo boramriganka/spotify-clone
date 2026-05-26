@@ -29,7 +29,11 @@ const ArtistPage: React.FC = () => {
 
   const handlePlayTrack = (track: Track) => {
     dispatch(setGlobalTracks(tracks));
-    dispatch(setQueue(tracks.map(t => t.id)));
+    dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'search',
+        addedAt: Date.now()
+    }))));
     dispatch(setCurrentTrack(track.id));
   };
 

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { setProgress, setIsPlaying, nextTrack } from '../store/slices/playerSlice';
+import { setProgress, setIsPlaying, nextTrack, setProviderStatus, setDuration } from '../store/slices/playerSlice';
 import { musicService } from '../providers';
 
 const AudioEngine: React.FC = () => {
@@ -51,8 +51,7 @@ const AudioEngine: React.FC = () => {
     if (audioRef.current) {
       dispatch(setProgress(audioRef.current.currentTime));
       if (audioRef.current.duration && !isNaN(audioRef.current.duration)) {
-          // Sync duration if it changed (e.g. metadata loaded)
-          // Actually duration is usually in track object, but fallback just in case
+          dispatch(setDuration(audioRef.current.duration));
       }
     }
   };
@@ -70,8 +69,13 @@ const AudioEngine: React.FC = () => {
 
   const handleError = () => {
     console.error("Audio playback error");
+    if (currentTrack) {
+        dispatch(setProviderStatus({
+            [currentTrack.provider]: 'failing',
+            lastError: `Playback failed for ${currentTrack.name} from ${currentTrack.provider}`
+        }));
+    }
     // Simple fallback: try next track if current one fails
-    // In a real app we'd try different providers for the same track first
     dispatch(nextTrack());
   };
 

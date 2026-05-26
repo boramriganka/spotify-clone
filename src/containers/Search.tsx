@@ -12,7 +12,7 @@ const Search: React.FC = () => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [filter, setFilter] = useState<'all' | 'full' | 'preview'>('all');
+  const [filter, setFilter] = useState<'all' | 'full' | 'preview' | 'artist' | 'playlist' | 'album'>('all');
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -21,48 +21,60 @@ const Search: React.FC = () => {
     if (q) {
       setQuery(q);
       if (full === 'true') setFilter('full');
-      // Trigger search
-      const load = async () => {
-         setIsSearching(true);
-         let data = await musicService.search(q);
-         if (full === 'true' || filter === 'full') {
-            data = data.filter(item => item.type !== 'track' || (item as Track).playability === 'full');
-         }
-         setResults(data);
-         dispatch(setTracks(data.filter(i => i.type === 'track') as Track[]));
-         setIsSearching(false);
-      };
-      load();
+      performSearch(q, full === 'true' ? 'full' : filter);
     }
   }, []);
+
+  const performSearch = async (q: string, currentFilter: typeof filter) => {
+    setIsSearching(true);
+    let data = await musicService.search(q);
+
+    // Advanced Ranking: Full playable tracks first, then artists, then previews
+    const tracks = data.filter(i => i.type === 'track') as Track[];
+    const artists = data.filter(i => i.type === 'artist');
+    const playlists = data.filter(i => i.type === 'playlist');
+    const albums = data.filter(i => i.type === 'album');
+
+    const fullTracks = tracks.filter(t => t.playability === 'full');
+    const previewTracks = tracks.filter(t => t.playability === 'preview');
+
+    let finalResults: MediaItem[] = [];
+
+    if (currentFilter === 'full') {
+      finalResults = fullTracks;
+    } else if (currentFilter === 'preview') {
+      finalResults = previewTracks;
+    } else if (currentFilter === 'artist') {
+      finalResults = artists;
+    } else if (currentFilter === 'playlist') {
+      finalResults = playlists;
+    } else if (currentFilter === 'album') {
+      finalResults = albums;
+    } else {
+      // All
+      finalResults = [...fullTracks, ...artists, ...playlists, ...albums, ...previewTracks];
+    }
+
+    setResults(finalResults);
+    dispatch(setTracks(tracks));
+    setIsSearching(false);
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
-
-    setIsSearching(true);
-    let data = await musicService.search(query);
-
-    if (filter === 'full') {
-      data = data.filter(item => item.type !== 'track' || (item as Track).playability === 'full');
-    } else if (filter === 'preview') {
-      data = data.filter(item => item.type !== 'track' || (item as Track).playability === 'preview');
-    }
-
-    setResults(data);
-
-    // Store tracks in normalized state
-    const tracks = data.filter(i => i.type === 'track') as Track[];
-    dispatch(setTracks(tracks));
-
-    setIsSearching(false);
+    performSearch(query, filter);
   };
 
   const handlePlay = (item: MediaItem) => {
     if (item.type === 'track') {
       const trackResults = results.filter(i => i.type === 'track') as Track[];
       dispatch(setTracks(trackResults));
-      dispatch(setQueue(trackResults.map(t => t.id)));
+      dispatch(setQueue(trackResults.map(t => ({
+        trackId: t.id,
+        origin: 'search',
+        addedAt: Date.now()
+      }))));
       dispatch(setCurrentTrack(item.id));
     }
   };
@@ -91,12 +103,12 @@ const Search: React.FC = () => {
           )}
         </form>
         <div className="search-filters">
-          <button className={`filter-chip ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>All</button>
-          <button className={`filter-chip ${filter === 'full' ? 'active' : ''}`} onClick={() => setFilter('full')}>Full Songs</button>
-          <button className="filter-chip">Artists</button>
-          <button className="filter-chip">Playlists</button>
-          <button className="filter-chip">Albums</button>
-          <button className={`filter-chip ${filter === 'preview' ? 'active' : ''}`} onClick={() => setFilter('preview')}>Previews</button>
+          <button className={`filter-chip ${filter === 'all' ? 'active' : ''}`} onClick={() => { setFilter('all'); if (query) performSearch(query, 'all'); }}>All</button>
+          <button className={`filter-chip ${filter === 'full' ? 'active' : ''}`} onClick={() => { setFilter('full'); if (query) performSearch(query, 'full'); }}>Full Songs</button>
+          <button className={`filter-chip ${filter === 'artist' ? 'active' : ''}`} onClick={() => { setFilter('artist'); if (query) performSearch(query, 'artist'); }}>Artists</button>
+          <button className={`filter-chip ${filter === 'playlist' ? 'active' : ''}`} onClick={() => { setFilter('playlist'); if (query) performSearch(query, 'playlist'); }}>Playlists</button>
+          <button className={`filter-chip ${filter === 'album' ? 'active' : ''}`} onClick={() => { setFilter('album'); if (query) performSearch(query, 'album'); }}>Albums</button>
+          <button className={`filter-chip ${filter === 'preview' ? 'active' : ''}`} onClick={() => { setFilter('preview'); if (query) performSearch(query, 'preview'); }}>Previews</button>
         </div>
       </div>
 

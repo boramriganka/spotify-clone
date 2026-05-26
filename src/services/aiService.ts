@@ -31,8 +31,14 @@ export const aiDjService = {
        tracks = tracks.filter(t => t.playability === 'full');
     }
 
+    // Ensure we have at least some tracks, otherwise expand search
+    if (tracks.length < 3 && !lowercasePrompt.includes('full')) {
+       const expanded = await musicService.search(query + " chill");
+       tracks = [...tracks, ...(expanded.filter(i => i.type === 'track') as Track[])];
+    }
+
     return {
-      tracks,
+      tracks: tracks.slice(0, 20),
       vibe
     };
   }
@@ -41,31 +47,54 @@ export const aiDjService = {
 export const tasteGraphService = {
   getMusicDNA: () => {
     const recentlyPlayed = JSON.parse(localStorage.getItem('spotify_neo_recentlyPlayed') || '[]');
+    const likedIds = JSON.parse(localStorage.getItem('spotify_neo_likedTrackIds') || '[]');
 
-    if (recentlyPlayed.length === 0) {
+    if (recentlyPlayed.length === 0 && likedIds.length === 0) {
       return {
-        vibe: "Music Explorer",
-        persona: "The Newbie",
-        topArtists: ["Discovery"],
+        vibe: "Silent Explorer",
+        persona: "The Blank Canvas",
+        topArtists: ["Finding your sound..."],
         recommendations: [],
-        currentVibe: "Curious"
+        currentVibe: "Quiet",
+        moods: ["Peaceful"]
       };
     }
 
-    // Deterministic mock analysis based on real local data
-    const genres = recentlyPlayed.map((t: any) => (t.artist || '').includes('EDM') ? 'EDM' : 'Indie');
-    const topGenre = genres.sort((a: any, b: any) =>
-      genres.filter((v: any) => v === a).length - genres.filter((v: any) => v === b).length
-    ).pop() || 'Discovery';
+    // Analyze artists
+    const artistCounts: Record<string, number> = {};
+    recentlyPlayed.forEach((t: any) => {
+      artistCounts[t.artist] = (artistCounts[t.artist] || 0) + 1;
+    });
+    const topArtists = Object.entries(artistCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 3)
+      .map(([name]) => name);
 
-    const artists = Array.from(new Set(recentlyPlayed.map((t: any) => t.artist))).filter(Boolean) as string[];
+    // Determine Vibe & Moods
+    const hasEdm = recentlyPlayed.some((t: any) => (t.artist || '').toLowerCase().includes('edm') || (t.name || '').toLowerCase().includes('remix'));
+    const hasIndian = recentlyPlayed.some((t: any) => (t.artist || '').toLowerCase().includes('assamese') || (t.artist || '').toLowerCase().includes('dhillon'));
+
+    let vibe = "Eclectic Mix";
+    let moods = ["Dynamic"];
+
+    if (hasEdm && hasIndian) {
+      vibe = "Northeast Nostalgia + EDM Vibe";
+      moods = ["Energetic", "Cultural"];
+    } else if (hasIndian) {
+      vibe = "Desi Indie Soul";
+      moods = ["Emotional", "Nostalgic"];
+    } else if (hasEdm) {
+      vibe = "2AM Club Focus";
+      moods = ["Electronic", "Deep"];
+    }
 
     return {
-      vibe: `${topGenre} Enthusiast`,
-      persona: recentlyPlayed.length > 10 ? "The Connoisseur" : "The Nocturnal Discoverer",
-      topArtists: artists.length > 0 ? artists.slice(0, 3) : ["Discovery"],
-      recommendations: recentlyPlayed.slice(0, 10),
-      currentVibe: topGenre
+      vibe,
+      persona: recentlyPlayed.length > 20 ? "The Connoisseur" : "The Digital Nomad",
+      topArtists: topArtists.length > 0 ? topArtists : ["Various Artists"],
+      recommendations: recentlyPlayed.slice(0, 6),
+      currentVibe: vibe.split('+')[0].trim(),
+      moods
     };
   }
 };

@@ -34,7 +34,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onClick, variant = 'square'
       <div className="media-tile" onClick={onClick}>
         <img src={item.image} alt={item.name} />
         <span className="tile-title">{item.name}</span>
-        {renderPlayabilityBadge()}
+        {item.type === 'track' && (item as any).playability === 'full' && (
+           <span className="badge">FULL</span>
+        )}
       </div>
     );
   }

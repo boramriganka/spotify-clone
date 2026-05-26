@@ -16,48 +16,44 @@ const Playlist: React.FC = () => {
   const dispatch = useDispatch();
   const { currentTrackId, likedTrackIds, tracksById } = useSelector((state: RootState) => state.player);
 
+  const { createdPlaylistIds, playlistsById } = useSelector((state: RootState) => state.player);
+
   useEffect(() => {
     const loadPlaylist = async () => {
-      if (id && id.startsWith('local-')) {
-        const locals = getUserPlaylists();
-        const found = locals.find(p => p.id === id);
-        if (found) setPlaylist(found);
-      } else if (window.location.pathname === '/liked') {
+      if (id && playlistsById[id]) {
+        setPlaylist(playlistsById[id]);
+      } else if (window.location.pathname === '/liked' || id === 'liked') {
          const likedTracks = likedTrackIds.map(tid => tracksById[tid]).filter(Boolean);
          setPlaylist({
             id: 'liked',
             name: 'Liked Songs',
-            description: '',
+            description: 'Your liked songs, always with you.',
             image: '',
             owner: 'Mriganka',
             tracks: likedTracks,
             provider: 'local',
             type: 'playlist'
           });
-      } else {
-        const results = await musicService.search('Liked Songs');
-        const tracks = results.filter(i => i.type === 'track') as Track[];
-        setPlaylist({
-          id: id || 'liked',
-          name: 'Liked Songs',
-          description: '',
-          image: '',
-          owner: 'Mriganka',
-          tracks,
-          provider: 'local',
-          type: 'playlist'
-        });
+      } else if (id && id.startsWith('local-')) {
+        const locals = getUserPlaylists();
+        const found = locals.find(p => p.id === id);
+        if (found) setPlaylist(found);
       }
     };
     loadPlaylist();
-  }, [id, likedTrackIds, tracksById]);
+  }, [id, likedTrackIds, tracksById, playlistsById]);
 
   const tracks = playlist?.tracks || [];
 
   const handlePlayAll = () => {
     if (tracks.length > 0) {
       dispatch(setTracks(tracks));
-      dispatch(setQueue(tracks.map(t => t.id)));
+      dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'playlist',
+        contextId: playlist?.id,
+        addedAt: Date.now()
+      }))));
       dispatch(setCurrentTrack(tracks[0].id));
     }
   };
@@ -67,14 +63,24 @@ const Playlist: React.FC = () => {
        dispatch(toggleShuffle());
        const randomIndex = Math.floor(Math.random() * tracks.length);
        dispatch(setTracks(tracks));
-       dispatch(setQueue(tracks.map(t => t.id)));
+       dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'playlist',
+        contextId: playlist?.id,
+        addedAt: Date.now()
+       }))));
        dispatch(setCurrentTrack(tracks[randomIndex].id));
     }
   };
 
   const handlePlayTrack = (track: Track) => {
     dispatch(setTracks(tracks));
-    dispatch(setQueue(tracks.map(t => t.id)));
+    dispatch(setQueue(tracks.map(t => ({
+        trackId: t.id,
+        origin: 'playlist',
+        contextId: playlist?.id,
+        addedAt: Date.now()
+    }))));
     dispatch(setCurrentTrack(track.id));
   };
 

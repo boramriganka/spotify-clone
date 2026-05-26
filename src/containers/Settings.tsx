@@ -15,6 +15,8 @@ const Settings: React.FC = () => {
       downloadWifiOnly: true,
       normalizeVolume: true,
       showCanvas: true,
+      preferFullSongs: true,
+      hidePreviews: false,
     };
   });
 
@@ -28,11 +30,11 @@ const Settings: React.FC = () => {
 
   const sections = [
     {
-      title: 'Provider Status (Neo Debug)',
+      title: 'Spotify Neo Experience',
       items: [
-        { label: 'Audius API', type: 'status', status: 'Active' },
-        { label: 'Jamendo API', type: 'status', status: 'Active' },
-        { label: 'iTunes Fallback', type: 'status', status: 'Ready' },
+        { label: 'Prefer full songs', type: 'toggle', key: 'preferFullSongs', subtitle: 'Prioritize Audius/Jamendo over iTunes' },
+        { label: 'Hide preview-only tracks', type: 'toggle', key: 'hidePreviews' },
+        { label: 'Provider status', type: 'link', action: () => navigate('/debug/providers') },
       ]
     },
     {
@@ -79,7 +81,10 @@ const Settings: React.FC = () => {
           <div key={section.title} className="settings-section">
             <h2>{section.title}</h2>
             {section.items.map((item: any) => (
-              <div key={item.label} className="settings-item" onClick={() => item.type === 'toggle' && handleToggle(item.key)}>
+              <div key={item.label} className="settings-item" onClick={() => {
+                  if (item.type === 'toggle') handleToggle(item.key);
+                  if (item.action) item.action();
+              }}>
                 <div className="item-text">
                   <span className="label">{item.label}</span>
                   {item.subtitle && <span className="subtitle">{item.subtitle}</span>}

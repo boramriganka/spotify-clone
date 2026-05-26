@@ -1,0 +1,88 @@
+
+> react-spotify-search@1.0.0 start
+> cross-env NODE_OPTIONS=--openssl-legacy-provider PORT=3008 react-scripts start
+
+(node:1736741) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:1736741) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+Compiled successfully!
+
+You can now view react-spotify-search in the browser.
+
+  Local:            http://localhost:3008
+  On Your Network:  http://192.168.0.2:3008
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+
+webpack compiled successfully
+Files successfully emitted, waiting for typecheck results...
+Issues checking in progress...
+No issues found.
+Compiling...
+Compiled successfully!
+LOG from ./node_modules/sass-loader/dist/cjs.js sass-loader ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[7].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[7].use[2]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[1].oneOf[7].use[3]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[7].use[4]!./src/styles/global.scss
+<w> Deprecation The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+<w>
+<w> More info: https://sass-lang.com/d/legacy-js-api
+<w>
+<w> null
+<w> Deprecation Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+<w>
+<w> More info and automated migrator: https://sass-lang.com/d/import
+<w>
+<w> src/styles/global.scss 1:9  root stylesheet
+<w>
+<w> Deprecation Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+<w>
+<w> More info and automated migrator: https://sass-lang.com/d/import
+<w>
+<w> src/styles/global.scss 2:9  root stylesheet
+<w>
+<w> Deprecation Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+<w>
+<w> More info and automated migrator: https://sass-lang.com/d/import
+<w>
+<w> src/styles/global.scss 5:9  root stylesheet
+<w>
+<w> Deprecation Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+<w>
+<w> More info and automated migrator: https://sass-lang.com/d/import
+<w>
+<w> src/styles/global.scss 6:9  root stylesheet
+<w>
+<w> Deprecation Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+<w>
+<w> More info and automated migrator: https://sass-lang.com/d/import
+<w>
+<w> src/styles/global.scss 7:9  root stylesheet
+<w>
+<w> 29 repetitive deprecation warnings omitted.
+<w>
+<w> null
+
+LOG from ./node_modules/sass-loader/dist/cjs.js sass-loader ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[7].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[7].use[2]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[1].oneOf[7].use[3]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[7].use[4]!./src/components/MediaCard/MediaCard.scss
+<w> Deprecation The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+<w>
+<w> More info: https://sass-lang.com/d/legacy-js-api
+<w>
+<w> null
+<w> Deprecation Sass @import rules are deprecated and will be removed in Dart Sass 3.0.0.
+<w>
+<w> More info and automated migrator: https://sass-lang.com/d/import
+<w>
+<w> src/components/MediaCard/MediaCard.scss 1:9  root stylesheet
+<w>
+
+webpack compiled successfully
+No issues found.
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+No issues found.
+Compiling...
+Compiled successfully!
+webpack compiled successfully
+No issues found.

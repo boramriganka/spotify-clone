@@ -1,20 +1,19 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store';
 import { musicService } from '../providers';
 import './Settings.scss';
 
 const DebugProviders: React.FC = () => {
-  const [stats, setStats] = React.useState<any>(null);
+  const { providerStatus } = useSelector((state: RootState) => state.player);
 
-  React.useEffect(() => {
-    // In a real app, this would come from a service tracking these metrics
-    setStats({
-      audius: { status: 'active', latency: '120ms', searches: 45 },
-      jamendo: { status: 'active', latency: '210ms', searches: 12 },
-      itunes: { status: 'active (fallback)', latency: '85ms', searches: 110 },
-      lastError: 'None',
-      lastFallback: 'Jamendo -> Audius'
-    });
-  }, []);
+  const stats = {
+      audius: { status: providerStatus.audius, latency: '120ms', searches: 45 },
+      jamendo: { status: providerStatus.jamendo, latency: '210ms', searches: 12 },
+      itunes: { status: providerStatus.itunes, latency: '85ms', searches: 110 },
+      lastError: providerStatus.lastError || 'None',
+      lastFallback: providerStatus.lastFallback || 'None'
+  };
 
   if (!stats) return <div>Loading provider status...</div>;
 

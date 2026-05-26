@@ -2,6 +2,13 @@ import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { Track, Artist, Album, Playlist, MediaItem } from '../../providers/types';
 import { persistenceService } from '../../services/persistenceService';
 
+export interface QueueItem {
+  trackId: string;
+  origin: "playlist" | "search" | "home" | "ai-dj" | "alternatives" | "manual" | "autoplay";
+  contextId?: string;
+  addedAt: number;
+}
+
 interface PlayerState {
   // Normalized Data
   tracksById: Record<string, Track>;
@@ -11,14 +18,14 @@ interface PlayerState {
 
   // Playback State
   currentTrackId: string | null;
-  queue: string[]; // array of track IDs
+  queue: QueueItem[];
   currentIndex: number;
   isPlaying: boolean;
   progress: number;
   duration: number;
   volume: number;
   isShuffled: boolean;
-  shuffledQueue: string[];
+  shuffledQueue: QueueItem[];
   repeatMode: 'off' | 'one' | 'all';
 
   // Library State
@@ -30,6 +37,15 @@ interface PlayerState {
   // UI State
   searchResults: string[]; // MediaItem IDs
   searchLoading: boolean;
+
+  // Provider Health
+  providerStatus: {
+    audius: 'active' | 'failing';
+    jamendo: 'active' | 'failing' | 'missing_key';
+    itunes: 'active' | 'failing';
+    lastError: string | null;
+    lastFallback: string | null;
+  };
 }
 
 const settings = persistenceService.getSettings();
@@ -41,7 +57,11 @@ const initialState: PlayerState = {
   playlistsById: {},
 
   currentTrackId: persistenceService.getCurrentTrack()?.id || null,
-  queue: persistenceService.getQueue().map(t => t.id),
+  queue: persistenceService.getQueue().map(t => ({
+    trackId: t.id,
+    origin: 'manual',
+    addedAt: Date.now()
+  })),
   currentIndex: -1,
   isPlaying: false,
   progress: 0,
@@ -58,6 +78,14 @@ const initialState: PlayerState = {
 
   searchResults: [],
   searchLoading: false,
+
+  providerStatus: {
+    audius: 'active',
+    jamendo: 'active',
+    itunes: 'active',
+    lastError: null,
+    lastFallback: null
+  }
 };
 
 // Pre-populate tracksById from persisted data
@@ -93,12 +121,15 @@ const playerSlice = createSlice({
         state.recentlyPlayedIds = [id, ...state.recentlyPlayedIds.filter(i => i !== id)].slice(0, 50);
       }
     },
-    setQueue: (state, action: PayloadAction<string[]>) => {
+    setQueue: (state, action: PayloadAction<QueueItem[]>) => {
       state.queue = action.payload;
 
       if (state.isShuffled && state.currentTrackId) {
-        const otherIds = state.queue.filter(id => id !== state.currentTrackId);
-        state.shuffledQueue = [state.currentTrackId, ...otherIds.sort(() => Math.random() - 0.5)];
+        const currentItem = state.queue.find(item => item.trackId === state.currentTrackId);
+        const otherItems = state.queue.filter(item => item.trackId !== state.currentTrackId);
+        state.shuffledQueue = currentItem
+          ? [currentItem, ...otherItems.sort(() => Math.random() - 0.5)]
+          : [...state.queue].sort(() => Math.random() - 0.5);
       }
     },
     setIsPlaying: (state, action: PayloadAction<boolean>) => {
@@ -128,7 +159,9 @@ const playerSlice = createSlice({
       const activeQueue = state.isShuffled ? state.shuffledQueue : state.queue;
       if (activeQueue.length === 0) return;
 
-      let nextIndex = activeQueue.indexOf(state.currentTrackId || '') + 1;
+      const currentIndex = activeQueue.findIndex(item => item.trackId === state.currentTrackId);
+      let nextIndex = currentIndex + 1;
+
       if (nextIndex >= activeQueue.length) {
         if (state.repeatMode === 'all') {
           nextIndex = 0;
@@ -138,7 +171,7 @@ const playerSlice = createSlice({
         }
       }
 
-      state.currentTrackId = activeQueue[nextIndex];
+      state.currentTrackId = activeQueue[nextIndex].trackId;
       state.progress = 0;
       state.isPlaying = true;
     },
@@ -151,7 +184,9 @@ const playerSlice = createSlice({
         return;
       }
 
-      let prevIndex = activeQueue.indexOf(state.currentTrackId || '') - 1;
+      const currentIndex = activeQueue.findIndex(item => item.trackId === state.currentTrackId);
+      let prevIndex = currentIndex - 1;
+
       if (prevIndex < 0) {
         if (state.repeatMode === 'all') {
           prevIndex = activeQueue.length - 1;
@@ -161,15 +196,18 @@ const playerSlice = createSlice({
         }
       }
 
-      state.currentTrackId = activeQueue[prevIndex];
+      state.currentTrackId = activeQueue[prevIndex].trackId;
       state.progress = 0;
       state.isPlaying = true;
     },
     toggleShuffle: (state) => {
       state.isShuffled = !state.isShuffled;
       if (state.isShuffled && state.currentTrackId) {
-        const otherIds = state.queue.filter(id => id !== state.currentTrackId);
-        state.shuffledQueue = [state.currentTrackId, ...otherIds.sort(() => Math.random() - 0.5)];
+        const currentItem = state.queue.find(item => item.trackId === state.currentTrackId);
+        const otherItems = state.queue.filter(item => item.trackId !== state.currentTrackId);
+        state.shuffledQueue = currentItem
+          ? [currentItem, ...otherItems.sort(() => Math.random() - 0.5)]
+          : [...state.queue].sort(() => Math.random() - 0.5);
       }
     },
     toggleRepeat: (state) => {
@@ -177,15 +215,37 @@ const playerSlice = createSlice({
       const nextIdx = (modes.indexOf(state.repeatMode) + 1) % modes.length;
       state.repeatMode = modes[nextIdx];
     },
-    addToQueue: (state, action: PayloadAction<string>) => {
+    addToQueue: (state, action: PayloadAction<QueueItem>) => {
       state.queue.push(action.payload);
     },
-    playNext: (state, action: PayloadAction<string>) => {
-      const currentIndex = state.queue.indexOf(state.currentTrackId || '');
+    playNext: (state, action: PayloadAction<QueueItem>) => {
+      const currentIndex = state.queue.findIndex(item => item.trackId === state.currentTrackId);
       state.queue.splice(currentIndex + 1, 0, action.payload);
     },
     removeFromQueue: (state, action: PayloadAction<string>) => {
-      state.queue = state.queue.filter(id => id !== action.payload);
+      state.queue = state.queue.filter(item => item.trackId !== action.payload);
+    },
+    clearQueue: (state) => {
+      state.queue = state.currentTrackId ? state.queue.filter(item => item.trackId === state.currentTrackId) : [];
+      state.shuffledQueue = [];
+    },
+    setProviderStatus: (state, action: PayloadAction<Partial<PlayerState['providerStatus']>>) => {
+      state.providerStatus = { ...state.providerStatus, ...action.payload };
+    },
+    addPlaylist: (state, action: PayloadAction<Playlist>) => {
+      state.playlistsById[action.payload.id] = action.payload;
+      if (!state.createdPlaylistIds.includes(action.payload.id)) {
+        state.createdPlaylistIds.push(action.payload.id);
+      }
+    },
+    removePlaylist: (state, action: PayloadAction<string>) => {
+      delete state.playlistsById[action.payload];
+      state.createdPlaylistIds = state.createdPlaylistIds.filter(id => id !== action.payload);
+    },
+    updatePlaylist: (state, action: PayloadAction<{ id: string, tracks: Track[] }>) => {
+      if (state.playlistsById[action.payload.id]) {
+        state.playlistsById[action.payload.id].tracks = action.payload.tracks;
+      }
     }
   },
 });
@@ -207,6 +267,11 @@ export const {
   addToQueue,
   playNext,
   removeFromQueue,
+  clearQueue,
+  setProviderStatus,
+  addPlaylist,
+  removePlaylist,
+  updatePlaylist,
   seekTo,
 } = playerSlice.actions;
 
