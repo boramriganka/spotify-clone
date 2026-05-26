@@ -82,7 +82,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                     <p>{currentTrack.artist}</p>
                   </div>
                 </div>
-                <button onClick={() => dispatch(toggleLike(currentTrack.id))}>
+            <button onClick={() => dispatch(toggleLike(currentTrack))}>
                   <Heart size={28} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
                 </button>
               </div>

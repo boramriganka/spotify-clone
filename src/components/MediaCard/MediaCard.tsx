@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { MediaItem } from '../../providers/types';
+import { MediaItem, Track } from '../../providers/types';
 import './MediaCard.scss';
 
 interface MediaCardProps {
@@ -17,7 +17,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onClick, variant = 'square'
 
   const renderPlayabilityBadge = () => {
     if (item.type !== 'track') return null;
-    const track = item as any;
+    const track = item as Track;
     if (track.playability === 'full') return <span className="badge badge-full">Full Song</span>;
     if (track.playability === 'preview') return <span className="badge badge-preview">Preview</span>;
     return <span className="badge badge-unavailable">Unavailable</span>;

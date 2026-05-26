@@ -22,7 +22,7 @@ export const persistenceMiddleware: Middleware = store => next => action => {
     }
 
     if (type.includes('toggleLike')) {
-      persistenceService.setLikedTrackIds(state.likedTrackIds);
+      persistenceService.setLikedTracks(state.likedTrackIds.map((id: string) => state.tracksById[id]));
     }
 
     if (type.includes('addPlaylist') || type.includes('removePlaylist') || type.includes('updatePlaylist')) {

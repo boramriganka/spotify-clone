@@ -1,17 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Search, Library, PlusSquare, Heart } from 'lucide-react';
-import { getUserPlaylists } from '../../providers/localProvider';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 import './Sidebar.scss';
 
 const Sidebar: React.FC = () => {
-  const [localPlaylists, setLocalPlaylists] = useState(getUserPlaylists());
-
-  useEffect(() => {
-    const update = () => setLocalPlaylists(getUserPlaylists());
-    window.addEventListener('playlists_updated', update);
-    return () => window.removeEventListener('playlists_updated', update);
-  }, []);
+  const { createdPlaylistIds, playlistsById } = useSelector((state: RootState) => state.player);
+  const localPlaylists = createdPlaylistIds.map(id => playlistsById[id]).filter(Boolean);
   return (
     <aside className="sidebar">
       <div className="sidebar-nav">

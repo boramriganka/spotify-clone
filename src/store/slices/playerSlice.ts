@@ -71,7 +71,7 @@ const initialState: PlayerState = {
   shuffledQueue: [],
   repeatMode: settings.repeatMode,
 
-  likedTrackIds: persistenceService.getLikedTrackIds(),
+  likedTrackIds: persistenceService.getLikedTracks().map(t => t.id),
   recentlyPlayedIds: persistenceService.getRecentlyPlayed().map(t => t.id),
   createdPlaylistIds: persistenceService.getCreatedPlaylists().map(p => p.id),
   currentDevice: "Mriganka’s OnePlus Buds 4",
@@ -93,6 +93,7 @@ const persistedTracks = [
   ...(persistenceService.getCurrentTrack() ? [persistenceService.getCurrentTrack()!] : []),
   ...persistenceService.getQueue(),
   ...persistenceService.getRecentlyPlayed(),
+  ...persistenceService.getLikedTracks(),
 ];
 
 persistedTracks.forEach(t => {
@@ -147,12 +148,14 @@ const playerSlice = createSlice({
     setVolume: (state, action: PayloadAction<number>) => {
       state.volume = action.payload;
     },
-    toggleLike: (state, action: PayloadAction<string>) => {
-      const id = action.payload;
+    toggleLike: (state, action: PayloadAction<Track>) => {
+      const track = action.payload;
+      const id = track.id;
       if (state.likedTrackIds.includes(id)) {
         state.likedTrackIds = state.likedTrackIds.filter(i => i !== id);
       } else {
         state.likedTrackIds.push(id);
+        state.tracksById[id] = track;
       }
     },
     nextTrack: (state) => {

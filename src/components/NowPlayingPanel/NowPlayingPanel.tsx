@@ -45,7 +45,7 @@ const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) =>
                 <h2>{currentTrack.name}</h2>
                 <p>{currentTrack.artist}</p>
               </div>
-              <button onClick={() => dispatch(toggleLike(currentTrack.id))}>
+              <button onClick={() => dispatch(toggleLike(currentTrack))}>
                 <Heart size={24} className={isLiked ? 'liked' : ''} fill={isLiked ? '#1DB954' : 'none'} />
               </button>
             </div>
