@@ -6,12 +6,19 @@
   cursor: pointer;
   width: 100%;
 
-  &:hover {
+  &:hover, &:focus-visible {
+    outline: none;
     .progress-bar-fill {
       background-color: var(--spotify-green) !important;
     }
     .progress-bar-knob {
       display: block !important;
+    }
+  }
+
+  &:focus-visible {
+    .progress-bar-bg {
+      box-shadow: 0 0 0 2px var(--spotify-green);
     }
   }
 
