@@ -36,22 +36,41 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
               <span className="artist">{currentTrack.artist}</span>
           </div>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack)); }}>
+        <button
+          onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack)); }}
+          aria-label={isLiked ? 'Remove from Liked Songs' : 'Add to Liked Songs'}
+        >
           <Heart size={16} className={isLiked ? 'liked' : ''} fill={isLiked ? '#1DB954' : 'none'} />
         </button>
       </div>
 
       <div className="controls-section">
         <div className="buttons">
-          <button className={`shuffle ${isShuffled ? 'active' : ''}`} onClick={() => dispatch(toggleShuffle())}>
+          <button
+            className={`shuffle ${isShuffled ? 'active' : ''}`}
+            onClick={() => dispatch(toggleShuffle())}
+            aria-label={isShuffled ? 'Disable shuffle' : 'Enable shuffle'}
+          >
             <Shuffle size={16} />
           </button>
-          <button onClick={() => dispatch(previousTrack())}><SkipBack size={20} fill="white" /></button>
-          <button className="play-pause" onClick={() => dispatch(setIsPlaying(!isPlaying))}>
+          <button onClick={() => dispatch(previousTrack())} aria-label="Previous track">
+            <SkipBack size={20} fill="white" />
+          </button>
+          <button
+            className="play-pause"
+            onClick={() => dispatch(setIsPlaying(!isPlaying))}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
             {isPlaying ? <Pause size={20} fill="black" /> : <Play size={20} fill="black" />}
           </button>
-          <button onClick={() => dispatch(nextTrack())}><SkipForward size={20} fill="white" /></button>
-          <button className={`repeat ${repeatMode !== 'off' ? 'active' : ''}`} onClick={() => dispatch(toggleRepeat())}>
+          <button onClick={() => dispatch(nextTrack())} aria-label="Next track">
+            <SkipForward size={20} fill="white" />
+          </button>
+          <button
+            className={`repeat ${repeatMode !== 'off' ? 'active' : ''}`}
+            onClick={() => dispatch(toggleRepeat())}
+            aria-label={repeatMode === 'off' ? 'Enable repeat' : 'Disable repeat'}
+          >
             <Repeat size={16} />
           </button>
         </div>
@@ -63,10 +82,16 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
       </div>
 
       <div className="extra-section">
-        <button onClick={onTogglePanel} className={isPanelOpen ? 'active' : ''}><Maximize2 size={16} /></button>
-        <button><ListMusic size={16} /></button>
+        <button
+          onClick={onTogglePanel}
+          className={isPanelOpen ? 'active' : ''}
+          aria-label={isPanelOpen ? 'Close now playing' : 'Open now playing'}
+        >
+          <Maximize2 size={16} />
+        </button>
+        <button aria-label="Queue"><ListMusic size={16} /></button>
         <div className="volume-control">
-          <Speaker size={16} />
+          <Speaker size={16} aria-label="Volume" />
           <VolumeSlider />
         </div>
       </div>
@@ -86,6 +111,7 @@ const VolumeSlider: React.FC = () => {
       value={volume}
       onChange={(e) => dispatch(setVolume(parseFloat(e.target.value)))}
       className="volume-slider"
+      aria-label="Volume"
     />
   );
 };

@@ -26,7 +26,11 @@ const Sidebar: React.FC = () => {
       </div>
 
       <div className="sidebar-actions">
-        <button className="action-item" onClick={() => (window as any).toggleCreateSheet?.()}>
+        <button
+          className="action-item"
+          onClick={() => (window as any).toggleCreateSheet?.()}
+          aria-label="Create Playlist"
+        >
           <div className="icon-box create-playlist">
             <PlusSquare size={20} />
           </div>

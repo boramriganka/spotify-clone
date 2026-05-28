@@ -34,10 +34,16 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
         </div>
         <div className="controls">
           <Speaker size={20} className="device-icon spotify-green" />
-          <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack)); }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack)); }}
+            aria-label={isLiked ? 'Remove from Liked Songs' : 'Add to Liked Songs'}
+          >
             <Heart size={20} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
           </button>
-          <button onClick={(e) => { e.stopPropagation(); dispatch(setIsPlaying(!isPlaying)); }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); dispatch(setIsPlaying(!isPlaying)); }}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
             {isPlaying ? <Pause size={28} fill="white" /> : <Play size={28} fill="white" />}
           </button>
         </div>

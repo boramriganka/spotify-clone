@@ -61,12 +61,12 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
             style={{ background: `linear-gradient(to bottom, ${bgColor} 0%, #121212 100%)` }}
           >
             <div className="player-header">
-              <button onClick={onClose}><ChevronDown size={32} /></button>
+              <button onClick={onClose} aria-label="Close"><ChevronDown size={32} /></button>
               <div className="playing-from">
                 <span className="label">PLAYING FROM PLAYLIST</span>
                 <span className="playlist-name">Liked Songs</span>
               </div>
-              <button><MoreHorizontal size={24} /></button>
+              <button aria-label="More options"><MoreHorizontal size={24} /></button>
             </div>
 
             <div className="player-content scroll-container">
@@ -82,7 +82,10 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                     <p>{currentTrack.artist}</p>
                   </div>
                 </div>
-            <button onClick={() => dispatch(toggleLike(currentTrack))}>
+            <button
+                  onClick={() => dispatch(toggleLike(currentTrack))}
+                  aria-label={isLiked ? 'Remove from Liked Songs' : 'Add to Liked Songs'}
+                >
                   <Heart size={28} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
                 </button>
               </div>
@@ -103,21 +106,27 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                 <button
                   className={`shuffle ${isShuffled ? 'active' : ''}`}
                   onClick={() => dispatch(toggleShuffle())}
+                  aria-label={isShuffled ? 'Disable shuffle' : 'Enable shuffle'}
                 >
                   <Shuffle size={24} />
                 </button>
-                <button className="skip" onClick={() => dispatch(previousTrack())}>
+                <button className="skip" onClick={() => dispatch(previousTrack())} aria-label="Previous track">
                   <SkipBack size={36} fill="white" />
                 </button>
-                <button className="play-pause" onClick={() => dispatch(setIsPlaying(!isPlaying))}>
+                <button
+                  className="play-pause"
+                  onClick={() => dispatch(setIsPlaying(!isPlaying))}
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
+                >
                   {isPlaying ? <Pause size={48} fill="black" /> : <Play size={48} fill="black" />}
                 </button>
-                <button className="skip" onClick={() => dispatch(nextTrack())}>
+                <button className="skip" onClick={() => dispatch(nextTrack())} aria-label="Next track">
                   <SkipForward size={36} fill="white" />
                 </button>
                 <button
                   className={`repeat ${repeatMode !== 'off' ? 'active' : ''}`}
                   onClick={() => dispatch(toggleRepeat())}
+                  aria-label={repeatMode === 'off' ? 'Enable repeat' : 'Disable repeat'}
                 >
                   <Repeat size={24} />
                   {repeatMode === 'one' && <span className="repeat-one">1</span>}
@@ -125,13 +134,17 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div className="footer-controls">
-                <button className="device-info" onClick={() => setIsDevicePickerOpen(true)}>
+                <button
+                  className="device-info"
+                  onClick={() => setIsDevicePickerOpen(true)}
+                  aria-label="Connect to a device"
+                >
                   <Speaker size={18} className="spotify-green" />
                   <span className="spotify-green">{currentDevice}</span>
                 </button>
                 <div className="extra-actions">
-                  <Share2 size={20} />
-                  <ListMusic size={20} />
+                  <button aria-label="Share track"><Share2 size={20} /></button>
+                  <button aria-label="Queue"><ListMusic size={20} /></button>
                 </div>
               </div>
 
