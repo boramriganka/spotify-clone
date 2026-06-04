@@ -4,7 +4,8 @@ import MediaCard from '../components/MediaCard/MediaCard';
 import HorizontalShelf from '../components/HorizontalShelf/HorizontalShelf';
 import { musicService } from '../providers';
 import { MediaItem, Track } from '../providers/types';
-import { setTracks, setCurrentTrack, setQueue, setIsPlaying } from '../store/slices/playerSlice';
+import { setTracks } from '../store/slices/playerSlice';
+import { useQueue } from '../core/queue/useQueue';
 import './Home.scss';
 
 const Home: React.FC = () => {
@@ -12,6 +13,9 @@ const Home: React.FC = () => {
   const [newReleases, setNewReleases] = useState<MediaItem[]>([]);
   const [featuredArtists, setFeaturedArtists] = useState<MediaItem[]>([]);
   const [recentlyPlayed, setRecentlyPlayed] = useState<MediaItem[]>([]);
+
+  const dispatch = useDispatch();
+  const { startPlaybackFromContext } = useQueue();
 
   useEffect(() => {
     const loadData = async () => {
@@ -45,30 +49,17 @@ const Home: React.FC = () => {
     };
 
     loadData();
-  }, []);
+  }, [dispatch]);
 
-  const dispatch = useDispatch();
-
-  const handlePlay = (item: MediaItem, context: MediaItem[] = []) => {
+  const handlePlay = (item: MediaItem, context: MediaItem[] = [], sourceId: string = 'home') => {
     if (item.type === 'track') {
       const tracks = context.filter(i => i.type === 'track') as Track[];
-      if (tracks.length > 0) {
-        dispatch(setTracks(tracks));
-        dispatch(setQueue(tracks.map(t => ({
-            trackId: t.id,
-            origin: 'home',
-            addedAt: Date.now()
-        }))));
-      } else {
-        dispatch(setTracks([item as Track]));
-        dispatch(setQueue([{
-            trackId: item.id,
-            origin: 'home',
-            addedAt: Date.now()
-        }]));
-      }
-      dispatch(setCurrentTrack(item.id));
-      dispatch(setIsPlaying(true));
+      startPlaybackFromContext({
+        sourceType: 'manual',
+        sourceId,
+        tracks: tracks.length > 0 ? tracks : [item as Track],
+        startTrackId: item.id
+      });
     } else if (item.type === 'artist') {
       window.location.href = `/search?q=${encodeURIComponent(item.name)}`;
     }
@@ -78,27 +69,27 @@ const Home: React.FC = () => {
     <div className="home-screen">
       <section className="recent-grid">
         {recentItems.slice(0, 6).map((item) => (
-          <MediaCard key={item.id} item={item} variant="tile" onClick={() => handlePlay(item, recentItems)} />
+          <MediaCard key={item.id} item={item} variant="tile" onClick={() => handlePlay(item, recentItems, 'discovery')} />
         ))}
       </section>
 
       {recentlyPlayed.length > 0 && (
         <HorizontalShelf title="Recently played" onSeeAll={() => {}}>
           {recentlyPlayed.map((item) => (
-            <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, recentlyPlayed)} />
+            <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, recentlyPlayed, 'recently-played')} />
           ))}
         </HorizontalShelf>
       )}
 
       <HorizontalShelf title="It's New Music Friday" onSeeAll={() => {}}>
         {newReleases.map((item) => (
-          <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, newReleases)} />
+          <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, newReleases, 'new-releases')} />
         ))}
       </HorizontalShelf>
 
       <HorizontalShelf title="Full songs discovery" onSeeAll={() => { window.location.href='/search?q=full%20songs'; }}>
         {recentItems.map((item) => (
-          <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, recentItems)} />
+          <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, recentItems, 'full-songs')} />
         ))}
       </HorizontalShelf>
 

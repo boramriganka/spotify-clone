@@ -1,57 +1,84 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { setProgress, setIsPlaying, nextTrack, setProviderStatus, setDuration } from '../store/slices/playerSlice';
+import {
+  setStatus,
+  setPosition,
+  setDuration,
+  setError
+} from '../core/player/playbackSlice';
+import { useQueue } from '../core/queue/useQueue';
 import { musicService } from '../providers';
 
 const AudioEngine: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dispatch = useDispatch();
-  const { currentTrackId, tracksById, isPlaying, volume, progress, repeatMode } = useSelector((state: RootState) => state.player);
-  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
+  const { currentTrack, status, volume, positionMs, durationMs } = useSelector((state: RootState) => state.playback);
+  const { repeatMode, next } = useQueue();
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
+  // Handle track changes and stream URL fetching
   useEffect(() => {
     if (currentTrack) {
-      musicService.getStreamUrl(currentTrack).then(url => {
-        setStreamUrl(url);
+      setStreamUrl(null); // Clear previous URL while loading
+      musicService.getStreamUrl(currentTrack as any).then(url => {
+        if (url) {
+          setStreamUrl(url);
+        } else {
+          dispatch(setError('Track unavailable'));
+        }
       });
+    } else {
+      setStreamUrl(null);
     }
-  }, [currentTrack]);
+  }, [currentTrack, dispatch]);
 
+  // Handle volume changes
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume]);
 
+  // Handle play/pause status
   useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying && streamUrl) {
-        const playPromise = audioRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(e => {
-             console.error("Playback failed", e);
-             dispatch(setIsPlaying(false));
-          });
-        }
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying, streamUrl]);
+    if (!audioRef.current || !streamUrl) return;
 
-  useEffect(() => {
-    if (audioRef.current && Math.abs(audioRef.current.currentTime - progress) > 2) {
-      audioRef.current.currentTime = progress;
+    if (status === 'playing') {
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(e => {
+          if (e.name === 'NotAllowedError') {
+            dispatch(setStatus('blocked'));
+          } else {
+            console.error("Playback failed", e);
+            dispatch(setStatus('error'));
+          }
+        });
+      }
+    } else if (status === 'paused') {
+      audioRef.current.pause();
     }
-  }, [progress]);
+  }, [status, streamUrl, dispatch]);
+
+  // Handle seek requests from UI
+  useEffect(() => {
+    if (audioRef.current && Math.abs(audioRef.current.currentTime * 1000 - positionMs) > 2000) {
+      audioRef.current.currentTime = positionMs / 1000;
+    }
+  }, [positionMs]);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      dispatch(setProgress(audioRef.current.currentTime));
+      // We only update position if it's playing to avoid loops during seeks
+      if (status === 'playing') {
+        dispatch(setPosition(audioRef.current.currentTime * 1000));
+      }
       if (audioRef.current.duration && !isNaN(audioRef.current.duration)) {
-          dispatch(setDuration(audioRef.current.duration));
+        const durMs = audioRef.current.duration * 1000;
+        if (durMs !== durationMs) {
+          dispatch(setDuration(durMs));
+        }
       }
     }
   };
@@ -63,21 +90,17 @@ const AudioEngine: React.FC = () => {
         audioRef.current.play();
       }
     } else {
-      dispatch(nextTrack());
+      next();
     }
   };
 
   const handleError = () => {
-    console.error("Audio playback error");
-    if (currentTrack) {
-        dispatch(setProviderStatus({
-            [currentTrack.provider]: 'failing',
-            lastError: `Playback failed for ${currentTrack.name} from ${currentTrack.provider}`
-        }));
-    }
-    // Simple fallback: try next track if current one fails
-    dispatch(nextTrack());
+    dispatch(setError('Audio playback error'));
+    next(); // Simple fallback: try next track
   };
+
+  const handleWaiting = () => dispatch(setStatus('buffering'));
+  const handlePlaying = () => dispatch(setStatus('playing'));
 
   return (
     <audio
@@ -86,6 +109,8 @@ const AudioEngine: React.FC = () => {
       onTimeUpdate={handleTimeUpdate}
       onEnded={handleEnded}
       onError={handleError}
+      onWaiting={handleWaiting}
+      onPlaying={handlePlaying}
     />
   );
 };

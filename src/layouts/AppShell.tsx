@@ -13,9 +13,11 @@ import NowPlayingPanel from '../components/NowPlayingPanel/NowPlayingPanel';
 import DesktopPlayer from '../components/DesktopPlayer/DesktopPlayer';
 import CreateSheet from '../components/CreateSheet/CreateSheet';
 import AiDj from '../containers/AiDj';
+import { usePlayerPersistence } from '../hooks/usePlayerPersistence';
 import './AppShell.scss';
 
 const AppShell: React.FC = () => {
+  usePlayerPersistence();
   const dispatch = useDispatch();
   const { isAiDjOpen, isAccountDrawerOpen, isNowPlayingOpen } = useSelector((state: RootState) => state.ui);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
