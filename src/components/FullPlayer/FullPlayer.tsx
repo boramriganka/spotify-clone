@@ -7,7 +7,9 @@ import {
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { setIsPlaying, nextTrack, previousTrack, toggleLike, toggleShuffle, toggleRepeat, seekTo } from '../../store/slices/playerSlice';
+import { toggleLike } from '../../store/slices/playerSlice';
+import { usePlaybackController } from '../../core/player/usePlaybackController';
+import { useQueue } from '../../core/queue/useQueue';
 import { FastAverageColor } from 'fast-average-color';
 import BottomSheet from '../BottomSheet/BottomSheet';
 import ProgressBar from '../ProgressBar/ProgressBar';
@@ -19,8 +21,9 @@ interface FullPlayerProps {
 }
 
 const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
-  const { currentTrackId, tracksById, isPlaying, progress, duration, likedTrackIds, isShuffled, repeatMode, currentDevice } = useSelector((state: RootState) => state.player);
-  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
+  const { currentTrack, status, positionMs, durationMs, togglePlay, seek } = usePlaybackController();
+  const { next, previous, shuffleEnabled, toggleShuffle, repeatMode, setRepeatMode } = useQueue();
+  const { likedTrackIds, currentDevice } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
   const [bgColor, setBgColor] = useState('#121212');
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
@@ -39,12 +42,13 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
 
   if (!currentTrack) return null;
 
-  const isLiked = likedTrackIds.includes(currentTrack.id);
-  const progressPercent = (progress / duration) * 100;
+  const isLiked = currentTrack ? likedTrackIds.includes(currentTrack.id) : false;
+  const isPlaying = status === 'playing';
 
-  const formatTime = (time: number) => {
-    const mins = Math.floor(time / 60);
-    const secs = Math.floor(time % 60);
+  const formatTime = (timeMs: number) => {
+    const timeSec = timeMs / 1000;
+    const mins = Math.floor(timeSec / 60);
+    const secs = Math.floor(timeSec % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
@@ -78,46 +82,50 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                 <div className="track-text">
                   <h1>{currentTrack.name}</h1>
                   <div className="meta">
-                    {currentTrack.provider === 'itunes' && <span className="preview-tag">Preview only</span>}
+                    {currentTrack.source === 'itunes' && <span className="preview-tag">Preview only</span>}
                     <p>{currentTrack.artist}</p>
                   </div>
                 </div>
-            <button onClick={() => dispatch(toggleLike(currentTrack))}>
+            <button onClick={() => dispatch(toggleLike(currentTrack as any))}>
                   <Heart size={28} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
                 </button>
               </div>
 
               <div className="progress-container">
               <ProgressBar
-                progress={progress}
-                duration={duration}
-                onSeek={(t) => dispatch(seekTo(t))}
+                progress={positionMs / 1000}
+                duration={durationMs / 1000}
+                onSeek={(t) => seek(t * 1000)}
               />
                 <div className="time-info">
-                  <span>{formatTime(progress)}</span>
-                  <span>{formatTime(duration)}</span>
+                  <span>{formatTime(positionMs)}</span>
+                  <span>{formatTime(durationMs)}</span>
                 </div>
               </div>
 
               <div className="main-controls">
                 <button
-                  className={`shuffle ${isShuffled ? 'active' : ''}`}
-                  onClick={() => dispatch(toggleShuffle())}
+                  className={`shuffle ${shuffleEnabled ? 'active' : ''}`}
+                  onClick={() => toggleShuffle()}
                 >
                   <Shuffle size={24} />
                 </button>
-                <button className="skip" onClick={() => dispatch(previousTrack())}>
+                <button className="skip" onClick={() => previous(positionMs)}>
                   <SkipBack size={36} fill="white" />
                 </button>
-                <button className="play-pause" onClick={() => dispatch(setIsPlaying(!isPlaying))}>
+                <button className="play-pause" onClick={() => togglePlay()}>
                   {isPlaying ? <Pause size={48} fill="black" /> : <Play size={48} fill="black" />}
                 </button>
-                <button className="skip" onClick={() => dispatch(nextTrack())}>
+                <button className="skip" onClick={() => next()}>
                   <SkipForward size={36} fill="white" />
                 </button>
                 <button
                   className={`repeat ${repeatMode !== 'off' ? 'active' : ''}`}
-                  onClick={() => dispatch(toggleRepeat())}
+                  onClick={() => {
+                    const modes: ('off' | 'all' | 'one')[] = ['off', 'all', 'one'];
+                    const nextIdx = (modes.indexOf(repeatMode) + 1) % modes.length;
+                    setRepeatMode(modes[nextIdx]);
+                  }}
                 >
                   <Repeat size={24} />
                   {repeatMode === 'one' && <span className="repeat-one">1</span>}
@@ -219,7 +227,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
           </div>
           <div className="credits-section">
             <h4>Source</h4>
-            <p className="source-text">{currentTrack.provider.toUpperCase()}</p>
+            <p className="source-text">{(currentTrack.source || 'unknown').toUpperCase()}</p>
           </div>
           <button className="report-btn">Report an error</button>
         </div>

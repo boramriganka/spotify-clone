@@ -13,9 +13,11 @@ import NowPlayingPanel from '../components/NowPlayingPanel/NowPlayingPanel';
 import DesktopPlayer from '../components/DesktopPlayer/DesktopPlayer';
 import CreateSheet from '../components/CreateSheet/CreateSheet';
 import AiDj from '../containers/AiDj';
+import { usePlayerPersistence } from '../hooks/usePlayerPersistence';
 import './AppShell.scss';
 
 const AppShell: React.FC = () => {
+  usePlayerPersistence();
   const dispatch = useDispatch();
   const { isAiDjOpen, isAccountDrawerOpen, isNowPlayingOpen } = useSelector((state: RootState) => state.ui);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
@@ -68,10 +70,14 @@ const AppShell: React.FC = () => {
 
       <AccountDrawer isOpen={isAccountDrawerOpen} onClose={() => dispatch(setAccountDrawerOpen(false))} />
 
-      <MiniPlayer onExpand={() => setIsPlayerOpen(true)} />
+      <div className="mini-player-container">
+        <MiniPlayer onExpand={() => setIsPlayerOpen(true)} />
+      </div>
       <FullPlayer isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
 
-      <DesktopPlayer onTogglePanel={togglePanel} isPanelOpen={isNowPlayingOpen} />
+      <div className="desktop-player-container">
+        <DesktopPlayer onTogglePanel={togglePanel} isPanelOpen={isNowPlayingOpen} />
+      </div>
       <BottomNav />
 
       {isAiDjOpen && <AiDj onClose={() => dispatch(setAiDjOpen(false))} />}

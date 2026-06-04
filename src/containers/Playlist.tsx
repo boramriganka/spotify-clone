@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Play, Shuffle, Download, ArrowLeft, MoreVertical } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../store';
-import { setTracks, setCurrentTrack, setQueue, toggleShuffle } from '../store/slices/playerSlice';
 import TrackRow from '../components/TrackRow/TrackRow';
 import { useParams } from 'react-router-dom';
-import { musicService } from '../providers';
 import { Track, Playlist as PlaylistType } from '../providers/types';
 import { getUserPlaylists } from '../providers/localProvider';
+import { useQueue } from '../core/queue/useQueue';
+import { usePlaybackController } from '../core/player/usePlaybackController';
 import './Playlist.scss';
 
 const Playlist: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [playlist, setPlaylist] = useState<PlaylistType | null>(null);
-  const dispatch = useDispatch();
-  const { currentTrackId, likedTrackIds, tracksById } = useSelector((state: RootState) => state.player);
+  const { startPlaybackFromContext, toggleShuffle, shuffleEnabled } = useQueue();
+  const { currentTrack } = usePlaybackController();
+  const { likedTrackIds, tracksById } = useSelector((state: RootState) => state.player);
 
-  const { createdPlaylistIds, playlistsById } = useSelector((state: RootState) => state.player);
+  const { playlistsById } = useSelector((state: RootState) => state.player);
 
   useEffect(() => {
     const loadPlaylist = async () => {
@@ -47,41 +48,37 @@ const Playlist: React.FC = () => {
 
   const handlePlayAll = () => {
     if (tracks.length > 0) {
-      dispatch(setTracks(tracks));
-      dispatch(setQueue(tracks.map(t => ({
-        trackId: t.id,
-        origin: 'playlist',
-        contextId: playlist?.id,
-        addedAt: Date.now()
-      }))));
-      dispatch(setCurrentTrack(tracks[0].id));
+      startPlaybackFromContext({
+        sourceType: 'playlist',
+        sourceId: playlist?.id || 'unknown',
+        tracks,
+        startTrackId: tracks[0].id
+      });
     }
   };
 
   const handleShufflePlay = () => {
     if (tracks.length > 0) {
-       dispatch(toggleShuffle());
-       const randomIndex = Math.floor(Math.random() * tracks.length);
-       dispatch(setTracks(tracks));
-       dispatch(setQueue(tracks.map(t => ({
-        trackId: t.id,
-        origin: 'playlist',
-        contextId: playlist?.id,
-        addedAt: Date.now()
-       }))));
-       dispatch(setCurrentTrack(tracks[randomIndex].id));
+       if (!shuffleEnabled) {
+         toggleShuffle();
+       }
+       // If shuffle is enabled, startPlaybackFromContext will handle the shuffling of the queue
+       startPlaybackFromContext({
+         sourceType: 'playlist',
+         sourceId: playlist?.id || 'unknown',
+         tracks,
+         startTrackId: tracks[Math.floor(Math.random() * tracks.length)].id
+       });
     }
   };
 
   const handlePlayTrack = (track: Track) => {
-    dispatch(setTracks(tracks));
-    dispatch(setQueue(tracks.map(t => ({
-        trackId: t.id,
-        origin: 'playlist',
-        contextId: playlist?.id,
-        addedAt: Date.now()
-    }))));
-    dispatch(setCurrentTrack(track.id));
+    startPlaybackFromContext({
+      sourceType: 'playlist',
+      sourceId: playlist?.id || 'unknown',
+      tracks,
+      startTrackId: track.id
+    });
   };
 
   return (
@@ -130,7 +127,7 @@ const Playlist: React.FC = () => {
             key={track.id}
             track={track}
             index={i}
-            isActive={track.id === currentTrackId}
+            isActive={track.id === currentTrack?.id}
             onPlay={() => handlePlayTrack(track)}
           />
         ))}

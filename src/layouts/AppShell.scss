@@ -34,6 +34,19 @@
     }
   }
 
+  .mini-player-container {
+    @include desktop {
+      display: none;
+    }
+  }
+
+  .desktop-player-container {
+    display: none;
+    @include desktop {
+      display: block;
+    }
+  }
+
   .mobile-header {
     position: sticky;
     top: 0;

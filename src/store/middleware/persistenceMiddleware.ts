@@ -1,42 +1,80 @@
-import { Middleware } from '@reduxjs/toolkit';
-import { persistenceService } from '../../services/persistenceService';
+import { Middleware, AnyAction } from '@reduxjs/toolkit';
+import { playbackPersistence } from '../../core/persistence/playbackPersistence';
+import { setTrack, setStatus, setPosition } from '../../core/player/playbackSlice';
+import { setQueue, setCurrentIndex } from '../../core/queue/queueSlice';
+import { toggleLike } from '../../store/slices/playerSlice';
 
-export const persistenceMiddleware: Middleware = store => next => action => {
-  const result = next(action);
-  const state = store.getState().player;
+const SAVE_INTERVAL_MS = 10000; // Throttle checkpoint saves to every 10 seconds
 
-  // Sync state to persistence service after specific actions
-  const type = (action as any).type;
+export const createPersistenceMiddleware = (): Middleware => {
+  let lastSaveTime = 0;
 
-  if (type.startsWith('player/')) {
-    if (type.includes('setCurrentTrack') || type.includes('nextTrack') || type.includes('previousTrack')) {
-      const track = state.currentTrackId ? state.tracksById[state.currentTrackId] : null;
-      persistenceService.setCurrentTrack(track);
+  return store => next => action => {
+    const result = next(action);
+    const state = store.getState();
+    const type = (action as any).type;
 
-      // Sync recently played
-      persistenceService.setRecentlyPlayed(state.recentlyPlayedIds.map((id: string) => state.tracksById[id]));
+    // Handle new architecture persistence
+    if (type.startsWith('playback/') || type.startsWith('queue/')) {
+      const { playback, queue } = state;
+
+      const isCriticalAction =
+          setTrack.match(action) ||
+          setQueue.match(action) ||
+          setStatus.match(action) ||
+          setCurrentIndex.match(action);
+
+      const now = Date.now();
+      const shouldSaveCheckpoint = isCriticalAction || (now - lastSaveTime > SAVE_INTERVAL_MS);
+
+      if (shouldSaveCheckpoint) {
+          try {
+              if (queue.snapshot) {
+                  playbackPersistence.saveQueueSnapshot(queue.snapshot);
+                  playbackPersistence.saveQueueItems(queue.items);
+              }
+
+              if (playback.currentTrack && queue.snapshot?.id) {
+                  const sessionId = playback.session?.id || `session-${queue.snapshot.id}`;
+
+                  playbackPersistence.saveSession({
+                      id: sessionId,
+                      queueSnapshotId: queue.snapshot.id,
+                      currentIndex: queue.currentIndex,
+                      repeatMode: queue.repeatMode,
+                      shuffleEnabled: queue.shuffleEnabled,
+                      shuffleSeed: queue.shuffleSeed || 0,
+                      activeTrackId: playback.currentTrack.id
+                  });
+
+                  playbackPersistence.saveCheckpoint({
+                      sessionId: sessionId,
+                      queueSnapshotId: queue.snapshot.id,
+                      currentIndex: queue.currentIndex,
+                      trackId: playback.currentTrack.id,
+                      positionMs: playback.positionMs,
+                      updatedAt: now
+                  });
+              }
+              lastSaveTime = now;
+          } catch (e) {
+              console.error('Failed to persist playback state', e);
+          }
+      }
     }
 
-    if (type.includes('setQueue') || type.includes('addToQueue') || type.includes('playNext') || type.includes('removeFromQueue') || type.includes('clearQueue')) {
-      persistenceService.setQueue(state.queue.map((item: any) => state.tracksById[item.trackId]));
+    // Legacy player slice persistence
+    if (toggleLike.match(action)) {
+      try {
+        const playerState = state.player;
+        playbackPersistence.saveFavourites(playerState.likedTrackIds.map((id: string) => playerState.tracksById[id]));
+      } catch (e) {
+        console.error('Failed to persist favourites', e);
+      }
     }
 
-    if (type.includes('toggleLike')) {
-      persistenceService.setLikedTracks(state.likedTrackIds.map((id: string) => state.tracksById[id]));
-    }
-
-    if (type.includes('addPlaylist') || type.includes('removePlaylist') || type.includes('updatePlaylist')) {
-      persistenceService.setCreatedPlaylists(state.createdPlaylistIds.map((id: string) => state.playlistsById[id]));
-    }
-
-    if (type.includes('setVolume') || type.includes('toggleShuffle') || type.includes('toggleRepeat')) {
-      persistenceService.setSettings({
-        volume: state.volume,
-        isShuffled: state.isShuffled,
-        repeatMode: state.repeatMode
-      });
-    }
-  }
-
-  return result;
+    return result;
+  };
 };
+
+export const persistenceMiddleware = createPersistenceMiddleware();

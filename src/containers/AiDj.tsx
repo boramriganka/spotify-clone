@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Send, Sparkles, Save, X } from 'lucide-react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { aiDjService } from '../services/aiService';
 import { Track } from '../providers/types';
-import { setTracks, setQueue, setCurrentTrack, addPlaylist } from '../store/slices/playerSlice';
+import { addPlaylist } from '../store/slices/playerSlice';
 import { Playlist } from '../providers/types';
 import TrackRow from '../components/TrackRow/TrackRow';
+import { useQueue } from '../core/queue/useQueue';
+import { usePlaybackController } from '../core/player/usePlaybackController';
 import './AiDj.scss';
 
 const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -14,6 +16,8 @@ const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [vibe, setVibe] = useState('');
   const [tracks, setTracksResult] = useState<Track[]>([]);
   const dispatch = useDispatch();
+  const { startPlaybackFromContext } = useQueue();
+  const { currentTrack } = usePlaybackController();
 
   const handleGenerate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,20 +28,16 @@ const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     setTracksResult(resTracks);
     setVibe(resVibe);
     setIsGenerating(false);
-
-    if (resTracks.length > 0) {
-      dispatch(setTracks(resTracks));
-    }
   };
 
   const handlePlayAll = () => {
     if (tracks.length > 0) {
-      dispatch(setQueue(tracks.map(t => ({
-        trackId: t.id,
-        origin: 'ai-dj',
-        addedAt: Date.now()
-      }))));
-      dispatch(setCurrentTrack(tracks[0].id));
+      startPlaybackFromContext({
+        sourceType: 'manual',
+        sourceId: 'ai-dj',
+        tracks,
+        startTrackId: tracks[0].id
+      });
     }
   };
 
@@ -101,13 +101,14 @@ const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                   key={track.id}
                   track={track}
                   index={i}
+                  isActive={track.id === currentTrack?.id}
                   onPlay={() => {
-                    dispatch(setQueue(tracks.map(t => ({
-                        trackId: t.id,
-                        origin: 'ai-dj',
-                        addedAt: Date.now()
-                    }))));
-                    dispatch(setCurrentTrack(track.id));
+                    startPlaybackFromContext({
+                      sourceType: 'manual',
+                      sourceId: 'ai-dj',
+                      tracks,
+                      startTrackId: track.id
+                    });
                   }}
                 />
               ))}

@@ -3,12 +3,14 @@ import { Search as SearchIcon, X } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { musicService } from '../providers';
 import { MediaItem, Track } from '../providers/types';
-import { setTracks, setCurrentTrack, setQueue } from '../store/slices/playerSlice';
+import { setTracks } from '../store/slices/playerSlice';
+import { useQueue } from '../core/queue/useQueue';
 import MediaCard from '../components/MediaCard/MediaCard';
 import './Search.scss';
 
 const Search: React.FC = () => {
   const dispatch = useDispatch();
+  const { startPlaybackFromContext } = useQueue();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaItem[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -69,13 +71,15 @@ const Search: React.FC = () => {
   const handlePlay = (item: MediaItem) => {
     if (item.type === 'track') {
       const trackResults = results.filter(i => i.type === 'track') as Track[];
-      dispatch(setTracks(trackResults));
-      dispatch(setQueue(trackResults.map(t => ({
-        trackId: t.id,
-        origin: 'search',
-        addedAt: Date.now()
-      }))));
-      dispatch(setCurrentTrack(item.id));
+      startPlaybackFromContext({
+        sourceType: 'search',
+        sourceId: query,
+        tracks: trackResults,
+        startTrackId: item.id
+      });
+    } else if (item.type === 'artist') {
+      setQuery(item.name);
+      performSearch(item.name, 'all');
     }
   };
 
