@@ -1,14 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { NeoTrack } from '../../utils/trackNormalizer';
-import { QueueSnapshot } from '../persistence/playbackPersistence';
-
-export interface QueueItem {
-  id: string;
-  trackId: string;
-  track: NeoTrack;
-  sourcePosition: number;
-  availability: 'playable' | 'unavailable';
-}
+import { QueueItem, QueueSnapshot } from './queueTypes';
 
 interface QueueState {
   snapshot: QueueSnapshot | null;
@@ -17,6 +8,7 @@ interface QueueState {
   repeatMode: 'off' | 'one' | 'all';
   shuffleEnabled: boolean;
   shuffledIndices: number[];
+  shuffleSeed: number;
 }
 
 const initialState: QueueState = {
@@ -26,6 +18,7 @@ const initialState: QueueState = {
   repeatMode: 'off',
   shuffleEnabled: false,
   shuffledIndices: [],
+  shuffleSeed: 0,
 };
 
 const queueSlice = createSlice({

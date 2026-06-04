@@ -12,22 +12,18 @@ interface MiniPlayerProps {
 }
 
 const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
-  const { currentTrack, status, positionMs, durationMs } = usePlaybackController();
+  const { currentTrack, status, positionMs, durationMs, togglePlay } = usePlaybackController();
   const { likedTrackIds } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
 
   if (!currentTrack) return null;
 
-  const isPlaying = status === 'playing';
+  const isPlaying = status === 'playing' || status === 'buffering';
   const isLiked = likedTrackIds.includes(currentTrack.id);
 
   const handleTogglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isPlaying) {
-      dispatch({ type: 'playback/setStatus', payload: 'paused' });
-    } else {
-      dispatch({ type: 'playback/setStatus', payload: 'playing' });
-    }
+    togglePlay();
   };
 
   return (

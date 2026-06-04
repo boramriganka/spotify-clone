@@ -8,12 +8,11 @@ import {
   removeItem,
   toggleShuffle,
   setRepeatMode,
-  clearQueue,
-  QueueItem
+  clearQueue
 } from './queueSlice';
+import { QueueItem, QueueSnapshot } from './queueTypes';
 import { NeoTrack, normalizeTrack } from '../../utils/trackNormalizer';
 import { usePlaybackController } from '../player/usePlaybackController';
-import { QueueSnapshot } from '../persistence/playbackPersistence';
 
 export const useQueue = () => {
   const dispatch = useDispatch();
@@ -26,7 +25,7 @@ export const useQueue = () => {
     tracks: any[];
     startTrackId?: string;
   }) => {
-    const normalizedTracks = params.tracks.map(normalizeTrack);
+    const normalizedTracks = params.tracks.map(normalizeTrack).filter((t): t is NeoTrack => !!t);
     const queueItems: QueueItem[] = normalizedTracks.map((track, index) => ({
       id: `${params.sourceType}-${params.sourceId}-${track.id}-${index}`,
       trackId: track.id,
@@ -55,6 +54,8 @@ export const useQueue = () => {
 
   const playNow = (track: any) => {
     const normalized = normalizeTrack(track);
+    if (!normalized) return;
+
     const item: QueueItem = {
       id: `manual-${normalized.id}-${Date.now()}`,
       trackId: normalized.id,
@@ -110,6 +111,8 @@ export const useQueue = () => {
     previous,
     addNext: (track: any) => {
         const normalized = normalizeTrack(track);
+        if (!normalized) return;
+
         dispatch(addNextAction({
             id: `manual-${normalized.id}-${Date.now()}`,
             trackId: normalized.id,
@@ -120,6 +123,8 @@ export const useQueue = () => {
     },
     append: (track: any) => {
         const normalized = normalizeTrack(track);
+        if (!normalized) return;
+
         dispatch(appendAction({
             id: `manual-${normalized.id}-${Date.now()}`,
             trackId: normalized.id,

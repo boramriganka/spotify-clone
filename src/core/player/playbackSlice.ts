@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { NeoTrack } from '../../utils/trackNormalizer';
 import { PlaybackSession, PlaybackCheckpoint } from '../persistence/playbackPersistence';
 
-export type PlaybackStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'buffering' | 'error' | 'unavailable' | 'blocked';
+export type PlaybackStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'buffering' | 'error' | 'unavailable' | 'blocked' | 'ended';
 
 interface PlaybackState {
   currentTrack: NeoTrack | null;

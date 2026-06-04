@@ -1,13 +1,6 @@
 import { storage } from './storage';
 import { NeoTrack } from '../../utils/trackNormalizer';
-
-export interface QueueSnapshot {
-  id: string;
-  sourceType: 'search' | 'artist' | 'album' | 'playlist' | 'charts' | 'mood' | 'smart-search' | 'manual';
-  sourceId: string;
-  queueItemIds: string[];
-  createdAt: number;
-}
+import { QueueItem, QueueSnapshot } from '../queue/queueTypes';
 
 export interface PlaybackSession {
   id: string;
@@ -49,8 +42,8 @@ export const playbackPersistence = {
   saveQueueSnapshot: (snapshot: QueueSnapshot) => storage.save(KEYS.QUEUE_SNAPSHOT, snapshot),
   loadQueueSnapshot: (): QueueSnapshot | null => storage.load(KEYS.QUEUE_SNAPSHOT, null),
 
-  saveQueueItems: (items: any[]) => storage.save(KEYS.QUEUE_ITEMS, items),
-  loadQueueItems: (): any[] => storage.load(KEYS.QUEUE_ITEMS, []),
+  saveQueueItems: (items: QueueItem[]) => storage.save(KEYS.QUEUE_ITEMS, items),
+  loadQueueItems: (): QueueItem[] => storage.load(KEYS.QUEUE_ITEMS, []),
 
   saveRecentTracks: (tracks: NeoTrack[]) => storage.save(KEYS.RECENT_TRACKS, tracks),
   loadRecentTracks: (): NeoTrack[] => storage.load(KEYS.RECENT_TRACKS, []),

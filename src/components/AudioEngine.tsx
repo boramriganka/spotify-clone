@@ -17,21 +17,51 @@ const AudioEngine: React.FC = () => {
   const { repeatMode, next } = useQueue();
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
 
+  // Track active request to prevent race conditions
+  const activeTrackIdRef = useRef<string | null>(null);
+
   // Handle track changes and stream URL fetching
   useEffect(() => {
-    if (currentTrack) {
-      setStreamUrl(null); // Clear previous URL while loading
-      musicService.getStreamUrl(currentTrack as any).then(url => {
+    if (!currentTrack) {
+      setStreamUrl(null);
+      activeTrackIdRef.current = null;
+      return;
+    }
+
+    const trackId = currentTrack.id;
+    activeTrackIdRef.current = trackId;
+
+    // Reset states for new track
+    setStreamUrl(null);
+    dispatch(setStatus('loading'));
+
+    let isCancelled = false;
+
+    musicService.getStreamUrl(currentTrack as any)
+      .then(url => {
+        if (isCancelled || activeTrackIdRef.current !== trackId) return;
+
         if (url) {
           setStreamUrl(url);
+          // status will be updated to 'playing' by onPlaying or manual play call
         } else {
+          setStreamUrl(null);
           dispatch(setError('Track unavailable'));
+          dispatch(setStatus('unavailable'));
         }
+      })
+      .catch(err => {
+        if (isCancelled || activeTrackIdRef.current !== trackId) return;
+        console.error("Failed to fetch stream URL", err);
+        setStreamUrl(null);
+        dispatch(setError('Failed to load track'));
+        dispatch(setStatus('error'));
       });
-    } else {
-      setStreamUrl(null);
-    }
-  }, [currentTrack, dispatch]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentTrack?.id, dispatch]); // Only trigger on ID change
 
   // Handle volume changes
   useEffect(() => {
@@ -95,12 +125,20 @@ const AudioEngine: React.FC = () => {
   };
 
   const handleError = () => {
-    dispatch(setError('Audio playback error'));
-    next(); // Simple fallback: try next track
+    if (activeTrackIdRef.current) {
+       dispatch(setError('Audio playback error'));
+       dispatch(setStatus('error'));
+       // Small delay before skipping to avoid rapid failure loops
+       setTimeout(() => next(), 2000);
+    }
   };
 
   const handleWaiting = () => dispatch(setStatus('buffering'));
-  const handlePlaying = () => dispatch(setStatus('playing'));
+  const handlePlaying = () => {
+    if (status !== 'playing') {
+      dispatch(setStatus('playing'));
+    }
+  };
 
   return (
     <audio

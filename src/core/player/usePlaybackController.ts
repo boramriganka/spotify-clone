@@ -4,12 +4,10 @@ import {
   setTrack,
   setStatus,
   setPosition,
-  setVolume,
+  setVolume as setVolumeAction,
   setError,
-  PlaybackStatus
 } from './playbackSlice';
-import { NeoTrack, normalizeTrack } from '../../utils/trackNormalizer';
-import { musicService } from '../../providers';
+import { normalizeTrack } from '../../utils/trackNormalizer';
 
 export const usePlaybackController = () => {
   const dispatch = useDispatch();
@@ -17,39 +15,42 @@ export const usePlaybackController = () => {
 
   const playTrack = async (track: any) => {
     const normalized = normalizeTrack(track);
+    if (!normalized) {
+      dispatch(setError('Invalid track data'));
+      dispatch(setStatus('error'));
+      return;
+    }
+
+    // Clear previous error and set new track
+    dispatch(setError(null));
     dispatch(setTrack(normalized));
     dispatch(setStatus('loading'));
 
-    try {
-      const streamUrl = await musicService.getStreamUrl(normalized as any);
-      if (!streamUrl) {
-        dispatch(setError('Track unavailable: No stream URL found'));
-        dispatch(setStatus('unavailable'));
-        return;
-      }
-      // AudioEngine will pick up the change in currentTrack and start playing
-      dispatch(setStatus('playing'));
-    } catch (err) {
-      dispatch(setError('Failed to load track'));
-      dispatch(setStatus('error'));
-    }
+    // Note: AudioEngine handles fetching the stream URL and starting playback
   };
 
   const play = () => {
-    if (currentTrack) {
+    if (currentTrack && (status === 'paused' || status === 'idle' || status === 'ended')) {
       dispatch(setStatus('playing'));
     }
   };
 
   const pause = () => {
-    dispatch(setStatus('paused'));
+    if (status === 'playing' || status === 'buffering') {
+      dispatch(setStatus('paused'));
+    }
   };
 
   const togglePlay = () => {
-    if (status === 'playing') {
+    if (status === 'playing' || status === 'buffering') {
       pause();
-    } else {
+    } else if (status === 'paused' || status === 'idle' || status === 'ended') {
       play();
+    } else if (status === 'error') {
+      // Basic retry: re-dispatch current track to trigger reload in AudioEngine
+      if (currentTrack) {
+        playTrack(currentTrack);
+      }
     }
   };
 
@@ -58,7 +59,7 @@ export const usePlaybackController = () => {
   };
 
   const updateVolume = (val: number) => {
-    dispatch(setVolume(val));
+    dispatch(setVolumeAction(val));
   };
 
   return {

@@ -1,65 +1,80 @@
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { playbackPersistence } from '../../core/persistence/playbackPersistence';
+import { setTrack, setStatus, setPosition } from '../../core/player/playbackSlice';
+import { setQueue, setCurrentIndex } from '../../core/queue/queueSlice';
+import { toggleLike } from '../../store/slices/playerSlice';
 
-let lastSaveTime = 0;
 const SAVE_INTERVAL_MS = 10000; // Throttle checkpoint saves to every 10 seconds
 
-export const persistenceMiddleware: Middleware = store => next => action => {
-  const result = next(action);
-  const state = store.getState();
-  const type = (action as any).type;
+export const createPersistenceMiddleware = (): Middleware => {
+  let lastSaveTime = 0;
 
-  // Handle new architecture persistence
-  if (type.startsWith('playback/') || type.startsWith('queue/')) {
-    const { playback, queue } = state;
+  return store => next => action => {
+    const result = next(action);
+    const state = store.getState();
+    const type = (action as any).type;
 
-    // Immediate save for critical state changes
-    const isCriticalAction =
-        type.includes('setTrack') ||
-        type.includes('setQueue') ||
-        type.includes('setStatus') ||
-        type.includes('setCurrentIndex');
+    // Handle new architecture persistence
+    if (type.startsWith('playback/') || type.startsWith('queue/')) {
+      const { playback, queue } = state;
 
-    const now = Date.now();
-    const shouldSaveCheckpoint = isCriticalAction || (now - lastSaveTime > SAVE_INTERVAL_MS);
+      const isCriticalAction =
+          setTrack.match(action) ||
+          setQueue.match(action) ||
+          setStatus.match(action) ||
+          setCurrentIndex.match(action);
 
-    if (shouldSaveCheckpoint) {
-        if (queue.snapshot) {
-            playbackPersistence.saveQueueSnapshot(queue.snapshot);
-            playbackPersistence.saveQueueItems(queue.items);
-        }
+      const now = Date.now();
+      const shouldSaveCheckpoint = isCriticalAction || (now - lastSaveTime > SAVE_INTERVAL_MS);
 
-        if (playback.currentTrack) {
-            playbackPersistence.saveSession({
-                id: playback.session?.id || 'default',
-                queueSnapshotId: queue.snapshot?.id || 'default',
-                currentIndex: queue.currentIndex,
-                repeatMode: queue.repeatMode,
-                shuffleEnabled: queue.shuffleEnabled,
-                shuffleSeed: 0,
-                activeTrackId: playback.currentTrack.id
-            });
+      if (shouldSaveCheckpoint) {
+          try {
+              if (queue.snapshot) {
+                  playbackPersistence.saveQueueSnapshot(queue.snapshot);
+                  playbackPersistence.saveQueueItems(queue.items);
+              }
 
-            playbackPersistence.saveCheckpoint({
-                sessionId: playback.session?.id || 'default',
-                queueSnapshotId: queue.snapshot?.id || 'default',
-                currentIndex: queue.currentIndex,
-                trackId: playback.currentTrack.id,
-                positionMs: playback.positionMs,
-                updatedAt: now
-            });
-        }
-        lastSaveTime = now;
+              if (playback.currentTrack && queue.snapshot?.id) {
+                  const sessionId = playback.session?.id || `session-${queue.snapshot.id}`;
+
+                  playbackPersistence.saveSession({
+                      id: sessionId,
+                      queueSnapshotId: queue.snapshot.id,
+                      currentIndex: queue.currentIndex,
+                      repeatMode: queue.repeatMode,
+                      shuffleEnabled: queue.shuffleEnabled,
+                      shuffleSeed: queue.shuffleSeed || 0,
+                      activeTrackId: playback.currentTrack.id
+                  });
+
+                  playbackPersistence.saveCheckpoint({
+                      sessionId: sessionId,
+                      queueSnapshotId: queue.snapshot.id,
+                      currentIndex: queue.currentIndex,
+                      trackId: playback.currentTrack.id,
+                      positionMs: playback.positionMs,
+                      updatedAt: now
+                  });
+              }
+              lastSaveTime = now;
+          } catch (e) {
+              console.error('Failed to persist playback state', e);
+          }
+      }
     }
-  }
 
-  // Legacy player slice persistence
-  if (type.startsWith('player/')) {
-    const playerState = state.player;
-    if (type.includes('toggleLike')) {
-      playbackPersistence.saveFavourites(playerState.likedTrackIds.map((id: string) => playerState.tracksById[id]));
+    // Legacy player slice persistence
+    if (toggleLike.match(action)) {
+      try {
+        const playerState = state.player;
+        playbackPersistence.saveFavourites(playerState.likedTrackIds.map((id: string) => playerState.tracksById[id]));
+      } catch (e) {
+        console.error('Failed to persist favourites', e);
+      }
     }
-  }
 
-  return result;
+    return result;
+  };
 };
+
+export const persistenceMiddleware = createPersistenceMiddleware();

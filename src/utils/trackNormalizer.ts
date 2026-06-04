@@ -15,19 +15,56 @@ export type NeoTrack = {
   raw?: any;
 };
 
-export const normalizeTrack = (track: any): NeoTrack => {
-  if (!track) return null as any;
+/**
+ * Creates a stable track ID based on available metadata.
+ * Order of preference:
+ * 1. track.id
+ * 2. track.trackId
+ * 3. track.track_id
+ * 4. collectionId + trackName
+ * 5. previewUrl
+ * 6. name + artist + album + duration (deterministic string)
+ */
+export const getStableTrackId = (track: any): string | null => {
+  if (!track) return null;
+
+  if (track.id) return track.id.toString();
+  if (track.trackId) return track.trackId.toString();
+  if (track.track_id) return track.track_id.toString();
+
+  if (track.collectionId && track.trackName) {
+    return `${track.collectionId}-${track.trackName}`;
+  }
+
+  if (track.previewUrl || track.streamUrl) {
+    return track.previewUrl || track.streamUrl;
+  }
+
+  const name = track.name || track.trackName || '';
+  const artist = track.artist || track.artistName || '';
+  const album = track.album || track.collectionName || '';
+  const duration = track.duration || track.trackTimeMillis || '';
+
+  if (name && artist) {
+    return `${name}-${artist}-${album}-${duration}`.replace(/\s+/g, '-').toLowerCase();
+  }
+
+  return null;
+};
+
+export const normalizeTrack = (track: any): NeoTrack | null => {
+  if (!track) return null;
 
   // If it's already a NeoTrack (has source and specific shape), return it
-  if (track.source && track.id) {
+  if (track.source && track.id && track.name && track.artist) {
       return track as NeoTrack;
   }
 
-  // Handle ProviderTrack from existing providers
-  const id = track.id || track.trackId?.toString() || Math.random().toString(36).substr(2, 9);
+  const stableId = getStableTrackId(track);
+  if (!stableId) return null;
 
   return {
-    id: id.toString(),
+    id: stableId,
     name: track.name || track.trackName || 'Unknown Track',
     artist: track.artist || track.artistName || 'Unknown Artist',
     album: track.album || track.collectionName || null,
