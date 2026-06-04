@@ -43,7 +43,7 @@ const AudioEngine: React.FC = () => {
 
         if (url) {
           setStreamUrl(url);
-          // status will be updated to 'playing' by onPlaying or manual play call
+          dispatch(setStatus('playing'));
         } else {
           setStreamUrl(null);
           dispatch(setError('Track unavailable'));

@@ -70,10 +70,14 @@ const AppShell: React.FC = () => {
 
       <AccountDrawer isOpen={isAccountDrawerOpen} onClose={() => dispatch(setAccountDrawerOpen(false))} />
 
-      <MiniPlayer onExpand={() => setIsPlayerOpen(true)} />
+      <div className="mini-player-container">
+        <MiniPlayer onExpand={() => setIsPlayerOpen(true)} />
+      </div>
       <FullPlayer isOpen={isPlayerOpen} onClose={() => setIsPlayerOpen(false)} />
 
-      <DesktopPlayer onTogglePanel={togglePanel} isPanelOpen={isNowPlayingOpen} />
+      <div className="desktop-player-container">
+        <DesktopPlayer onTogglePanel={togglePanel} isPanelOpen={isNowPlayingOpen} />
+      </div>
       <BottomNav />
 
       {isAiDjOpen && <AiDj onClose={() => dispatch(setAiDjOpen(false))} />}

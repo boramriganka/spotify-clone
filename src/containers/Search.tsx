@@ -77,6 +77,9 @@ const Search: React.FC = () => {
         tracks: trackResults,
         startTrackId: item.id
       });
+    } else if (item.type === 'artist') {
+      setQuery(item.name);
+      performSearch(item.name, 'all');
     }
   };
 

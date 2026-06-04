@@ -4,6 +4,7 @@ import { X, Heart } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { toggleLike } from '../../store/slices/playerSlice';
+import { usePlaybackController } from '../../core/player/usePlaybackController';
 import './NowPlayingPanel.scss';
 
 interface NowPlayingPanelProps {
@@ -12,8 +13,8 @@ interface NowPlayingPanelProps {
 }
 
 const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) => {
-  const { currentTrackId, tracksById, likedTrackIds } = useSelector((state: RootState) => state.player);
-  const currentTrack = currentTrackId ? tracksById[currentTrackId] : null;
+  const { currentTrack } = usePlaybackController();
+  const { likedTrackIds } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
 
   if (!currentTrack) return null;
@@ -45,7 +46,7 @@ const NowPlayingPanel: React.FC<NowPlayingPanelProps> = ({ isOpen, onClose }) =>
                 <h2>{currentTrack.name}</h2>
                 <p>{currentTrack.artist}</p>
               </div>
-              <button onClick={() => dispatch(toggleLike(currentTrack))}>
+              <button onClick={() => dispatch(toggleLike(currentTrack as any))}>
                 <Heart size={24} className={isLiked ? 'liked' : ''} fill={isLiked ? '#1DB954' : 'none'} />
               </button>
             </div>
