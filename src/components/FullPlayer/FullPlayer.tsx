@@ -160,7 +160,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
 
               <div className="footer-controls">
                 <button className="device-info" onClick={() => setIsDevicePickerOpen(true)}>
-                  <Speaker size={18} className="spotify-green" />
+                  <Volume2 size={18} className="spotify-green" />
                   <span className="spotify-green">{currentDevice}</span>
                 </button>
                 <div className="extra-actions">
