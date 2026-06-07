@@ -20,6 +20,7 @@
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-radius: var(--radius-lg);
   @include flex-between;
+
   padding: 0 var(--spacing-md);
   position: relative;
   overflow: hidden;
@@ -54,6 +55,7 @@
         font-size: 13px;
         font-weight: 700;
         @include text-truncate;
+
         color: var(--text-primary);
         letter-spacing: -0.1px;
       }

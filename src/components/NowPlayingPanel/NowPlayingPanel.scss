@@ -19,6 +19,7 @@
 
   .panel-header {
     @include flex-between;
+
     padding: var(--spacing-md);
     position: sticky;
     top: 0;
@@ -42,6 +43,7 @@
 
   .panel-content {
     flex: 1;
+
     padding: var(--spacing-md);
 
     .main-art {
@@ -101,6 +103,7 @@
         height: 140px;
         background-size: cover;
         background-position: center;
+
         padding: var(--spacing-md);
         position: relative;
 
@@ -161,6 +164,7 @@
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: var(--radius-md);
+
       padding: var(--spacing-md);
 
       .header {

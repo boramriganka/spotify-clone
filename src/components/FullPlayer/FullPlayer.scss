@@ -27,6 +27,7 @@
 
   .player-header {
     @include flex-between;
+
     height: var(--header-height);
     margin-bottom: var(--spacing-lg);
 

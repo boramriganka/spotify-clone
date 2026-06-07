@@ -66,6 +66,7 @@
         font-size: 14px;
         font-weight: 600;
         @include text-truncate;
+
         color: var(--text-primary);
         transition: color var(--transition-sm);
         &:hover { color: var(--text-primary); text-decoration: underline; }
@@ -93,6 +94,7 @@
           font-size: 11px;
           color: var(--text-secondary);
           @include text-truncate;
+
           transition: color var(--transition-sm);
           &:hover { color: var(--text-primary); text-decoration: underline; }
         }
@@ -102,6 +104,7 @@
     .like-btn {
       flex-shrink: 0;
       color: var(--text-secondary);
+
       transition: color var(--transition-sm), transform var(--transition-sm);
       &:hover { color: var(--text-primary); transform: scale(1.12); }
       .liked { color: var(--spotify-green); }

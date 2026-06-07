@@ -81,6 +81,7 @@
       .icon-box {
         width: 24px;
         height: 24px;
+
         @include flex-center;
         border-radius: 2px;
         opacity: 0.8;
@@ -120,6 +121,7 @@
       font-size: 14px;
       cursor: pointer;
       @include text-truncate;
+
       border-radius: var(--radius-xs);
       transition: color var(--transition-sm), background-color var(--transition-sm);
 

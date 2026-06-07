@@ -3,6 +3,7 @@
 .progress-bar-container {
   height: 16px;
   @include flex-center;
+
   cursor: pointer;
   width: 100%;
   padding: 6px 0;
