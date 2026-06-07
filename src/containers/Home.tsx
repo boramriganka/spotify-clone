@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MediaCard from '../components/MediaCard/MediaCard';
@@ -76,6 +77,9 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-screen">
+      <Helmet>
+        <title>Discover — Spotify Neo</title>
+      </Helmet>
       <h2 className="home-greeting">{getGreeting()}</h2>
       <section className="recent-grid">
         {recentItems.slice(0, 6).map((item) => (

@@ -1,1 +1,1 @@
-# spotify-clone-react-redux
+# Spotify Neo

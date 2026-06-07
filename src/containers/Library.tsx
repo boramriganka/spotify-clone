@@ -1,4 +1,5 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +18,9 @@ const Library: React.FC = () => {
 
   return (
     <div className="library-screen playlist-screen">
+      <Helmet>
+        <title>Your Library — Spotify Neo</title>
+      </Helmet>
       <header className="playlist-header">
         <div className="header-bg" />
         <div className="header-content">

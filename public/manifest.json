@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Spotify Neo",
+  "name": "Spotify Neo — Music Explorer",
+  "description": "Full-featured music app with AI DJ and custom audio engine",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,8 +9,8 @@
       "type": "image/png"
     }
   ],
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#121212",
+  "background_color": "#121212"
 }

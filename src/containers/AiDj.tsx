@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Send, Sparkles, Save, X } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { aiDjService } from '../services/aiService';
@@ -59,6 +60,9 @@ const AiDj: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <div className="ai-dj-screen">
+      <Helmet>
+        <title>AI DJ — Spotify Neo</title>
+      </Helmet>
       <div className="ai-dj-header">
         <div className="title">
           <Sparkles className="sparkle-icon" size={24} />
