@@ -41,7 +41,7 @@
     gap: var(--spacing-md);
     overflow-x: auto;
     padding-bottom: var(--spacing-sm);
-    padding-left: var(--spacing-sm);
+    padding-left: 16px;
     scroll-behavior: smooth;
 
     // Fade edge on right
@@ -51,6 +51,7 @@
     &::-webkit-scrollbar {
       display: none;
     }
+
     scrollbar-width: none;
 
     @include desktop {

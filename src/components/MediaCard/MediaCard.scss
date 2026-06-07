@@ -33,6 +33,7 @@
     padding: 0 var(--spacing-sm);
     @include line-clamp(2);
     flex: 1;
+
     letter-spacing: -0.1px;
   }
 
@@ -184,6 +185,7 @@
       transform: translateY(8px) scale(0.88);
       transition: opacity var(--transition-md), transform var(--transition-bounce), background-color var(--transition-sm), box-shadow var(--transition-md);
       box-shadow: var(--shadow-green);
+
       z-index: 3;
       color: #000;
 
@@ -204,6 +206,7 @@
       font-weight: 700;
       margin-bottom: 4px;
       @include text-truncate;
+
       letter-spacing: -0.1px;
     }
 

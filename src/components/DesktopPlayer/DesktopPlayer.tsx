@@ -23,14 +23,25 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
   const [accentColor, setAccentColor] = useState<string>('transparent');
 
   useEffect(() => {
+    let active = true;
+    const fac = new FastAverageColor();
+
     if (currentTrack?.image) {
-      const fac = new FastAverageColor();
       fac.getColorAsync(currentTrack.image, { algorithm: 'dominant' })
         .then(color => {
-          setAccentColor(color.hex);
+          if (active) setAccentColor(color.hex);
         })
-        .catch(() => setAccentColor('transparent'));
+        .catch(() => {
+          if (active) setAccentColor('transparent');
+        });
+    } else {
+      setAccentColor('transparent');
     }
+
+    return () => {
+      active = false;
+      fac.destroy();
+    };
   }, [currentTrack?.image]);
 
   if (!currentTrack) return null;
