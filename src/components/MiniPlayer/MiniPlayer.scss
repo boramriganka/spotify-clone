@@ -3,10 +3,10 @@
 .mini-player-wrapper {
   position: fixed;
   bottom: calc(64px + env(safe-area-inset-bottom));
-  left: 8px;
-  right: 8px;
+  left: var(--spacing-sm);
+  right: var(--spacing-sm);
   z-index: var(--z-sticky);
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
 
   @include desktop {
     display: none;
@@ -14,27 +14,35 @@
 }
 
 .mini-player {
-  height: 56px;
-  background-color: #383838;
-  border-radius: 8px;
+  height: 60px;
+  background: rgba(40, 40, 40, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-radius: var(--radius-lg);
   @include flex-between;
-  padding: 0 12px;
+  padding: 0 var(--spacing-md);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: background var(--transition-md);
+
+  &:active { transform: scale(0.99); }
 
   .track-info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-md);
     flex: 1;
     min-width: 0;
 
     img {
       width: 40px;
       height: 40px;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       object-fit: cover;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
     }
 
     .text {
@@ -46,29 +54,32 @@
         font-size: 13px;
         font-weight: 700;
         @include text-truncate;
-        color: #fff;
+        color: var(--text-primary);
+        letter-spacing: -0.1px;
       }
 
       .meta {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+        margin-top: 2px;
 
-          .preview-tag {
-              background-color: rgba(255, 255, 255, 0.1);
-              color: #b3b3b3;
-              font-size: 10px;
-              padding: 0 4px;
-              border-radius: 2px;
-              white-space: nowrap;
-          }
+        .preview-tag {
+          background-color: rgba(255, 255, 255, 0.1);
+          color: var(--text-secondary);
+          font-size: 9px;
+          font-weight: 700;
+          padding: 1px 5px;
+          border-radius: var(--radius-xs);
+          white-space: nowrap;
+        }
 
-          .artist {
-            font-size: 12px;
-            color: #b3b3b3;
-            @include text-truncate;
-          }
+        .artist {
+          font-size: 12px;
+          color: var(--text-secondary);
+          @include text-truncate;
+        }
       }
     }
   }
@@ -76,32 +87,31 @@
   .controls {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: var(--spacing-md);
 
     button {
-      color: #fff;
+      color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform var(--transition-xs), opacity var(--transition-sm);
 
-      .liked {
-        color: var(--spotify-green);
-      }
+      &:active { transform: scale(0.88); }
+
+      .liked { color: var(--spotify-green); }
     }
 
     .device-icon {
-      color: #b3b3b3;
-      &.spotify-green {
-        color: var(--spotify-green);
-      }
+      color: var(--text-secondary);
+      &.spotify-green { color: var(--spotify-green); }
     }
   }
 
   .progress-bar-mini {
     position: absolute;
-    bottom: 0px;
-    left: 8px;
-    right: 8px;
+    bottom: 0;
+    left: var(--spacing-sm);
+    right: var(--spacing-sm);
     pointer-events: none;
 
     .progress-bar-container {
@@ -110,12 +120,13 @@
 
       .progress-bar-bg {
         height: 2px;
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: rgba(255, 255, 255, 0.08);
         border-radius: 1px;
       }
 
       .progress-bar-fill {
-        background-color: #fff;
+        background-color: var(--text-primary);
+        border-radius: 1px;
       }
     }
   }

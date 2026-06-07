@@ -1,0 +1,63 @@
+@import '../styles/mixins.scss';
+
+.library-screen {
+  .library-content {
+    padding: var(--spacing-xl);
+
+    @include mobile {
+      padding: var(--spacing-md);
+    }
+  }
+
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: var(--spacing-xl);
+
+    @include mobile {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--spacing-md);
+    }
+  }
+
+  .liked-songs-card {
+    background: linear-gradient(135deg, #450af5 0%, #c4efd9 100%);
+    border-radius: var(--radius-md);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    transition: transform var(--transition-md), box-shadow var(--transition-md), filter var(--transition-sm);
+    box-shadow: var(--shadow-md);
+
+    &:hover {
+      filter: brightness(1.08);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .liked-icon {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .liked-info {
+      .liked-title {
+        display: block;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+      }
+
+      .liked-count {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+    }
+  }
+}

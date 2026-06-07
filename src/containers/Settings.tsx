@@ -103,7 +103,7 @@ const Settings: React.FC = () => {
           </div>
         ))}
 
-        <button className="logout-btn">Log out</button>
+        <button className="logout-btn" onClick={() => { localStorage.clear(); navigate('/'); }}>Log out</button>
       </div>
     </div>
   );

@@ -1,32 +1,60 @@
 @import '../../styles/mixins.scss';
 
 .media-tile {
-  background-color: var(--elevated-grey); // Spotify uses #242424 or #282828
-  border-radius: var(--radius-sm); // 4-8px
+  background-color: var(--elevated-grey);
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
-  height: 64px; // Specified height
+  height: 64px;
   overflow: hidden;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--transition-sm);
   position: relative;
 
   &:hover {
     background-color: var(--surface-grey-hover);
+
+    .tile-play {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
 
   img {
-    width: 64px; // Specified thumbnail size
+    width: 64px;
     height: 64px;
     object-fit: cover;
+    flex-shrink: 0;
   }
 
   .tile-title {
-    font-size: 13px; // Specified 13-15px
+    font-size: 13px;
     font-weight: 700;
     padding: 0 var(--spacing-sm);
-    @include line-clamp(2); // Specified max 2 lines
+    @include line-clamp(2);
     flex: 1;
+    letter-spacing: -0.1px;
+  }
+
+  .tile-play {
+    position: absolute;
+    right: var(--spacing-sm);
+    top: 50%;
+    transform: translateY(-50%) translateX(4px);
+    width: 40px;
+    height: 40px;
+    background-color: var(--spotify-green);
+    border-radius: 50%;
+    @include flex-center;
+    box-shadow: var(--shadow-green);
+    opacity: 0;
+    transition: opacity var(--transition-md), transform var(--transition-bounce);
+    color: #000;
+
+    &:hover {
+      background-color: var(--spotify-green-hover);
+      transform: translateY(-50%) scale(1.06) !important;
+    }
   }
 
   .badge {
@@ -48,20 +76,26 @@
 }
 
 .media-card {
-  width: 170px; // Desktop default
+  width: 170px;
   background-color: var(--surface-grey);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color var(--transition-md), transform var(--transition-md), box-shadow var(--transition-md);
   flex-shrink: 0;
 
   &:hover {
     background-color: var(--surface-grey-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
 
     .play-button {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
+    }
+
+    .image-container img {
+      transform: scale(1.03);
     }
   }
 
@@ -70,9 +104,11 @@
     padding: 0;
     width: 140px;
 
+    &:hover { transform: translateY(-4px); }
+
     .image-container {
       border-radius: var(--radius-full);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
     }
 
     .card-info {
@@ -88,12 +124,24 @@
     margin-bottom: var(--spacing-md);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    box-shadow: var(--shadow-md);
+    transition: box-shadow var(--transition-md);
 
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform var(--transition-md);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.4) 100%);
+      opacity: 0;
+      transition: opacity var(--transition-md);
+      pointer-events: none;
     }
 
     .badge {
@@ -101,7 +149,7 @@
       top: 8px;
       left: 8px;
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-xs);
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
@@ -127,36 +175,43 @@
       position: absolute;
       bottom: 8px;
       right: 8px;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       background-color: var(--spotify-green);
-      border-radius: var(--radius-full);
+      border-radius: 50%;
       @include flex-center;
       opacity: 0;
-      transform: translateY(8px);
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      transform: translateY(8px) scale(0.88);
+      transition: opacity var(--transition-md), transform var(--transition-bounce), background-color var(--transition-sm), box-shadow var(--transition-md);
+      box-shadow: var(--shadow-green);
+      z-index: 3;
+      color: #000;
 
       &:hover {
-        transform: scale(1.05) !important;
+        background-color: var(--spotify-green-hover);
+        transform: translateY(0) scale(1.07) !important;
+        box-shadow: var(--shadow-green-lg);
       }
     }
   }
 
+  &:hover .image-container::after { opacity: 1; }
+
   .card-info {
     .item-name {
       display: block;
-      font-size: 15px; // Specified 13-15px
+      font-size: 14px;
       font-weight: 700;
       margin-bottom: 4px;
       @include text-truncate;
+      letter-spacing: -0.1px;
     }
 
     .item-desc {
       display: block;
-      font-size: 13px;
-      color: var(--text-secondary); // #b3b3b3
-      @include line-clamp(2); // Specified 2 lines
+      font-size: 12px;
+      color: var(--text-secondary);
+      @include line-clamp(2);
     }
 
     .find-full-cta {
@@ -165,11 +220,11 @@
       color: var(--spotify-green);
       font-size: 11px;
       font-weight: 700;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: var(--radius-full);
-      margin-top: 8px;
+      margin-top: var(--spacing-sm);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background-color var(--transition-sm), color var(--transition-sm);
 
       &:hover {
         background-color: var(--spotify-green);
@@ -179,16 +234,10 @@
   }
 
   @include mobile {
-    width: 150px; // Specified 140-160px
+    width: 150px;
     background-color: transparent;
-    padding: 0;
 
-    .item-name {
-      font-size: 13px;
-    }
-
-    .item-desc {
-      font-size: 12px;
-    }
+    .item-name { font-size: 13px; }
+    .item-desc { font-size: 12px; }
   }
 }

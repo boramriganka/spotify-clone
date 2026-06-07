@@ -5,7 +5,7 @@
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  background-color: var(--black);
+  background-color: var(--dark-grey);
   overflow: hidden;
 
   .app-layout {
@@ -17,19 +17,32 @@
   .main-content {
     flex: 1;
     position: relative;
-    background: linear-gradient(to bottom, #1e1e1e 0%, var(--black) 300px);
+    background: var(--dark-grey);
+
+    // Gorgeous top-fade gradient for every page
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 340px;
+      background: linear-gradient(180deg, rgba(40, 40, 40, 0.8) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
     .content-wrapper {
+      position: relative;
+      z-index: 1;
       padding: var(--spacing-md);
       @include desktop {
-        padding: var(--spacing-xl);
+        padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-md);
       }
     }
 
     .content-bottom-spacing {
-      height: calc(var(--bottom-nav-height) + var(--mini-player-height) + 20px);
+      height: calc(var(--bottom-nav-height) + var(--mini-player-height) + 24px);
       @include desktop {
-        height: var(--bottom-player-height);
+        height: calc(var(--bottom-player-height) + 16px);
       }
     }
   }
@@ -50,13 +63,15 @@
   .mobile-header {
     position: sticky;
     top: 0;
-    padding: var(--spacing-md);
-    background: rgba(18, 18, 18, 0.8);
-    backdrop-filter: blur(20px);
+    padding: 12px var(--spacing-md);
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     z-index: var(--z-sticky);
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-subtle);
 
     @include desktop {
       display: none;
@@ -66,28 +81,38 @@
       .avatar {
         width: 32px;
         height: 32px;
-        background-color: #f57c00;
+        background: linear-gradient(135deg, #f57c00, #ff9800);
         border-radius: var(--radius-full);
         @include flex-center;
         font-weight: 700;
-        font-size: 14px;
+        font-size: 13px;
+        box-shadow: var(--shadow-sm);
+        letter-spacing: 0;
       }
     }
 
     .header-chips {
       display: flex;
       gap: var(--spacing-sm);
+      flex: 1;
 
       .chip {
         padding: 6px 16px;
-        background-color: var(--surface-grey-hover);
+        background-color: var(--elevated-grey-2);
         border-radius: var(--radius-full);
         font-size: 12px;
-        font-weight: 500;
+        font-weight: 600;
         color: var(--text-primary);
+        border: 1px solid transparent;
+        transition: background-color var(--transition-sm), border-color var(--transition-sm);
+        letter-spacing: 0;
+
+        &:hover {
+          background-color: var(--surface-grey-hover);
+        }
 
         &.active {
-          background-color: var(--spotify-green);
+          background-color: var(--text-primary);
           color: var(--black);
         }
       }

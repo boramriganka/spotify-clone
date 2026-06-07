@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Play, Shuffle, Download, ArrowLeft, MoreVertical } from 'lucide-react';
+import { Play, Shuffle, Download, MoreVertical, Heart } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
 import TrackRow from '../components/TrackRow/TrackRow';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Track, Playlist as PlaylistType } from '../providers/types';
 import { getUserPlaylists } from '../providers/localProvider';
 import { useQueue } from '../core/queue/useQueue';
@@ -12,6 +12,7 @@ import './Playlist.scss';
 
 const Playlist: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [playlist, setPlaylist] = useState<PlaylistType | null>(null);
   const { startPlaybackFromContext, toggleShuffle, shuffleEnabled } = useQueue();
   const { currentTrack } = usePlaybackController();
@@ -30,7 +31,7 @@ const Playlist: React.FC = () => {
             name: 'Liked Songs',
             description: 'Your liked songs, always with you.',
             image: '',
-            owner: 'Mriganka',
+            owner: 'You',
             tracks: likedTracks,
             provider: 'local',
             type: 'playlist'
@@ -87,9 +88,17 @@ const Playlist: React.FC = () => {
         <div className="header-bg" />
         <div className="header-content">
           <div className="album-art">
-             <div className="liked-heart-bg">
+            {playlist?.image ? (
+              <img src={playlist.image} alt={playlist.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : playlist?.id === 'liked' ? (
+              <div className="liked-heart-bg">
+                <Heart fill="white" size={40} />
+              </div>
+            ) : (
+              <div className="liked-heart-bg" style={{ background: 'linear-gradient(135deg, #404040 0%, #282828 100%)' }}>
                 <Play fill="white" size={40} />
-             </div>
+              </div>
+            )}
           </div>
           <div className="playlist-info">
             <span className="type">Playlist</span>
@@ -104,7 +113,7 @@ const Playlist: React.FC = () => {
       {tracks.length === 0 && (
         <div className="empty-playlist">
           <p>Start adding songs to your playlist</p>
-          <button onClick={() => window.location.href='/search'}>Find songs</button>
+          <button onClick={() => navigate('/search')}>Find songs</button>
         </div>
       )}
 

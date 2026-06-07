@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search as SearchIcon, X } from 'lucide-react';
 import { useDispatch } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { musicService } from '../providers';
 import { MediaItem, Track } from '../providers/types';
 import { setTracks } from '../store/slices/playerSlice';
@@ -8,8 +9,20 @@ import { useQueue } from '../core/queue/useQueue';
 import MediaCard from '../components/MediaCard/MediaCard';
 import './Search.scss';
 
+const CATEGORIES = [
+  { name: 'Podcasts', color: '#8D67AB' },
+  { name: 'Live Events', color: '#148A08' },
+  { name: 'Made For You', color: '#1DB954' },
+  { name: 'New Releases', color: '#E8115B' },
+  { name: 'Pop', color: '#DC148C' },
+  { name: 'Hip-Hop', color: '#477D95' },
+  { name: 'Rock', color: '#A22C46' },
+  { name: 'Latin', color: '#0D73EC' },
+];
+
 const Search: React.FC = () => {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
   const { startPlaybackFromContext } = useQueue();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaItem[]>([]);
@@ -17,9 +30,8 @@ const Search: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'full' | 'preview' | 'artist' | 'playlist' | 'album'>('all');
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get('q');
-    const full = params.get('full');
+    const q = searchParams.get('q');
+    const full = searchParams.get('full');
     if (q) {
       setQuery(q);
       if (full === 'true') setFilter('full');
@@ -131,10 +143,14 @@ const Search: React.FC = () => {
           <div className="browse-all">
             <h2>Browse all</h2>
             <div className="category-grid">
-              {['Podcasts', 'Live Events', 'Made For You', 'New Releases', 'Pop', 'Hip-Hop', 'Rock', 'Latin'].map((cat, i) => (
-                <div key={cat} className={`category-card color-${i % 8}`}>
-                  <span>{cat}</span>
-                  <img src={`https://picsum.photos/seed/${cat}/100/100`} alt="" />
+              {CATEGORIES.map((cat) => (
+                <div
+                  key={cat.name}
+                  className="category-card"
+                  style={{ backgroundColor: cat.color }}
+                  onClick={() => { setQuery(cat.name); performSearch(cat.name, 'all'); }}
+                >
+                  <span>{cat.name}</span>
                 </div>
               ))}
             </div>

@@ -1,5 +1,12 @@
 @import '../../styles/mixins.scss';
 
+@keyframes equalizer {
+  0%, 100% { height: 3px; }
+  25% { height: 12px; }
+  50% { height: 8px; }
+  75% { height: 14px; }
+}
+
 .track-row {
   display: flex;
   align-items: center;
@@ -8,22 +15,17 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   gap: var(--spacing-md);
+  transition: background-color var(--transition-sm);
 
   &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.08);
 
-    .track-index {
-      display: none;
-    }
-    .track-more {
-      opacity: 1;
-    }
+    .track-more { opacity: 1; }
+    .track-index { color: var(--text-primary); }
   }
 
   &.active {
-    .track-name {
-      color: var(--spotify-green);
-    }
+    .track-name { color: var(--spotify-green); }
   }
 
   .track-start {
@@ -35,16 +37,40 @@
 
     .track-index {
       width: 16px;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-secondary);
-      text-align: right;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: color var(--transition-sm);
+
+      .equalizer-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 14px;
+
+        span {
+          width: 3px;
+          background-color: var(--spotify-green);
+          border-radius: 1px;
+          animation: equalizer 1s ease-in-out infinite;
+
+          &:nth-child(2) { animation-delay: 0.25s; }
+          &:nth-child(3) { animation-delay: 0.5s; }
+        }
+      }
     }
 
     .track-img {
       width: 40px;
       height: 40px;
-      border-radius: 2px;
+      border-radius: var(--radius-xs);
       object-fit: cover;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-xs);
     }
 
     .track-info {
@@ -56,30 +82,37 @@
         font-size: 14px;
         font-weight: 500;
         @include text-truncate;
+        transition: color var(--transition-sm);
       }
 
       .track-meta {
         display: flex;
         align-items: center;
         gap: 6px;
+        margin-top: 2px;
 
         .preview-label {
-          font-size: 10px;
-          background: #444;
-          padding: 1px 4px;
-          border-radius: 2px;
-          color: #fff;
+          font-size: 9px;
+          font-weight: 700;
+          background: rgba(255,255,255,0.12);
+          padding: 1px 5px;
+          border-radius: var(--radius-xs);
+          color: var(--text-secondary);
           text-transform: uppercase;
+          letter-spacing: 0.3px;
         }
 
         .track-artist {
           font-size: 12px;
           color: var(--text-secondary);
           @include text-truncate;
+          transition: color var(--transition-sm);
         }
       }
     }
   }
+
+  &:hover .track-artist { color: var(--text-primary); }
 
   .track-album {
     flex: 1;
@@ -102,12 +135,20 @@
       color: var(--text-secondary);
       width: 40px;
       text-align: right;
+      font-variant-numeric: tabular-nums;
     }
 
     .track-more {
       color: var(--text-secondary);
       opacity: 0;
       padding: 4px;
+      border-radius: var(--radius-xs);
+      transition: opacity var(--transition-sm), color var(--transition-sm), background-color var(--transition-sm);
+
+      &:hover {
+        color: var(--text-primary);
+        background-color: rgba(255,255,255,0.1);
+      }
     }
   }
 }
