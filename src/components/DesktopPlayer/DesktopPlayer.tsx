@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Heart, Volume2, Shuffle, Repeat, ListMusic, Maximize2 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
+import { FastAverageColor } from 'fast-average-color';
 import { RootState } from '../../store';
 import { toggleLike } from '../../store/slices/playerSlice';
 import { setPosition } from '../../core/player/playbackSlice';
@@ -19,6 +20,18 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
   const { next, previous, shuffleEnabled, toggleShuffle, repeatMode, setRepeatMode } = useQueue();
   const { likedTrackIds } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
+  const [accentColor, setAccentColor] = useState<string>('transparent');
+
+  useEffect(() => {
+    if (currentTrack?.image) {
+      const fac = new FastAverageColor();
+      fac.getColorAsync(currentTrack.image, { algorithm: 'dominant' })
+        .then(color => {
+          setAccentColor(color.hex);
+        })
+        .catch(() => setAccentColor('transparent'));
+    }
+  }, [currentTrack?.image]);
 
   if (!currentTrack) return null;
 
@@ -32,18 +45,22 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const dynamicStyle = accentColor !== 'transparent'
+    ? { background: `linear-gradient(to right, ${accentColor}22 0%, transparent 30%), rgba(18, 18, 18, 0.95)` }
+    : {};
+
   return (
-    <footer className="desktop-player">
+    <footer className="desktop-player" style={dynamicStyle}>
       <div className="track-section" onClick={onTogglePanel}>
         <img src={currentTrack.image || ''} alt={currentTrack.name} />
         <div className="text">
           <span className="name">{currentTrack.name}</span>
           <div className="meta">
-              {currentTrack.source === 'itunes' && <span className="preview-tag">Preview only</span>}
-              <span className="artist">{currentTrack.artist}</span>
+            {currentTrack.source === 'itunes' && <span className="preview-tag">Preview only</span>}
+            <span className="artist">{currentTrack.artist}</span>
           </div>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack as any)); }}>
+        <button className="like-btn" onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack as any)); }}>
           <Heart size={16} className={isLiked ? 'liked' : ''} fill={isLiked ? '#1DB954' : 'none'} />
         </button>
       </div>
@@ -59,14 +76,14 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
           </button>
           <button onClick={() => next()}><SkipForward size={20} fill="white" /></button>
           <button className={`repeat ${repeatMode !== 'off' ? 'active' : ''}`} onClick={() => {
-              const modes: ('off' | 'all' | 'one')[] = ['off', 'all', 'one'];
-              const nextIdx = (modes.indexOf(repeatMode) + 1) % modes.length;
-              setRepeatMode(modes[nextIdx]);
+            const modes: ('off' | 'all' | 'one')[] = ['off', 'all', 'one'];
+            const nextIdx = (modes.indexOf(repeatMode) + 1) % modes.length;
+            setRepeatMode(modes[nextIdx]);
           }}>
             <Repeat size={16} />
           </button>
         </div>
-        <div className="progress-area">
+        <div className="progress-area player-controls-group">
           <span>{formatTime(positionMs)}</span>
           <ProgressBar
             progress={positionMs / 1000}
@@ -80,7 +97,7 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
       <div className="extra-section">
         <button onClick={onTogglePanel} className={isPanelOpen ? 'active' : ''}><Maximize2 size={16} /></button>
         <button onClick={onTogglePanel}><ListMusic size={16} /></button>
-        <div className="volume-control">
+        <div className="volume-control player-controls-group">
           <Volume2 size={16} />
           <input
             type="range"

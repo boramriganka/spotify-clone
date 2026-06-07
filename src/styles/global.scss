@@ -30,14 +30,15 @@
 }
 
 body {
-  background-color: var(--black);
+  background-color: var(--dark-grey);
   color: var(--text-primary);
-  font-family: 'Circular Std', 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Montserrat', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
+  letter-spacing: -0.1px;
 }
 
 button {
@@ -49,27 +50,82 @@ button {
   outline: none;
   display: flex;
   align-items: center;
-  transition: transform 0.1s ease;
+  transition: color var(--transition-sm), transform var(--transition-xs), opacity var(--transition-sm);
 
-  &:active {
-    transform: scale(0.95);
+  &:hover { opacity: 0.9; }
+  &:active { transform: scale(0.94); opacity: 0.8; }
+  &:focus-visible {
+    outline: 2px solid var(--spotify-green);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
   }
 }
 
 a {
   color: inherit;
   text-decoration: none;
+  transition: color var(--transition-sm);
 }
 
-ul {
-  list-style: none;
+ul { list-style: none; }
+
+img {
+  display: block;
+  max-width: 100%;
+  color: transparent;
 }
 
+// Utility classes
 .spotify-green { color: var(--spotify-green) !important; }
 .text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
 
+// Scrollable container
 .scroll-container {
   overflow-y: auto;
   overflow-x: hidden;
   @include scrollbar;
+}
+
+// Premium card hover base
+.card-hover {
+  transition: transform var(--transition-md), box-shadow var(--transition-md), background-color var(--transition-md);
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+// Skeleton loading animation
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-grey) 25%, var(--elevated-grey) 50%, var(--surface-grey) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+// Fade in animation for loaded content
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.4s var(--ease-out) both;
+}
+
+// Green pulse for active elements
+@keyframes green-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--spotify-green-glow); }
+  50% { box-shadow: 0 0 0 8px transparent; }
+}
+
+// Stagger helper for lists
+@for $i from 1 through 20 {
+  .stagger-#{$i} { animation-delay: #{$i * 0.05}s; }
 }

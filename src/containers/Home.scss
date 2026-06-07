@@ -4,10 +4,11 @@
   padding: var(--spacing-md);
 
   .home-greeting {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 800;
     margin-bottom: var(--spacing-md);
     color: var(--text-primary);
+    letter-spacing: -0.5px;
 
     @include desktop {
       font-size: 28px;
@@ -18,7 +19,7 @@
   .recent-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: var(--spacing-sm);
     margin-bottom: var(--spacing-xl);
 
     @include desktop {

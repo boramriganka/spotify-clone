@@ -29,10 +29,13 @@
     justify-content: flex-end;
     padding: var(--spacing-lg);
     cursor: pointer;
-    transition: filter 0.2s ease;
+    transition: transform var(--transition-md), box-shadow var(--transition-md), filter var(--transition-sm);
+    box-shadow: var(--shadow-md);
 
     &:hover {
       filter: brightness(1.08);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
     }
 
     .liked-icon {
