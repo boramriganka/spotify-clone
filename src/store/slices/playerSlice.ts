@@ -74,7 +74,7 @@ const initialState: PlayerState = {
   likedTrackIds: persistenceService.getLikedTracks().map(t => t.id),
   recentlyPlayedIds: persistenceService.getRecentlyPlayed().map(t => t.id),
   createdPlaylistIds: persistenceService.getCreatedPlaylists().map(p => p.id),
-  currentDevice: "Mriganka’s OnePlus Buds 4",
+  currentDevice: 'This device',
 
   searchResults: [],
   searchLoading: false,
@@ -249,7 +249,10 @@ const playerSlice = createSlice({
       if (state.playlistsById[action.payload.id]) {
         state.playlistsById[action.payload.id].tracks = action.payload.tracks;
       }
-    }
+    },
+    setCurrentDevice: (state, action: PayloadAction<string>) => {
+      state.currentDevice = action.payload;
+    },
   },
 });
 
@@ -276,6 +279,7 @@ export const {
   removePlaylist,
   updatePlaylist,
   seekTo,
+  setCurrentDevice,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;

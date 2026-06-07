@@ -43,15 +43,12 @@ const Sidebar: React.FC = () => {
       <div className="sidebar-divider" />
 
       <div className="sidebar-playlists scroll-container">
+        {localPlaylists.length === 0 && (
+          <p className="sidebar-empty-hint">Create your first playlist</p>
+        )}
         {localPlaylists.map((p) => (
           <NavLink key={p.id} to={`/playlist/${p.id}`} className="playlist-item">
             {p.name}
-          </NavLink>
-        ))}
-        <div className="sidebar-divider" style={{ margin: '8px 0' }} />
-        {['Chill Vibes', 'Driving Mix', 'Morning Coffee', 'Focus', 'Top Hits 2023', 'Oldies but Goldies'].map((name) => (
-          <NavLink key={name} to={`/search?q=${encodeURIComponent(name)}`} className="playlist-item">
-            {name}
           </NavLink>
         ))}
       </div>

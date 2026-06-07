@@ -1,8 +1,9 @@
 import React from 'react';
-import { Play, Pause, Heart, Speaker } from 'lucide-react';
+import { Play, Pause, Heart, Volume2 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { toggleLike } from '../../store/slices/playerSlice';
+import { setPosition } from '../../core/player/playbackSlice';
 import { usePlaybackController } from '../../core/player/usePlaybackController';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import './MiniPlayer.scss';
@@ -40,7 +41,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
           </div>
         </div>
         <div className="controls">
-          <Speaker size={20} className="device-icon spotify-green" />
+          <Volume2 size={20} className="device-icon spotify-green" />
           <button onClick={(e) => { e.stopPropagation(); dispatch(toggleLike(currentTrack as any)); }}>
             <Heart size={20} className={isLiked ? 'liked' : ''} fill={isLiked ? 'var(--spotify-green)' : 'none'} />
           </button>
@@ -52,7 +53,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onExpand }) => {
           <ProgressBar
             progress={positionMs / 1000}
             duration={durationMs / 1000}
-            onSeek={(t) => dispatch({ type: 'playback/setPosition', payload: t * 1000 })}
+            onSeek={(t) => dispatch(setPosition(t * 1000))}
             showKnob={false}
           />
         </div>

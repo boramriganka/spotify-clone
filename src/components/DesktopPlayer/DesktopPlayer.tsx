@@ -1,8 +1,9 @@
 import React from 'react';
-import { Play, Pause, SkipBack, SkipForward, Heart, Speaker, Shuffle, Repeat, ListMusic, Maximize2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Heart, Volume2, Shuffle, Repeat, ListMusic, Maximize2 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
 import { toggleLike } from '../../store/slices/playerSlice';
+import { setPosition } from '../../core/player/playbackSlice';
 import { usePlaybackController } from '../../core/player/usePlaybackController';
 import { useQueue } from '../../core/queue/useQueue';
 import ProgressBar from '../ProgressBar/ProgressBar';
@@ -70,7 +71,7 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
           <ProgressBar
             progress={positionMs / 1000}
             duration={durationMs / 1000}
-            onSeek={(t) => dispatch({ type: 'playback/setPosition', payload: t * 1000 })}
+            onSeek={(t) => dispatch(setPosition(t * 1000))}
           />
           <span>{formatTime(durationMs)}</span>
         </div>
@@ -78,9 +79,9 @@ const DesktopPlayer: React.FC<DesktopPlayerProps> = ({ onTogglePanel, isPanelOpe
 
       <div className="extra-section">
         <button onClick={onTogglePanel} className={isPanelOpen ? 'active' : ''}><Maximize2 size={16} /></button>
-        <button><ListMusic size={16} /></button>
+        <button onClick={onTogglePanel}><ListMusic size={16} /></button>
         <div className="volume-control">
-          <Speaker size={16} />
+          <Volume2 size={16} />
           <input
             type="range"
             min="0"

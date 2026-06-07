@@ -52,7 +52,6 @@ const AppShell: React.FC = () => {
               <div className="header-chips">
                 <button className="chip active">All</button>
                 <button className="chip">Music</button>
-                <button className="chip">Podcasts</button>
               </div>
             </header>
           )}

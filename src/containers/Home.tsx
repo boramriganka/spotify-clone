@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import MediaCard from '../components/MediaCard/MediaCard';
 import HorizontalShelf from '../components/HorizontalShelf/HorizontalShelf';
 import { musicService } from '../providers';
@@ -8,6 +9,13 @@ import { setTracks } from '../store/slices/playerSlice';
 import { useQueue } from '../core/queue/useQueue';
 import './Home.scss';
 
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 18) return 'Good afternoon';
+  return 'Good evening';
+};
+
 const Home: React.FC = () => {
   const [recentItems, setRecentItems] = useState<MediaItem[]>([]);
   const [newReleases, setNewReleases] = useState<MediaItem[]>([]);
@@ -15,6 +23,7 @@ const Home: React.FC = () => {
   const [recentlyPlayed, setRecentlyPlayed] = useState<MediaItem[]>([]);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { startPlaybackFromContext } = useQueue();
 
   useEffect(() => {
@@ -61,12 +70,13 @@ const Home: React.FC = () => {
         startTrackId: item.id
       });
     } else if (item.type === 'artist') {
-      window.location.href = `/search?q=${encodeURIComponent(item.name)}`;
+      navigate(`/search?q=${encodeURIComponent(item.name)}`);
     }
   };
 
   return (
     <div className="home-screen">
+      <h2 className="home-greeting">{getGreeting()}</h2>
       <section className="recent-grid">
         {recentItems.slice(0, 6).map((item) => (
           <MediaCard key={item.id} item={item} variant="tile" onClick={() => handlePlay(item, recentItems, 'discovery')} />
@@ -87,7 +97,7 @@ const Home: React.FC = () => {
         ))}
       </HorizontalShelf>
 
-      <HorizontalShelf title="Full songs discovery" onSeeAll={() => { window.location.href='/search?q=full%20songs'; }}>
+      <HorizontalShelf title="Full songs discovery" onSeeAll={() => navigate('/search?q=full%20songs')}>
         {recentItems.map((item) => (
           <MediaCard key={item.id} item={item} onClick={() => handlePlay(item, recentItems, 'full-songs')} />
         ))}

@@ -3,17 +3,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown, MoreHorizontal, Heart, Shuffle,
   SkipBack, SkipForward, Play, Pause, Repeat,
-  Share2, ListMusic, Speaker
+  Share2, ListMusic, Volume2, Tv
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store';
-import { toggleLike } from '../../store/slices/playerSlice';
+import { toggleLike, setCurrentDevice } from '../../store/slices/playerSlice';
+import { setNowPlayingOpen } from '../../store/slices/uiSlice';
 import { usePlaybackController } from '../../core/player/usePlaybackController';
 import { useQueue } from '../../core/queue/useQueue';
 import { FastAverageColor } from 'fast-average-color';
 import BottomSheet from '../BottomSheet/BottomSheet';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import './FullPlayer.scss';
+
+const GENERIC_DEVICES = ['This device', 'Web Player', 'TV / Chromecast'];
 
 interface FullPlayerProps {
   isOpen: boolean;
@@ -24,10 +27,13 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
   const { currentTrack, status, positionMs, durationMs, togglePlay, seek } = usePlaybackController();
   const { next, previous, shuffleEnabled, toggleShuffle, repeatMode, setRepeatMode } = useQueue();
   const { likedTrackIds, currentDevice } = useSelector((state: RootState) => state.player);
+  const queueSnapshot = useSelector((state: RootState) => state.queue.snapshot);
   const dispatch = useDispatch();
   const [bgColor, setBgColor] = useState('#121212');
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
   const [isDevicePickerOpen, setIsDevicePickerOpen] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [shareToast, setShareToast] = useState(false);
 
   useEffect(() => {
     if (currentTrack?.image) {
@@ -44,6 +50,26 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
 
   const isLiked = currentTrack ? likedTrackIds.includes(currentTrack.id) : false;
   const isPlaying = status === 'playing';
+
+  const playingFromLabel = queueSnapshot
+    ? queueSnapshot.sourceType.replace(/-/g, ' ').toUpperCase()
+    : 'NOW PLAYING';
+
+  const playingFromName = queueSnapshot?.sourceId === 'liked'
+    ? 'Liked Songs'
+    : queueSnapshot?.sourceId || currentTrack?.artist || '';
+
+  const handleShare = () => {
+    const text = `${currentTrack!.name} by ${currentTrack!.artist}`;
+    if (navigator.share) {
+      navigator.share({ title: currentTrack!.name, text });
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        setShareToast(true);
+        setTimeout(() => setShareToast(false), 2000);
+      });
+    }
+  };
 
   const formatTime = (timeMs: number) => {
     const timeSec = timeMs / 1000;
@@ -67,10 +93,10 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
             <div className="player-header">
               <button onClick={onClose}><ChevronDown size={32} /></button>
               <div className="playing-from">
-                <span className="label">PLAYING FROM PLAYLIST</span>
-                <span className="playlist-name">Liked Songs</span>
+                <span className="label">{playingFromLabel}</span>
+                <span className="playlist-name">{playingFromName}</span>
               </div>
-              <button><MoreHorizontal size={24} /></button>
+              <button onClick={() => setIsCreditsOpen(true)}><MoreHorizontal size={24} /></button>
             </div>
 
             <div className="player-content scroll-container">
@@ -138,8 +164,12 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                   <span className="spotify-green">{currentDevice}</span>
                 </button>
                 <div className="extra-actions">
-                  <Share2 size={20} />
-                  <ListMusic size={20} />
+                  <button onClick={handleShare} className="icon-btn" title={shareToast ? 'Copied!' : 'Share'}>
+                    <Share2 size={20} className={shareToast ? 'spotify-green' : ''} />
+                  </button>
+                  <button onClick={() => { dispatch(setNowPlayingOpen(true)); onClose(); }} className="icon-btn">
+                    <ListMusic size={20} />
+                  </button>
                 </div>
               </div>
 
@@ -150,22 +180,14 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                     </div>
                     <div className="artist-card-content">
                       <h3>{currentTrack.artist}</h3>
-                      <p>3,456,789 monthly listeners</p>
-                      <p className="bio">Known for their unique sound and captivating performances...</p>
-                      <button className="follow-btn">Follow</button>
+                      <p className="bio">Explore more from this artist and discover their music.</p>
+                      <button
+                        className={`follow-btn ${isFollowing ? 'following' : ''}`}
+                        onClick={() => setIsFollowing(f => !f)}
+                      >
+                        {isFollowing ? 'Following' : 'Follow'}
+                      </button>
                     </div>
-                 </div>
-              </div>
-
-              <div className="explore-section">
-                 <h3>Explore {currentTrack.artist}</h3>
-                 <div className="explore-grid">
-                    {[1,2,3].map(i => (
-                      <div key={i} className="explore-tile">
-                        <img src={`https://picsum.photos/seed/${currentTrack.artist}-${i}/150/150`} alt="" />
-                        <span>Fan Favorites {i}</span>
-                      </div>
-                    ))}
                  </div>
               </div>
 
@@ -178,10 +200,6 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
                    <div className="credit-item">
                       <span className="name">{currentTrack.artist}</span>
                       <span className="role">Main Artist</span>
-                   </div>
-                   <div className="credit-item">
-                      <span className="name">{currentTrack.artist}</span>
-                      <span className="role">Producer</span>
                    </div>
                  </div>
               </div>
@@ -229,7 +247,7 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
             <h4>Source</h4>
             <p className="source-text">{(currentTrack.source || 'unknown').toUpperCase()}</p>
           </div>
-          <button className="report-btn">Report an error</button>
+          <button className="report-btn" onClick={() => { alert('Thank you — error reported!'); setIsCreditsOpen(false); }}>Report an error</button>
         </div>
       </BottomSheet>
 
@@ -239,9 +257,13 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
         title="Connect to a device"
       >
         <div className="device-picker-content">
-          {['This phone', 'Mriganka’s OnePlus Buds 4', 'Web Player'].map(device => (
-             <div key={device} className={`device-item ${device === currentDevice ? 'active' : ''}`}>
-               <Speaker size={20} />
+          {GENERIC_DEVICES.map(device => (
+             <div
+               key={device}
+               className={`device-item ${device === currentDevice ? 'active' : ''}`}
+               onClick={() => { dispatch(setCurrentDevice(device)); setIsDevicePickerOpen(false); }}
+             >
+               <Volume2 size={20} />
                <span>{device}</span>
              </div>
           ))}

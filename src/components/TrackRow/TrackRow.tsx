@@ -1,5 +1,5 @@
-import React from 'react';
-import { MoreHorizontal, Heart } from 'lucide-react';
+import React, { useState } from 'react';
+import { MoreHorizontal, Heart, Play } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NeoTrack } from '../../utils/trackNormalizer';
 import { toggleLike } from '../../store/slices/playerSlice';
@@ -16,6 +16,7 @@ interface TrackRowProps {
 
 const TrackRow: React.FC<TrackRowProps> = ({ track, index, isActive, onPlay, showAlbum = true }) => {
   const dispatch = useDispatch();
+  const [isHovered, setIsHovered] = useState(false);
   const likedTrackIds = useSelector((state: RootState) => state.player.likedTrackIds);
   const isLiked = likedTrackIds.includes(track.id);
 
@@ -28,9 +29,26 @@ const TrackRow: React.FC<TrackRowProps> = ({ track, index, isActive, onPlay, sho
   const durationSec = track.duration || 0;
 
   return (
-    <div className={`track-row ${isActive ? 'active' : ''}`} onClick={onPlay}>
+    <div
+      className={`track-row ${isActive ? 'active' : ''}`}
+      onClick={onPlay}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="track-start">
-        {index !== undefined && <span className="track-index">{index + 1}</span>}
+        {index !== undefined && (
+          <span className="track-index">
+            {isActive ? (
+              <span className="equalizer-bars">
+                <span /><span /><span />
+              </span>
+            ) : isHovered ? (
+              <Play size={14} fill="white" />
+            ) : (
+              index + 1
+            )}
+          </span>
+        )}
         <img src={track.image || track.artwork || ''} alt={track.name} className="track-img" />
         <div className="track-info">
           <span className="track-name">{track.name}</span>
@@ -54,7 +72,11 @@ const TrackRow: React.FC<TrackRowProps> = ({ track, index, isActive, onPlay, sho
         <span className="track-duration">
           {Math.floor(durationSec / 60)}:{String(Math.floor(durationSec % 60)).padStart(2, '0')}
         </span>
-        <button className="track-more" aria-label="More options">
+        <button
+          className="track-more"
+          aria-label="More options"
+          onClick={(e) => { e.stopPropagation(); }}
+        >
           <MoreHorizontal size={20} />
         </button>
       </div>
