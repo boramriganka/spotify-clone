@@ -1,4 +1,4 @@
-// Mock data API for Spotify clone
+// Mock data API for Spotify Neo
 import axios from 'axios';
 
 const ITUNES_URL = 'https://itunes.apple.com/search';

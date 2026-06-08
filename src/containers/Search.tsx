@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Search as SearchIcon, X } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -102,6 +103,9 @@ const Search: React.FC = () => {
 
   return (
     <div className="search-screen">
+      <Helmet>
+        <title>{query ? `Search: "${query}" — Spotify Neo` : 'Search — Spotify Neo'}</title>
+      </Helmet>
       <div className="search-header">
         <form className="search-input-wrapper" onSubmit={handleSearch}>
           <SearchIcon className="search-icon" size={20} />

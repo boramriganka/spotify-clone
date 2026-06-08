@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Play, Shuffle, ArrowLeft, MoreVertical } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store';
@@ -53,6 +54,9 @@ const ArtistPage: React.FC = () => {
 
   return (
     <div className="artist-screen">
+      <Helmet>
+        <title>{artist.name} — Spotify Neo</title>
+      </Helmet>
       <header className="artist-header" style={{ backgroundImage: `url(${artist.image})` }}>
         <div className="overlay" />
         <div className="header-content">

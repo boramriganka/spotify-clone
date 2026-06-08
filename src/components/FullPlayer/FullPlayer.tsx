@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronDown, MoreHorizontal, Heart, Shuffle,
@@ -80,6 +81,11 @@ const FullPlayer: React.FC<FullPlayerProps> = ({ isOpen, onClose }) => {
 
   return (
     <>
+      {isOpen && currentTrack && (
+        <Helmet>
+          <title>{currentTrack.name} · {currentTrack.artist} — Spotify Neo</title>
+        </Helmet>
+      )}
       <AnimatePresence>
         {isOpen && (
           <motion.div
