@@ -20,8 +20,43 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, duration, onSeek, s
     onSeek(clickedPercent * duration);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    let newTime = progress;
+    const step = 5; // 5 seconds jump
+
+    switch (e.key) {
+      case 'ArrowRight':
+        newTime = Math.min(duration, progress + step);
+        break;
+      case 'ArrowLeft':
+        newTime = Math.max(0, progress - step);
+        break;
+      case 'Home':
+        newTime = 0;
+        break;
+      case 'End':
+        newTime = duration;
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
+    onSeek(newTime);
+  };
+
   return (
-    <div className="progress-bar-container" ref={barRef} onClick={handleClick}>
+    <div
+      className="progress-bar-container"
+      ref={barRef}
+      onClick={handleClick}
+      role="slider"
+      tabIndex={0}
+      aria-valuemin={0}
+      aria-valuemax={duration}
+      aria-valuenow={Math.round(progress)}
+      aria-label="Progress bar"
+      onKeyDown={handleKeyDown}
+    >
       <div className="progress-bar-bg">
         <div className="progress-bar-fill" style={{ width: `${percent}%` }}>
           {showKnob && <div className="progress-bar-knob" />}
